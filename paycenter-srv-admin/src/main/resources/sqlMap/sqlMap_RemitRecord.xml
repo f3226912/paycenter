@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="RemitRecord">
+	<sql id="insertAudit">
+ 	<![CDATA[ 
+      INSERT INTO remit_record (
+       	orderNo,
+       	payCenterNumber,
+		auditUserId,
+		auditStatus,
+		createUserId,
+		updateTime
+	  )
+	  VALUES
+	  (
+  		:orderNo,
+  		:payCenterNumber,
+  	 	:auditUserId,
+  	 	'1',
+  	 	:auditUserId,
+  	 	null
+	  )
+  	]]>
+	</sql>
+	<sql id="updateAudit">
+ 	<![CDATA[ 
+      update remit_record set auditUserId = :auditUserId, auditStatus = '1' where id = :id
+  	]]>
+	</sql>
+	<sql id="updateTransfer">
+ 	<![CDATA[ 
+      update remit_record set payerBankName = :payerBankName, bankTradeNo = :bankTradeNo, payAmt = :payAmt,  
+      		feeAmt = :feeAmt, payTime = :payTime, payerName = :payerName, updateUserId = :operaUserId, updateTime = SYSDATE() 
+			<#if updateUserId==null || updateUserId=="">
+      		,bankRealName = :bankRealName, bankCardNo = :bankCardNo, depositBankName = :depositBankName, provinceName = :provinceName, 
+      		cityName = :cityName, areaName = :areaName, subBankName = :subBankName, bankMobile =:bankMobile 
+			</#if>
+      where id = :id
+  	]]>
+	</sql>
+	<sql id="insertTransfer">
+ 	<![CDATA[ 
+      INSERT INTO remit_record (
+       	orderNo,
+		payerBankName,
+		bankTradeNo,
+		payAmt,
+		feeAmt,
+		payTime,
+		payerName,
+		createUserId,
+		updateUserId,
+		auditStatus,
+		bankRealName,
+		bankCardNo,
+		depositBankName,
+		provinceName,
+		cityName,
+		areaName,
+		subBankName,
+		bankMobile,
+		payCenterNumber
+	  )
+	  VALUES
+	  (
+  		:orderNo,
+  	 	:payerBankName,
+  	 	:bankTradeNo,
+  	 	:payAmt,
+  	 	:feeAmt,
+  	 	:payTime,
+  	 	:payerName,
+  	 	:operaUserId,
+  	 	:operaUserId,
+  	 	'0',
+		:bankRealName,
+		:bankCardNo,
+		:depositBankName,
+		:provinceName,
+		:cityName,
+		:areaName,
+		:subBankName,
+		:bankMobile,
+		:payCenterNumber
+	  )
+  	]]>
+	</sql>
+
+
+
+	<!-- <sql id="queryPage">
+	<![CDATA[
+	select * from (
+		select 
+			 r.id
+			,mb.account
+			,mb.mobile 
+			,r.changeTime
+			,r.orderNum
+			,r.commissionNum
+			,r.refundNum
+			,r.penaltyNum
+			,r.dueAmt
+			,r.payTime
+			,r.bankTradeNo as thirdPayNumber
+			,r.payStatus
+	   		,mb.realName
+      		,r.payerBankName
+			,r.bankCardNo
+			,IF(r.orderNum>0,mbi.bankCardNo,mbci.bankCardNo) as userBankCardNo
+			,IF(r.orderNum>0,mbi.depositBankName,mbci.depositBankName) as depositBankName
+			,r.batNo
+			,r.memberId
+			,(SELECT COUNT(1) FROM remit_record_error where  remit_record_id=r.id) as exceptionMackCount
+		from remit_record r
+		LEFT JOIN member_baseinfo mb on mb.memberId=r.memberId
+		LEFT JOIN member_bankcard_info mbi on mbi.memberId=r.memberId
+		LEFT JOIN market_bank_acc_info mbci on mbci.memberId=r.memberId
+		WHERE 1=1
+		<#if payStatus?exists && payStatus!="">
+				AND r.payStatus = :payStatus
+		</#if>
+		<#if realName?exists && realName!="">
+				AND mb.realName like "%":realName"%"
+			</#if>
+		<#if mobile?exists && mobile!="">
+				AND mb.mobile like "%":mobile"%"
+		</#if>
+		<#if changeTimeBeginTime?exists && changeTimeBeginTime!="">
+				AND r.changeTime>=:changeTimeBeginTime
+		</#if>
+		<#if changeTimeEndTime?exists && changeTimeEndTime!="">
+				AND r.changeTime<=:changeTimeEndTime
+		</#if>
+		
+		<#if payTimeBeginTime?exists && payTimeBeginTime!="">
+				AND r.payTime>=:payTimeBeginTime
+		</#if>
+		<#if payTimeEndTime?exists && payTimeEndTime!="">
+				AND r.payTime<=:payTimeEndTime
+		</#if>
+		) t where 1=1 
+		 <#if exceptionMark?exists && exceptionMark!=""&& exceptionMark!='4'>
+				AND t.exceptionMackCount = :exceptionMark
+		</#if>
+		 <#if exceptionMark?exists && exceptionMark=='4'>
+				AND t.exceptionMackCount > :exceptionMark
+		</#if>
+		order by t.changeTime desc
+		limit :startRow,:endRow 
+	]]>
+	</sql> -->
+	
+	<sql id="queryPage">
+	<![CDATA[
+	SELECT
+	*
+     FROM
+	 (
+		SELECT
+			r.id,
+			mb.account,
+			mb.mobile,
+			r.changeTime,
+			r.orderNum,
+			r.commissionNum,
+			r.refundNum,
+			r.penaltyNum,
+			r.dueAmt,
+			r.payTime,
+			r.bankTradeNo AS thirdPayNumber,
+			r.payStatus,
+			mb.realName,
+			r.payerBankName,
+			r.bankCardNo,
+
+		IF (
+			r.commissionNum > 0,
+			mbci.bankCardNo,
+			mbi.bankCardNo
+			
+		) AS userBankCardNo,
+
+	   IF (
+		r.commissionNum > 0,
+		mbci.depositBankName,
+		mbi.depositBankName		
+	   ) AS depositBankName,
+	    r.batNo,
+	    r.memberId,
+	(
+		SELECT
+			COUNT(1)
+		FROM
+			remit_record_error
+		WHERE
+			remit_record_id = r.id
+	) AS exceptionMackCount
+    FROM
+	remit_record r
+        LEFT JOIN member_baseinfo mb ON mb.memberId = r.memberId
+        LEFT JOIN member_bankcard_info mbi ON mbi.memberId = r.memberId AND mbi.status = '1'
+        LEFT JOIN market_bank_acc_info mbci ON mbci.memberId = r.memberId AND mbci.isDeleted = 0
+		WHERE 1=1
+		<#if payStatus?exists && payStatus!="">
+				AND r.payStatus = :payStatus
+		</#if>
+		<#if realName?exists && realName!="">
+				AND mb.realName like "%":realName"%"
+			</#if>
+		<#if mobile?exists && mobile!="">
+				AND mb.mobile like "%":mobile"%"
+		</#if>
+		<#if changeTimeBeginTime?exists && changeTimeBeginTime!="">
+				AND r.changeTime>=:changeTimeBeginTime
+		</#if>
+		<#if changeTimeEndTime?exists && changeTimeEndTime!="">
+				AND r.changeTime<=:changeTimeEndTime
+		</#if>
+		
+		<#if payTimeBeginTime?exists && payTimeBeginTime!="">
+				AND r.payTime>=:payTimeBeginTime
+		</#if>
+		<#if payTimeEndTime?exists && payTimeEndTime!="">
+				AND r.payTime<=:payTimeEndTime
+		</#if>
+		) t where 1=1 
+		 <#if exceptionMark?exists && exceptionMark!=""&& exceptionMark!='4'>
+				AND t.exceptionMackCount = :exceptionMark
+		</#if>
+		 <#if exceptionMark?exists && exceptionMark=='4'>
+				AND t.exceptionMackCount > :exceptionMark
+		</#if>
+		order by t.changeTime desc
+		limit :startRow,:endRow 
+	]]>
+	</sql>
+	<!-- 记录总数 -->
+	<sql id="queryCount">
+		 <![CDATA[  
+			select count(1) from (
+			select 
+				(SELECT COUNT(1) FROM remit_record_error where  remit_record_id=r.id) as exceptionMackCount
+			from remit_record r
+			LEFT JOIN member_baseinfo mb on mb.memberId=r.memberId
+			LEFT JOIN member_bankcard_info mbi on r.memberId=mbi.memberId AND mbi.status = '1'
+			LEFT JOIN market_bank_acc_info mbci on mbci.memberId=r.memberId AND mbci.isDeleted = 0
+			WHERE 1=1
+			<#if payStatus?exists && payStatus!="">
+					AND r.payStatus = :payStatus
+			</#if>
+			
+			<#if realName?exists && realName!="">
+				AND mb.realName  like "%":realName"%"
+			</#if>
+			<#if mobile?exists && mobile!="">
+					AND mb.mobile like "%":mobile"%"
+			</#if>
+				
+			<#if changeTimeBeginTime?exists && changeTimeBeginTime!="">
+					AND r.changeTime>=:changeTimeBeginTime
+			</#if>
+			<#if changeTimeEndTime?exists && changeTimeEndTime!="">
+					AND r.changeTime<=:changeTimeEndTime
+			</#if>
+			
+			<#if payTimeBeginTime?exists && payTimeBeginTime!="">
+					AND r.payTime>=:payTimeBeginTime
+			</#if>
+			<#if payTimeEndTime?exists && payTimeEndTime!="">
+					AND r.payTime<=:payTimeEndTime
+			</#if>
+			) t where 1=1
+			 <#if exceptionMark?exists && exceptionMark!=""&& exceptionMark!='4'>
+				AND t.exceptionMackCount = :exceptionMark
+			</#if>
+			 <#if exceptionMark?exists && exceptionMark=='4'>
+				AND t.exceptionMackCount > :exceptionMark
+			</#if>
+		  limit 1
+		 ]]>
+	</sql>
+	<!-- 查询结算详情 -->
+	<sql id="queryDetail">
+		 <![CDATA[  
+			SELECT 
+				r.id
+				,mb.account
+				,mb.mobile 
+				,mb.realName
+				,IF(r.commissionNum<1,mbi.realName,mbai.realName) AS bankCardRealName
+				,IF(r.commissionNum<1,mbi.bankCardNo,mbai.bankCardNo) AS bankCardNo
+				,IF(r.commissionNum<1,mbi.depositBankName,mbai.depositBankName) AS depositBankName
+				,IF(r.commissionNum<1,CONCAT(mbi.provinceName,mbi.cityName,mbi.areaName),mbai.addr) AS address
+				,IF(r.commissionNum<1,mbi.subBankName,mbai.subBankName ) AS subBankName
+				,IF(r.commissionNum<1,mbi.mobile,mbai.reservePhone) AS bankMobile
+				,r.payerBankName
+				,r.bankCardNo as payerBankCardNo
+				,IFNULL(r.dueAmt, 0.00) AS dueAmt 
+				,r.payTime AS generationPayTime
+				,r.payStatus
+				,r.comment
+				,r.payerName
+				,r.payCenterNumber
+				,(SELECT userName FROM sysregisteruser WHERE userID=r.updateUserId) AS updateUserId
+				,IFNULL(r.payAmt, 0.00) AS payAmt
+				,IFNULL(r.feeAmt, 0.00) AS feeAmt
+				,r.bankTradeNo
+				,r.auditUserId
+				,r.memberId
+				,r.batNo
+			FROM remit_record r
+				LEFT JOIN member_baseinfo mb ON mb.memberId=r.memberId AND mb.`status` = '1'
+				LEFT JOIN member_bankcard_info mbi ON mbi.memberId=r.memberId AND mbi.`status` = '1'
+				LEFT JOIN market_bank_acc_info mbai ON mbai.memberId=r.memberId AND mbai.isDeleted = 0
+			WHERE r.id=:id
+		 ]]>
+	</sql>	
+	
+	<!-- 查询结算详情的异常标记 -->
+	<sql id="queryDetailErrorMarkById">
+		 <![CDATA[  
+			select 
+				e.id,
+				e.remit_record_id,
+				e.comment,
+				e.createTime,
+				(select userName from sysregisteruser where userID=e.createUserId) as createUserId 
+			from remit_record_error   e
+			WHERE e.remit_record_id=:id
+		 ]]>
+	</sql>	
+	
+	<!-- 更新结算详情 代付信息-->
+	<sql id="updateGenerationPay">
+		 <![CDATA[  
+			update remit_record set
+			<#if payCenterNumber?exists && payCenterNumber!="">
+				payCenterNumber = :payCenterNumber,
+			</#if>
+			<#if payerBankName?exists && payerBankName!="">
+				payerBankName = :payerBankName,
+			</#if>
+			<#if payerName?exists && payerName!="">
+				payerName = :payerName,
+			</#if>
+			<#if bankTradeNo?exists && bankTradeNo!="">
+				bankTradeNo = :bankTradeNo,
+			</#if>
+			<#if payAmt?exists && payAmt!="">
+				payAmt = :payAmt,
+			</#if>
+			<#if feeAmt?exists && feeAmt!="">
+				feeAmt = :feeAmt,
+			</#if>
+			<#if comment?exists && comment!="">
+				comment = :comment,
+			</#if>
+			<#if payTime?exists && payTime!="">
+				payTime = :payTime,
+			</#if>
+			<#if bankCardNo?exists && bankCardNo!="">
+				bankCardNo = :bankCardNo,
+			</#if>
+			<#if payStatus?exists && payStatus!="">
+				payStatus = :payStatus,
+			</#if>
+			updateUserId=:updateUserId,
+			updateTime=now()
+			where id=:id
+		 ]]>
+	</sql>	
+	
+	<sql id="updateMemeberBank">
+		 <![CDATA[  
+			update member_bankcard_info set auditStatus=0  
+			where account = :account  AND bankCardNo=:bankCardNo 
+		 ]]>
+	</sql>	
+	
+	
+	<!-- 记录结算详情   待付款订单分页 -->
+	<sql id="queryOrderDetailPage">
+	<![CDATA[
+		 
+		SELECT s.orderNo, s.memberId, s.batNo,s.feeType, s.paidAmt, pt.orderTime AS createOrderDate , IFNULL(rr.payStatus, 0) AS payStatus FROM (
+
+			SELECT a.orderNo,a.`memberId` , a.batNo, a.hasChange, '100001' AS feeType, a.orderAmt - a.feeAmt - a.commissionAmt - a.platCommissionAmt + a.subsidyAmt AS paidAmt FROM (
+			 
+				 SELECT b.* FROM (
+		
+					SELECT  t.`orderNo`,
+						t.`memberId`,
+						(CASE WHEN (t.`feeType` = '100001') THEN `batNo` END) AS `batNo`,
+						(CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+						(CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+						SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+						SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+		
+					 FROM clear_detail t WHERE t.`isValid` = '1'
+					
+					 GROUP BY t.`orderNo`, t.`userType`,t.`memberId` 
+				 
+				 ) b WHERE (b.orderAmt > 0 OR b.subsidyAmt > 0) AND b.szType = '1'
+			) a
+		
+		
+			UNION ALL
+				SELECT  t.`orderNo`,
+					t.`memberId`,
+					t.`batNo`,
+					t.`hasChange`,
+					t.`feeType`,
+					SUM(t.`tradeAmt`) AS paidAmt
+		
+				 FROM clear_detail t WHERE t.`isValid` = '1' AND t.`szType` = '1' AND t.`feeType` IN ('100002', '100006', '100007') 
+				 GROUP BY t.orderNo, t.memberId, t.`feeType`
+		 ) s 
+				 
+		LEFT JOIN pay_trade pt ON s.orderNo = pt.`orderNo`
+		LEFT JOIN pay_trade_extend pte ON s.orderNo = pte.orderNo 
+		LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId 
+		WHERE s.hasChange = '1' and s.batNo = :batNo and s.memberId = :memberId 
+		GROUP BY s.orderNo, s.memberId
+		ORDER BY pt.orderTime ASC
+
+		limit :startRow,:endRow 
+	]]>
+	</sql>
+	
+	<!-- <sql id="queryOrderDetailPage">
+	<![CDATA[
+		select s.orderNo, s.memberId, s.batNo,s.feeType, s.paidAmt, pt.orderTime AS createOrderDate , IFNULL(rr.payStatus, 0) AS payStatus  from (
+
+select
+	a.orderNo,a.`memberId` , a.batNo,'100001' as feeType, a.orderAmt - a.feeAmt - a.commissionAmt - a.platCommissionAmt + a.subsidyAmt AS paidAmt
+ from (
+ 
+ select b.* from (
+
+	select  t.`orderNo`,
+		t.`memberId`,
+		(CASE WHEN (t.`feeType` = '100001') THEN `batNo` END) AS `batNo`,
+	  (CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+	  (CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+		SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+
+	 from clear_detail t where t.`isValid` = '1'
+	
+	 GROUP BY t.`orderNo`, t.`userType`,t.`memberId` 
+ 
+ ) b WHERE (b.orderAmt > 0 OR b.subsidyAmt > 0) AND b.hasChange = '0' AND b.szType = '1'
+	) a
+
+
+union all
+	SELECT  t.`orderNo`,
+		t.`memberId`,
+		t.`batNo`,
+		t.`feeType`,
+		sum(t.`tradeAmt`) AS paidAmt
+
+	 FROM clear_detail t WHERE t.`isValid` = '1' AND t.`szType` = '1' AND t.`feeType` IN ('100002', '100006', '100007') 
+	 group by t.orderNo, t.memberId
+	 ) s left JOIN pay_trade pt ON s.orderNo = pt.`orderNo`
+	    LEFT JOIN pay_trade_extend pte ON pt.orderNo = pte.orderNo 
+	    LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId 
+	 where s.memberId =:memberId and s.batNo=:batNo
+	group by s.orderNo, s.memberId
+	]]>
+	</sql> -->
+	<!-- 记录结算详情   待付款订单总数  count(1) as count, -->
+	<sql id="queryOrderDetailCount">
+		 <![CDATA[  
+			select count(DISTINCT(t.orderNo)) as count, IFNULL(SUM(t.paidAmt),0.00) as paidAmt from (SELECT
+			vcd.memberId,
+			vcd.orderNo,
+			vcd.batNo,
+			pte.orderType,
+			IFNULL(vcd.orderAmt, 0.00) - IFNULL(vcd.feeAmt, 0.00) - IFNULL(vcd.commissionAmt, 0.00) + IFNULL(vcd.subsidyAmt, 0.00) AS paidAmt,
+			IFNULL(rr.payStatus,0) as payStatus,
+			pt.orderTime as createOrderDate
+		FROM
+			v_clear_detail vcd
+		INNER JOIN pay_trade pt ON vcd.orderNo = pt.orderNo
+		AND vcd.memberId = payeeUserId
+		LEFT JOIN pay_trade_extend pte ON vcd.orderNo = pte.orderNo
+		LEFT JOIN remit_record rr ON rr.batNo = vcd.batNo and rr.memberId=vcd.memberId
+		UNION
+			SELECT
+				mbai.memberId,
+				vcd.orderNo,
+				vcd2.batNo,
+				100 AS orderType,
+				vcd.commissionAmt AS paidAmt,
+				IFNULL(rr.payStatus,0) as payStatus,
+				pt.orderTime as createOrderDate
+			FROM
+				v_clear_detail vcd
+			INNER JOIN pay_trade pt ON vcd.orderNo = pt.orderNo
+			AND vcd.memberId = pt.payerUserId and vcd.commissionAmt!=0
+			LEFT JOIN pay_trade_extend pte ON vcd.orderNo = pte.orderNo
+			LEFT JOIN market_bank_acc_info mbai ON pte.marketId = mbai.marketId AND mbai.isDeleted = 0
+			LEFT JOIN v_clear_detail vcd2 ON vcd.orderNo=vcd2.orderNo AND mbai.memberId=vcd2.memberId
+			LEFT JOIN remit_record rr ON vcd2.batNo = rr.batNo AND rr.memberId=vcd2.memberId
+			UNION ALL
+				SELECT
+					mbai.memberId,
+        			vcd.orderNo,
+					vcd2.batNo,
+					101 AS orderType,
+					vcd.commissionAmt AS paidAmt,
+					IFNULL(rr.payStatus,0) as payStatus,
+					pt.orderTime as createOrderDate
+				FROM
+					v_clear_detail vcd
+				INNER JOIN pay_trade pt ON vcd.orderNo = pt.orderNo
+				AND vcd.memberId = pt.payeeUserId and vcd.commissionAmt!=0
+				LEFT JOIN pay_trade_extend pte ON vcd.orderNo = pte.orderNo
+				LEFT JOIN market_bank_acc_info mbai ON pte.marketId = mbai.marketId AND mbai.isDeleted = 0
+				LEFT JOIN v_clear_detail vcd2 ON vcd.orderNo=vcd2.orderNo AND mbai.memberId=vcd2.memberId
+				LEFT JOIN remit_record rr ON vcd2.batNo = rr.batNo AND rr.memberId=vcd2.memberId
+				
+				Group by vcd.orderNo
+		) t where t.batNo= :batNo and  t.memberId=:memberId and t.paidAmt > 0
+		  limit 1
+		 ]]>
+	</sql>
+	
+	<!-- <sql id="queryOrderDetailCount">
+		 <![CDATA[  
+		 select count(1) as count from (
+			select s.orderNo, s.memberId, s.batNo,s.feeType, s.paidAmt, pt.orderTime AS createOrderDate , IFNULL(rr.payStatus, 0) AS payStatus  from (
+
+select
+	a.orderNo,a.`memberId` , a.batNo,'100001' as feeType, a.orderAmt - a.feeAmt - a.commissionAmt - a.platCommissionAmt + a.subsidyAmt AS paidAmt
+ from (
+ 
+ select b.* from (
+
+	select  t.`orderNo`,
+		t.`memberId`,
+		(CASE WHEN (t.`feeType` = '100001') THEN `batNo` END) AS `batNo`,
+	  (CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+	  (CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+		SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+		SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+
+	 from clear_detail t where t.`isValid` = '1'
+	
+	 GROUP BY t.`orderNo`, t.`userType`,t.`memberId` 
+ 
+ ) b WHERE (b.orderAmt > 0 OR b.subsidyAmt > 0) AND b.hasChange = '0' AND b.szType = '1'
+	) a
+
+
+union all
+	SELECT  t.`orderNo`,
+		t.`memberId`,
+		t.`batNo`,
+		t.`feeType`,
+		sum(t.`tradeAmt`) AS paidAmt
+
+	 FROM clear_detail t WHERE t.`isValid` = '1' AND t.`szType` = '1' AND t.`feeType` IN ('100002', '100006', '100007') 
+	 group by t.orderNo, t.memberId
+	 ) s left JOIN pay_trade pt ON s.orderNo = pt.`orderNo`
+	    LEFT JOIN pay_trade_extend pte ON pt.orderNo = pte.orderNo 
+	    LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId 
+	 where s.memberId =:memberId and s.batNo=:batNo
+	group by s.orderNo, s.memberId
+	) tab
+		 ]]>
+	</sql> -->
+	<!-- 查询导出结算的集合 -->
+	<sql id="queryList">
+		 <![CDATA[  
+			select * from (
+			  select 
+				 r.id
+				,mb.account
+				,mb.mobile 
+	      		,mb.realName
+				,r.changeTime
+				,r.orderNum
+				,r.commissionNum
+				,r.refundNum
+			    ,r.penaltyNum
+				,r.dueAmt
+				,r.payTime
+				,r.bankTradeNo as thirdPayNumber
+				,r.payStatus
+	     		,r.payerBankName
+				,r.bankCardNo
+				,r.payerName
+				,r.payAmt
+				,r.feeAmt
+				,r.payCenterNumber
+				,r.comment
+				,IF(r.orderNum>0,mbi.mobile,mbai.reservePhone) as userMobile
+				,IF(r.orderNum>0,mbi.bankCardNo,mbai.bankCardNo) as userBankCardNo
+				,IF(r.orderNum>0,mbi.depositBankName,mbai.depositBankName) as userDepositBankName
+				,IF(r.orderNum>0,CONCAT(mbi.provinceName,mbi.cityName,mbi.areaName),mbai.addr) as address
+				,IF(r.orderNum>0,mbi.subBankName,mbai.subBankName ) as userSubBankName	
+				,(SELECT COUNT(1) FROM remit_record_error where  remit_record_id=r.id) as exceptionMackCount
+			from remit_record r
+			LEFT JOIN member_baseinfo mb on mb.memberId=r.memberId
+			LEFT JOIN member_bankcard_info mbi on r.memberId=mbi.memberId AND mbi.status = '1'
+			LEFT JOIN market_bank_acc_info mbai on mbai.memberId=r.memberId AND mbai.isDeleted = 0
+			WHERE 1=1
+			<#if payStatus?exists && payStatus!="">
+					AND r.payStatus = :payStatus
+			</#if>
+			<#if realName?exists && realName!="">
+					AND mb.realName like "%":realName"%"
+				</#if>
+			<#if mobile?exists && mobile!="">
+					AND mb.mobile like "%":mobile"%"
+			</#if>
+			<#if changeTimeBeginTime?exists && changeTimeBeginTime!="">
+					AND r.changeTime>=:changeTimeBeginTime
+			</#if>
+			<#if changeTimeEndTime?exists && changeTimeEndTime!="">
+					AND r.changeTime<=:changeTimeEndTime
+			</#if>
+			
+			<#if payTimeBeginTime?exists && payTimeBeginTime!="">
+					AND r.payTime>=:payTimeBeginTime
+			</#if>
+			<#if payTimeEndTime?exists && payTimeEndTime!="">
+					AND r.payTime<=:payTimeEndTime
+			</#if>
+			) t where 1=1 
+			 <#if exceptionMark?exists && exceptionMark!=""&& exceptionMark!='4'>
+					AND t.exceptionMackCount = :exceptionMark
+			</#if>
+			 <#if exceptionMark?exists && exceptionMark=='4'>
+					AND t.exceptionMackCount > :exceptionMark
+			</#if>
+			order by t.changeTime desc
+			limit :startRow,:endRow 
+		 ]]>
+	</sql>
+	<!-- 匹配数据  -->
+	<sql id="matchData">
+		 <![CDATA[  
+			select r.id,r.orderNo,mb.account,mb.mobile
+			from remit_record  r 
+			LEFT JOIN member_baseinfo mb on mb.memberId=r.memberId
+			where  
+				r.changeTime=:changeTime AND mb.account=:account
+				AND mb.mobile=:mobile AND mb.realName=:realName
+		 ]]>
+	</sql>	
+
+	<!-- 查询手续费   -->
+	<sql id="queryFeeRecord">
+		 <![CDATA[  
+			select count(id)  from fee_record where batNo = :batNo and memberId = :memberId
+		 ]]>
+	</sql>
+	<!-- 处理结算信息 更新手续费 -->
+	<sql id="updateFeeRecord">
+		 <![CDATA[  
+			update fee_record set 
+			<#if feeType?exists && feeType!="">
+				feeType = :feeType,
+			</#if>
+			<#if financeTime?exists && financeTime!="">
+				financeTime = :financeTime,
+			</#if>
+			<#if payAmt?exists && payAmt!="">
+				payAmt = :payAmt,
+			</#if>
+			<#if feeAmt?exists && feeAmt!="">
+				feeAmt = :feeAmt,
+			</#if>
+			<#if operaUserId?exists && operaUserId!="">
+				operaUserId = :operaUserId,
+			</#if>
+			<#if bankTradeNo?exists && bankTradeNo!="">
+				thridPayNumber = :bankTradeNo,
+			</#if>
+			operaTime =now(),
+			updateTime=now(),
+			updateUserId=:updateUserId
+			where batNo = :batNo and memberId = :memberId
+		 ]]>
+	</sql>		
+	
+	<!-- 根据订单号查询结算记录 -->
+	<sql id="selRemitRecByOrderNo">
+		 <![CDATA[  
+			select * from remit_record 
+			where 1 = 1
+			<#if orderNo?exists && orderNo!="">
+				and orderNo=:orderNo
+			</#if>
+			limit 1
+		 ]]>
+	</sql>
+	<!-- 处理结算信息 更新退款记录-->
+	<sql id="updateRefundRecord">
+		 <![CDATA[  
+			update refund_record rr
+				JOIN clear_detail cd ON rr.orderNo = cd.orderNo and cd.feeType = '100007'
+				JOIN remit_record rrd ON rrd.batNo = cd.batNo and cd.id = :id
+			set rr.status = '2'
+			where rr.status = '4' 
+		 ]]>
+	</sql>	
+	<!-- 处理结算信息 更新退款明细记录-->
+	<sql id="updateRefundRecordDetail">
+		 <![CDATA[  
+			update refund_fee_item_detail rfid
+				JOIN refund_record rr ON rfid.refundNo = rr.refundNo and rr.status = '2'
+				JOIN clear_detail cd ON rr.orderNo = cd.orderNo and cd.feeType = '100007'
+				JOIN remit_record rrd ON rrd.batNo = cd.batNo and cd.id = :id
+			set rfid.clearState = '2'
+			where rfid.clearState = '1' 
+		 ]]>
+	</sql>	
+	<sql id="addFeeRecord"> 
+ 	<![CDATA[ 
+		INSERT `fee_record` (
+		  `thridPayNumber`,
+		  `feeType`,
+		  `financeTime`,
+		  `payAmt`,
+		  `feeAmt`,
+		  `batNo`,
+		  `memberId`,
+		  `operaUserId`,
+		  `operaTime`,
+		  `createUserId`,
+		  `updateUserId`
+		) 
+		VALUES
+		  (
+		    :thridPayNumber,
+		    :feeType,
+		    :financeTime,
+		    :payAmt,
+		    :feeAmt,
+		    :batNo,
+		    :memberId,
+		    :operaUserId,
+		    SYSDATE(),
+		    :createUserId,
+		    :updateUserId
+		  )
+ 		]]> 
+ 	</sql>
+</sqlMap>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="FeeRecord">
+	<sql id="queryFeeList"> 
+	<![CDATA[ 
+		  SELECT
+		  m.id,
+		  m.thridPayNumber,
+		  m.feeType,
+		  m.financeTime,
+		  m.payAmt,
+		  m.rate,
+		  m.feeAmt,
+		  m.payCenterNumber,
+		  m.operaUserId,
+		  m.operaTime,
+		  m.createTime,
+		  m.createUserId,
+		  m.updateTime,
+		  m.updateUserId,
+		  m.isSys,
+		  m.remark,
+		  ac.name AS appKey,
+		  pt.payTypeName AS payType
+		  FROM
+		  fee_record m
+		  LEFT JOIN gd_pay.pay_trade p on p.thirdPayNumber = m.thridPayNumber
+		  LEFT JOIN gd_pay.access_sys_config ac ON p.appKey = ac.appKey
+		  LEFT JOIN pay_type pt ON p.payType = pt.payType
+			WHERE 1=1 
+			AND m.feeAmt !=0
+			AND m.feeType = 0
+				<#if financeBeginTime?exists && financeBeginTime!="">
+						AND m.financetime >= :financeBeginTime
+				</#if>
+				<#if financeEndTime?exists && financeEndTime!="">
+						AND m.financetime <= :financeEndTime
+				</#if>
+				<#if thridPayNumber?exists && thridPayNumber!="">
+						AND m.thridPayNumber = :thridPayNumber
+				</#if>
+				GROUP BY p.thirdPayNumber
+				ORDER BY m.financetime DESC
+				<#if startRow?exists && startRow!="">
+					LIMIT :startRow , :endRow
+				</#if>
+
+	]]> 
+	</sql>
+	<sql id="queryPayList">
+		<![CDATA[ 
+			SELECT
+			  m.id,
+			  m.thridPayNumber,
+			  m.feeType,
+			  m.financeTime,
+			  m.payAmt,
+			  m.rate,
+			  m.feeAmt,
+			  m.payCenterNumber,
+			  m.operaUserId,
+			  m.operaTime,
+			  m.createTime,
+			  m.createUserId,
+			  m.updateTime,
+			  m.updateUserId,
+			  m.isSys,
+			  m.remark,
+			  concat(r.payerBankName,"(尾号",right(r.bankCardNo,4),")")  AS payType
+			  FROM
+			  fee_record m
+			  LEFT JOIN gd_pay.remit_record r ON m.batNo = r.batNo AND m.memberId = r.memberId
+			  WHERE 1=1 
+			    AND m.feeAmt !=0 
+			  	AND m.feeType = 1
+			  	<#if financeBeginTime?exists && financeBeginTime!="">
+						AND m.financetime >= :financeBeginTime
+				</#if>
+				<#if financeEndTime?exists && financeEndTime!="">
+						AND m.financetime <= :financeEndTime
+				</#if>
+				<#if thridPayNumber?exists && thridPayNumber!="">
+						AND m.thridPayNumber = :thridPayNumber
+				</#if>
+				GROUP BY m.thridPayNumber
+				ORDER BY m.financetime DESC
+				<#if startRow?exists && startRow!="">
+					LIMIT :startRow , :endRow
+				</#if>
+		]]> 
+	</sql>
+	<sql id="queryById"> 
+	<![CDATA[ 
+		SELECT 
+		  `id`,
+		  `thridPayNumber`,
+		  `feeType`,
+		  `financeTime`,
+		  `payAmt`,
+		  `rate`,
+		  `feeAmt`,
+		  `payCenterNumber`,
+		  `operaUserId`,
+		  `operaTime`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  `updateUserId`,
+		  `isSys`,
+		  `remark`
+		FROM
+		  `fee_record` m
+		WHERE 
+			m.id = :id
+	]]> 
+	</sql> 
+ 	
+	<sql id="queryCount"> 
+	<![CDATA[ 
+		SELECT count(*)
+      		FROM (
+              SELECT m.id from fee_record m
+              LEFT JOIN gd_pay.pay_trade p on p.thirdPayNumber = m.thridPayNumber
+              LEFT JOIN gd_pay.access_sys_config ac ON p.appKey = ac.appKey
+              LEFT JOIN pay_type pt ON p.payType = pt.payType
+              WHERE 1=1
+              AND m.feeAmt !=0
+              AND m.feeType = 0
+              <#if financeBeginTime?exists && financeBeginTime!="">
+				AND m.financetime >= :financeBeginTime
+			</#if>
+			<#if financeEndTime?exists && financeEndTime!="">
+					AND m.financetime <= :financeEndTime
+			</#if>
+			<#if thridPayNumber?exists && thridPayNumber!="">
+					AND m.thridPayNumber = :thridPayNumber
+			</#if>
+              GROUP BY p.thirdPayNumber
+           ) AS td
+	]]> 
+	</sql> 
+	<sql id="queryPayCount">
+		<![CDATA[ 
+		SELECT count(*)
+		FROM (
+       SELECT m.id
+       FROM fee_record m
+         LEFT JOIN gd_pay.remit_record r ON m.batNo = r.batNo AND m.memberId = r.memberId
+       WHERE 1 = 1
+             AND m.feeAmt != 0
+             AND m.feeType = 1
+             <#if financeBeginTime?exists && financeBeginTime!="">
+				AND m.financetime >= :financeBeginTime
+			</#if>
+			<#if financeEndTime?exists && financeEndTime!="">
+					AND m.financetime <= :financeEndTime
+			</#if>
+			<#if thridPayNumber?exists && thridPayNumber!="">
+					AND m.thridPayNumber = :thridPayNumber
+			</#if>
+       GROUP BY r.batNo
+     ) AS td
+		]]> 
+	</sql>
+ 	
+	<sql id="addFeeRecord"> 
+	<![CDATA[ 
+		INSERT `fee_record` (
+		  `thridPayNumber`,
+		  `feeType`,
+		  `financeTime`,
+		  `payAmt`,
+		  `rate`,
+		  `feeAmt`,
+		  `operaUserId`,
+		  `operaTime`,
+		  `createUserId`,
+		  `updateUserId`,
+		  `payCenterNumber`,
+		  `isSys`,
+		  `remark`
+		) 
+		VALUES
+		  (
+			:thridPayNumber,
+			:feeType,
+		<#if financeTime?exists && financeTime!="">
+			:financeTime,
+		<#else>
+			SYSDATE(),
+		</#if>
+			:payAmt,
+			:rate,
+			:feeAmt,
+			:operaUserId,
+			SYSDATE(),
+			:createUserId,
+			:updateUserId,
+			:payCenterNumber,
+			:isSys,
+			:remark
+		  )
+	]]> 
+	</sql> 
+ 	
+	<sql id="updateFeeRecord"> 
+	<![CDATA[ 
+		update `fee_record` set `thridPayNumber` = :thridPayNumber, `financeTime` = :financeTime,`isSys` = :isSys,
+			`payAmt` = :payAmt, `feeAmt` = :feeAmt, `operaUserId` = :operaUserId, `operaTime` = SYSDATE(), 
+			`updateUserId` = :updateUserId, `updateTime` = SYSDATE() 
+		where `feeType` = :feeType and `payCenterNumber` = :payCenterNumber
+	]]> 
+	</sql> 
+	
+</sqlMap>

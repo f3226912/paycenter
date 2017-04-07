@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="nstNotice">
+	<sql id="insert"> 
+ 	<![CDATA[ 
+          INSERT INTO ad_notice (
+				notice,
+				startTime,
+				endTime,
+				createTime,
+				createUserId,
+				updateTime,
+				updateUserId
+			)
+		  VALUES
+		  (
+		  	 	:notice,
+		  	 	:startTime,
+		  	 	:endTime,
+		  		SYSDATE(), 
+ 				:createuserId, 
+ 				SYSDATE(), 
+ 				:updateuserId
+		  )
+	        
+ 		]]> 
+ 	</sql>
+ 	<sql id="update"> 
+ 	<![CDATA[ 
+          UPDATE ad_notice SET notice=:notice,startTime=:startTime,endTime=:endTime,updateTime=SYSDATE(),updateuserId=:updateuserId WHERE id=:id
+ 		]]> 
+ 	</sql> 
+ 	
+ 	<sql id="selectById"> 
+ 	<![CDATA[ 
+          select 
+          	nn.id,
+			nn.notice,
+			nn.startTime,
+			nn.endTime 
+			from ad_notice nn WHERE nn.id=:id
+ 		]]> 
+ 	</sql> 
+ 	
+ 	<sql id="queryNstNoticeListByPage"> 
+ 	<![CDATA[ 
+         SELECT
+			nn.id,
+			nn.notice,
+			nn.startTime,
+			nn.endTime
+		FROM
+			ad_notice nn
+		WHERE 1=1
+		<#if startBeginTime?exists && startBeginTime!="">
+				AND nn.startTime>= :startBeginTime
+		</#if>
+		<#if startEndTime?exists && startEndTime!="">
+				AND	nn.startTime <= :startEndTime
+		</#if>
+		<#if endBeginTime?exists && endBeginTime!="">
+				AND nn.endTime >= :endBeginTime
+		</#if>
+		<#if endEndTime?exists && endEndTime!="">
+				AND nn.endTime <= :endEndTime
+		</#if>
+		order by nn.endTime desc
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="" >
+				LIMIT :startRow,:endRow
+		</#if>
+ 		]]> 
+ 	</sql> 
+ 	<sql id="queryNstNoticeListByPageCount"> 
+ 	<![CDATA[ 
+         SELECT
+			count(id)
+		FROM
+			ad_notice nn
+		WHERE 1=1
+		<#if startBeginTime?exists && startBeginTime!="">
+				AND nn.startTime>= :startBeginTime
+		</#if>
+		<#if startEndTime?exists && startEndTime!="">
+				AND	nn.startTime <= :startEndTime
+		</#if>
+		<#if endBeginTime?exists && endBeginTime!="">
+				AND nn.endTime >= :endBeginTime
+		</#if>
+		<#if endEndTime?exists && endEndTime!="">
+				AND nn.endTime <= :endEndTime
+		</#if>
+ 		]]> 
+ 	</sql> 
+ 	
+ 	<delete id="delete">
+		delete from ad_notice where id=:id
+	</delete>
+	
+</sqlMap>

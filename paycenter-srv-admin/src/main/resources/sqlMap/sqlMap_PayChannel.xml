@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="PayChannel"> 
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			address,id,payChannelName,updateUserId,payChannelCode,createTime,companyAddr,createUserId,
+			updateTime,remark,mail,bankName,contact,telephone
+		  FROM pay_channel
+		  WHERE 1=1 
+			<#if address?exists && address != "" >
+			   AND address=:address
+			</#if>
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payChannelName?exists && payChannelName != "" >
+			   AND payChannelName like  '%' :payChannelName '%'
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if companyAddr?exists && companyAddr != "" >
+			   AND companyAddr=:companyAddr
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if remark?exists && remark != "" >
+			   AND remark=:remark
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			address,id,payChannelName,updateUserId,payChannelCode,createTime,companyAddr,createUserId,
+			updateTime,remark,mail,bankName,contact,telephone
+		  FROM pay_channel
+		  WHERE 1=1 
+			<#if address?exists && address != "" >
+			   AND address=:address
+			</#if>
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payChannelName?exists && payChannelName != "" >
+			   AND payChannelName like  '%' :payChannelName '%'
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if companyAddr?exists && companyAddr != "" >
+			   AND companyAddr=:companyAddr
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if remark?exists && remark != "" >
+			   AND remark=:remark
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM pay_channel
+		  WHERE 1=1 
+			<#if address?exists && address != "" >
+			   AND address=:address
+			</#if>
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payChannelName?exists && payChannelName != "" >
+			   AND payChannelName like  '%' :payChannelName '%'
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if companyAddr?exists && companyAddr != "" >
+			   AND companyAddr=:companyAddr
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if remark?exists && remark != "" >
+			   AND remark=:remark
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+	   ]]>
+	</sql>
+	
+	
+	<sql  id="findAll">
+	 SELECT 
+			address,id,payChannelName,updateUserId,payChannelCode,createTime,companyAddr,createUserId,
+			updateTime,remark,mail,bankName,contact,telephone
+		  FROM pay_channel
+	</sql>
+
+</sqlMap>

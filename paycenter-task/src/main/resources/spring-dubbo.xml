@@ -1,0 +1,23 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	
+	<dubbo:application name="${maven.dubbo.consumer.application.name}" owner="${maven.dubbo.consumer.application.owner}" />
+ 	<dubbo:registry address="${maven.dubbo.registry.address}"  />
+ 	<dubbo:consumer retries="${maven.dubbo.consumer.reference.retries}"  init="${maven.dubbo.consumer.reference.init}" 
+ 		loadbalance="${maven.dubbo.consumer.reference.loadbalance}" async="${maven.dubbo.consumer.reference.async}" 
+ 		cache="${maven.dubbo.consumer.reference.cache}" group="${maven.dubbo.consumer.reference.group}"
+		version="${maven.dubbo.consumer.reference.version}" 
+ 		timeout="${maven.dubbo.consumer.reference.timeout}" 
+ 		check="${maven.dubbo.consumer.reference.check}"
+ 		/>
+ 		
+   <dubbo:reference  id="alipayAccountService" interface="cn.gdeng.paycenter.api.server.pay.AlipayAccountService" />
+   <dubbo:reference  id="payJobService" interface="cn.gdeng.paycenter.api.server.job.PayJobService" />
+   <dubbo:reference  id="accessSysConfigService" interface="cn.gdeng.paycenter.api.server.pay.AccessSysConfigService" />
+   <dubbo:reference  id="posPayNotifyService" interface="cn.gdeng.paycenter.api.server.pay.PosPayNotifyService" />
+   <dubbo:reference  id="payTypeService" interface="cn.gdeng.paycenter.api.server.pay.PayTypeService" />
+</beans>

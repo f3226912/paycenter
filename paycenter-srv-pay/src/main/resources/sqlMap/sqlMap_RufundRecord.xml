@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="RefundRecord"> 
+
+	<sql id="queryRefundNo">
+	<![CDATA[
+		SELECT	nextval('gd_refund')
+	]]>
+	</sql>
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,payCenterNumber,refundRequestNo,thirdRefundNo,thirdRefundRequestNo,refundUserId,refundType,refundReason,
+			refundTime,extendJson,createTime,createUserId,updateTime,updateUserId,appKey,orderNo,
+			refundNo,refundAmt,status,sign
+		  FROM refund_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if refundRequestNo?exists && refundRequestNo != "" >
+			   AND refundRequestNo=:refundRequestNo
+			</#if>
+			<#if thirdRefundNo?exists && thirdRefundNo != "" >
+			   AND thirdRefundNo=:thirdRefundNo
+			</#if>
+			<#if thirdRefundRequestNo?exists && thirdRefundRequestNo != "" >
+			   AND thirdRefundRequestNo=:thirdRefundRequestNo
+			</#if>
+			<#if refundUserId?exists && refundUserId != "" >
+			   AND refundUserId=:refundUserId
+			</#if>
+			<#if refundType?exists && refundType != "" >
+			   AND refundType=:refundType
+			</#if>
+			<#if refundReason?exists && refundReason != "" >
+			   AND refundReason=:refundReason
+			</#if>
+			<#if refundTime?exists && refundTime != "" >
+			   AND refundTime=:refundTime
+			</#if>
+			<#if extendJson?exists && extendJson != "" >
+			   AND extendJson=:extendJson
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if refundAmt?exists && refundAmt != "" >
+			   AND refundAmt=:refundAmt
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,payCenterNumber,refundRequestNo,thirdRefundNo,thirdRefundRequestNo,refundUserId,refundType,refundReason,
+			refundTime,extendJson,createTime,createUserId,updateTime,updateUserId,appKey,orderNo,
+			refundNo,refundAmt,status,sign
+		  FROM refund_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if refundRequestNo?exists && refundRequestNo != "" >
+			   AND refundRequestNo=:refundRequestNo
+			</#if>
+			<#if thirdRefundNo?exists && thirdRefundNo != "" >
+			   AND thirdRefundNo=:thirdRefundNo
+			</#if>
+			<#if thirdRefundRequestNo?exists && thirdRefundRequestNo != "" >
+			   AND thirdRefundRequestNo=:thirdRefundRequestNo
+			</#if>
+			<#if refundUserId?exists && refundUserId != "" >
+			   AND refundUserId=:refundUserId
+			</#if>
+			<#if refundType?exists && refundType != "" >
+			   AND refundType=:refundType
+			</#if>
+			<#if refundReason?exists && refundReason != "" >
+			   AND refundReason=:refundReason
+			</#if>
+			<#if refundTime?exists && refundTime != "" >
+			   AND refundTime=:refundTime
+			</#if>
+			<#if extendJson?exists && extendJson != "" >
+			   AND extendJson=:extendJson
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if refundAmt?exists && refundAmt != "" >
+			   AND refundAmt=:refundAmt
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM refund_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if refundRequestNo?exists && refundRequestNo != "" >
+			   AND refundRequestNo=:refundRequestNo
+			</#if>
+			<#if thirdRefundNo?exists && thirdRefundNo != "" >
+			   AND thirdRefundNo=:thirdRefundNo
+			</#if>
+			<#if thirdRefundRequestNo?exists && thirdRefundRequestNo != "" >
+			   AND thirdRefundRequestNo=:thirdRefundRequestNo
+			</#if>
+			<#if refundUserId?exists && refundUserId != "" >
+			   AND refundUserId=:refundUserId
+			</#if>
+			<#if refundType?exists && refundType != "" >
+			   AND refundType=:refundType
+			</#if>
+			<#if refundReason?exists && refundReason != "" >
+			   AND refundReason=:refundReason
+			</#if>
+			<#if refundTime?exists && refundTime != "" >
+			   AND refundTime=:refundTime
+			</#if>
+			<#if extendJson?exists && extendJson != "" >
+			   AND extendJson=:extendJson
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if refundAmt?exists && refundAmt != "" >
+			   AND refundAmt=:refundAmt
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+	   ]]>
+	</sql>
+
+	<sql id="deleteRefundFeeItem">
+		<![CDATA[
+			delete from refund_fee_item_detail where refundNo=:refundNo
+		]]>
+	</sql>
+</sqlMap>

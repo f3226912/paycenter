@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="MemberBankcardInfo">
+	<sql id="queryByCondition"> 
+ 	<![CDATA[ 
+		SELECT 
+		  `id`,
+		  `memberId`,
+		  `account`,
+		  `realName`,
+		  `idCard`,
+		  `bankId`,
+		  `depositBankName`,
+		  `subBankName`,
+		  `bankCardNo`,
+		  `cityName`,
+		  `provinceName`,
+		  `areaName`,
+		  `areaId`,
+		  `mobile`,
+		  `telephone`,
+		  `infoId`,
+		  `provinceId`,
+		  `cityId`,
+		  `areaId`,
+		  `accCardType`,
+		  `status`,
+		  `auditStatus`,
+		  `auditTime`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  `updateUserId`,
+		  `commitTime`
+		FROM
+		  `member_bankcard_info` m
+		WHERE 1 = 1 
+		<#if id?exists && id!="">
+				AND m.id = :id
+		</#if>
+		<#if memberId?exists && memberId!="">
+				AND m.memberId = :memberId
+		</#if>
+		<#if account?exists && account!="">
+				AND m.account = :account
+		</#if>
+		<#if realName?exists && realName!="">
+				AND m.realName = :realName
+		</#if>
+		<#if idCard?exists && idCard!="">
+				AND m.idCard = :idCard
+		</#if>
+		<#if bankId?exists && bankId!="">
+				AND m.bankId = :bankId
+		</#if>
+		<#if depositBankName?exists && depositBankName!="">
+				AND m.depositBankName = :depositBankName
+		</#if>
+		<#if subBankName?exists && subBankName!="">
+				AND m.subBankName = :subBankName
+		</#if>
+		<#if bankCardNo?exists && bankCardNo!="">
+				AND m.bankCardNo = :bankCardNo
+		</#if>
+		<#if provinceId?exists && provinceId!="">
+				AND m.provinceId = :provinceId
+		</#if>
+		<#if cityId?exists && cityId!="">
+				AND m.cityId = :cityId
+		</#if>
+		<#if areaId?exists && areaId!="">
+				AND m.areaId = :areaId
+		</#if>
+		<#if accCardType?exists && accCardType!="">
+				AND m.accCardType = :accCardType
+		</#if>
+		<#if status?exists && status!="">
+				AND m.status = :status
+		</#if>
+		<#if telephone?exists && telephone!="">
+				AND m.telephone = :telephone
+		</#if>
+		<#if auditStatus?exists && auditStatus!="" > 
+			AND auditStatus=:auditStatus
+ 		</#if>
+ 		<#if auditDoStatus?exists && auditDoStatus=="2" > 
+			AND auditStatus=:auditDoStatus
+ 		</#if>
+ 		<#if auditDoStatus?exists && auditDoStatus=="1" > 
+			AND (auditStatus=1 OR auditStatus=0)
+ 		</#if>
+		<#if regtype?exists && regtype!="">
+				AND m.regtype = :regtype 
+		</#if>
+		ORDER BY commitTime DESC
+		<#if startRow?exists && startRow!="">
+			LIMIT :startRow , :endRow
+		</#if>
+ 		]]> 
+ 	</sql>
+ 	<sql id="queryById"> 
+ 	<![CDATA[ 
+		SELECT 
+		  `id`,
+		  `commitTime`,
+		  `memberId`,
+		  `account`,
+		  `realName`,
+		  `idCard`,
+		  `bankId`,
+		  `depositBankName`,
+		  `subBankName`,
+		  `bankCardNo`,
+		  `cityName`,
+		  `provinceName`,
+		  `areaName`,
+		  `areaId`,
+		  `mobile`,
+		  `telephone`,
+		  `infoId`,
+		  `provinceId`,
+		  `cityId`,
+		  `areaId`,
+		  `accCardType`,
+		  `status`,
+		  `auditStatus`,
+		  `auditTime`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  `updateUserId` 
+		FROM
+		  `member_bankcard_info` m
+		WHERE 
+			m.id = :id
+	]]> 
+ 	</sql> 
+ 	
+ 	<sql id="update"> 
+ 	<![CDATA[ 
+	UPDATE 
+	  `member_bankcard_info`
+	SET
+		<#if memberId?exists && memberId!="">
+				memberId = :memberId,
+		</#if>
+		<#if account?exists && account!="">
+				account = :account,
+		</#if>
+		<#if realName?exists && realName!="">
+				realName = :realName,
+		</#if>
+		<#if idCard?exists && idCard!="">
+				idCard = :idCard,
+		</#if>
+		<#if bankId?exists && bankId!="">
+				bankId = :bankId,
+		</#if>
+		<#if depositBankName?exists && depositBankName!="">
+				depositBankName = :depositBankName,
+		</#if>
+		<#if mobile?exists && mobile!="">
+				mobile = :mobile,
+		</#if>
+		<#if subBankName?exists && subBankName!="">
+				subBankName = :subBankName,
+		</#if>
+		<#if bankCardNo?exists && bankCardNo!="">
+				bankCardNo = :bankCardNo,
+		</#if>
+		<#if provinceId?exists && provinceId!="">
+				provinceId = :provinceId,
+		</#if>
+		<#if cityId?exists && cityId!="">
+				cityId = :cityId,
+		</#if>
+		<#if areaId?exists && areaId!="">
+				areaId = :areaId,
+		</#if>
+		<#if accCardType?exists && accCardType!="">
+				accCardType = :accCardType,
+		</#if>
+		<#if status?exists && status!="">
+				status = :status,
+		</#if>
+		<#if auditStatus?exists && auditStatus!="" > 
+			auditStatus=:auditStatus,
+ 		</#if>
+		<#if updateUserId?exists && updateUserId!="">
+				updateUserId = :updateUserId,
+		</#if>
+		auditTime = SYSDATE() 
+	WHERE 
+	  `id` = :id
+ 		]]> 
+ 	</sql> 
+ 	
+ 	<sql id="queryCount"> 
+ 	<![CDATA[ 
+         SELECT
+			count(*)
+		FROM
+		  `member_bankcard_info` m
+		WHERE 1 = 1 
+		<#if id?exists && id!="">
+				AND m.id = :id
+		</#if>
+		<#if memberId?exists && memberId!="">
+				AND m.memberId = :memberId
+		</#if>
+		<#if account?exists && account!="">
+				AND m.account = :account
+		</#if>
+		<#if realName?exists && realName!="">
+				AND m.realName = :realName
+		</#if>
+		<#if idCard?exists && idCard!="">
+				AND m.idCard = :idCard
+		</#if>
+		<#if bankId?exists && bankId!="">
+				AND m.bankId = :bankId
+		</#if>
+		<#if depositBankName?exists && depositBankName!="">
+				AND m.depositBankName = :depositBankName
+		</#if>
+		<#if subBankName?exists && subBankName!="">
+				AND m.subBankName = :subBankName
+		</#if>
+		<#if mobile?exists && mobile!="">
+				AND m.mobile = :mobile
+		</#if>
+		<#if bankCardNo?exists && bankCardNo!="">
+				AND m.bankCardNo = :bankCardNo
+		</#if>
+		<#if provinceId?exists && provinceId!="">
+				AND m.provinceId = :provinceId
+		</#if>
+		<#if cityId?exists && cityId!="">
+				AND m.cityId = :cityId
+		</#if>
+		<#if areaId?exists && areaId!="">
+				AND m.areaId = :areaId
+		</#if>
+		<#if telephone?exists && telephone!="">
+				AND m.telephone = :telephone
+		</#if>
+		<#if accCardType?exists && accCardType!="">
+				AND m.accCardType = :accCardType
+		</#if>
+		<#if status?exists && status!="">
+				AND m.status = :status
+		</#if>
+		<#if auditStatus?exists && auditStatus!="" > 
+			AND auditStatus=:auditStatus
+ 		</#if>
+ 		<#if auditDoStatus?exists && auditDoStatus=="2" > 
+			AND auditStatus=:auditDoStatus
+ 		</#if>
+ 		<#if auditDoStatus?exists && auditDoStatus=="1" > 
+			AND (auditStatus=1 OR auditStatus=0)
+ 		</#if>
+ 		]]> 
+ 	</sql> 
+	
+</sqlMap>

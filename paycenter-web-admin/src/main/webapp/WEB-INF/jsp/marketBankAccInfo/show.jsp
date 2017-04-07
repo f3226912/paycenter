@@ -1,0 +1,62 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div style="margin: 10px auto;width:80%">
+	<form action="" id="addMarketForm">
+		<table>
+			<tr>
+				<td>市场名称：</td>
+				<td>
+					${dto.marketName}
+				</td>
+			</tr>
+			<tr>
+				<td>用户手机：</td>
+				<td>
+					${dto.mobile}
+				</td>
+			</tr>
+			<tr>
+				<td>用户账号：</td>
+				<td>
+					${dto.account}
+				</td>
+			</tr>
+			<tr>
+				<td>持卡人:</td>
+				<td>
+					${dto.realName}
+				</td>
+			</tr>
+			<tr>
+				<td>银行卡号:</td>
+				<td>
+					${dto.bankCardNo}
+				</td>
+			</tr>
+			<tr>
+				<td>开户银行名称：</td>
+				<td>
+					${dto.depositBankName}
+				</td>
+			</tr>
+			<tr>
+				<td>支行名称:</td>
+				<td>
+				${dto.subBankName}
+				</td>
+			</tr>
+			<tr>
+				<td>开户所在地:</td>
+				<td>
+				${dto.addr}
+				</td>
+			</tr>
+			<tr>
+				<td>银行卡预留手机:</td>
+				<td>
+				${dto.reservePhone}
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>

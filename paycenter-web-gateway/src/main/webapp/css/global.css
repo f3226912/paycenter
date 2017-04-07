@@ -1,0 +1,47 @@
+@charset "utf-8";
+
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,blockquote,th,td,p{margin:0;padding:0}
+		input,button,select,textarea{outline:none}
+		img{vertical-align:top;border:none;}
+		textarea{overflow: auto;vertical-align: top;resize:none;}
+		button,input,select,textarea {font-size:100%;}
+		h1,h2,h3,h4,h5,h6 {font-size:100%;font-weight:normal}
+		table {border-collapse:collapse;border-spacing:0}
+		em,i,b{ font-style:normal; font-weight:normal;}
+		body {
+			overflow-x:hidden;
+			font: normal 100% "Microsoft YaHei",'Helvetica Neue', Helvetica, Arial, sans-serif;  /*为了让电脑上和手机一样字体效果。手机是没有"Microsoft YaHei",'Helvetica Neue'*/
+			/***min-width: 300px;设置最小宽HTCG7***/
+			-webkit-text-size-adjust:none;/**避免重力感应时文字随分辨率增大而增大**/ 
+			/** display:-webkit-box;/**流布局**/
+			color:#404040;
+			background: #f5f5f5;
+
+		}
+		article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block;}
+		ul, li, ol, dl, dd, dt{list-style:none;list-style-position:outside;}
+		img	{ border:none;max-width: 100%;height: auto;}
+		a{color:#565656;}
+		a:link, a:hover{text-decoration:none;}
+		a:link *, a:hover *{text-decoration:none;}
+		@-ms-viewport {width: device-width;}
+		.clearfix:after{content:".";display:block;font-size:0;height:0;clear:both;visibility:hidden}
+		.clearfix{zoom:1}
+		html{ font-family: sans-serif; -webkit-text-size-adjust: 100%;}
+		@media screen and (min-width:1200px){html{font-size: 125%;/*10 ÷ 16 × 100% × 2 = 62.5%  pc chrom最小字体12px所以为了调试方便，rem定为20px*/}}
+		@media screen and (min-width: 980px) and (max-width: 1199px) {html{font-size: 125%;}}
+		@media screen and (min-width: 768px) and (max-width: 979px) {html{font-size: 100%;}}
+		@media screen and (max-width: 767px){html{font-size: 75%;}}
+		@media screen and (max-width: 480px) {html{font-size: 62.5%;}}
+		
+.clear:after {
+　　visibility: hidden;
+　　clear: both;
+　　display: block;
+　　height: 0px;
+　　content: "."
+}
+.clear {
+　　zoom: 1;
+}

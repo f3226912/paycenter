@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <sqlMap namespace="Profit">
+
+	<sql id="queryPlatCommission">
+	<![CDATA[
+	select * from (
+	    		 
+		select s.orderNo,
+			mb.`mobile` AS payerMobile,
+			vcd.orderAmt AS totalAmt,
+			s.commissionAmt AS commission,
+			pt.`orderTime`,
+			s.userType
+			
+		 from (
+			SELECT vcdi.`orderNo`,
+				vcdi.`tradeAmt` AS commissionAmt,
+				vcdi.`batNo`,
+				vcdi.`hasChange`,
+				vcdi.`refUserType` AS userType ,
+				vcdi.`refMemberId` AS memberId
+			FROM v_clear_detail_item vcdi
+			WHERE  vcdi.`isValid` = '1' AND vcdi.`feeType` = '100005' AND vcdi.`szType` = '1'
+			
+		) s 
+		left join pay_trade pt on pt.`orderNo` = s.orderNo
+		left join v_clear_detail2 vcd on s.orderNo = vcd.orderNo and vcd.memberId = pt.`payeeUserId`
+		left join member_baseinfo mb on mb.`memberId` = s.memberId
+		
+		WHERE 1=1 AND s.userType IS NOT NULL
+		
+		<#if userType?exists && userType!="">
+			AND s.userType = :userType
+	   </#if>
+	
+	   <#if orderNo?exists && orderNo!="">
+			AND s.orderNo = :orderNo
+	   </#if>
+	   
+	   <#if payerMobile?exists && payerMobile!="">
+			AND pt.payerMobile = :payerMobile
+	   </#if>
+	
+	   <#if orderTimeBegin?exists && orderTimeBegin!="">
+			AND pt.orderTime>=:orderTimeBegin
+	   </#if>
+	   
+	   <#if orderTimeEnd?exists && orderTimeEnd!="">
+			AND pt.orderTime<=:orderTimeEnd
+	   </#if>
+		
+		GROUP BY s.orderNo, s.userType
+		order by pt.orderTime desc
+		    
+		 ) tab where tab.commission > 0
+		 
+		 <#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+				limit :startRow,:endRow 
+		   </#if>
+		
+	]]>
+	</sql>
+	
+	<sql id="queryPlatCommissionCount">
+		 <![CDATA[ 
+		 select count(1) from(
+			select s.orderNo,
+				mb.`mobile`,
+				vcd.orderAmt,
+				s.commissionAmt,
+				pt.`orderTime`,
+				s.userType
+				
+			 from (
+				SELECT vcdi.`orderNo`,
+					vcdi.`tradeAmt` AS commissionAmt,
+					vcdi.`batNo`,
+					vcdi.`hasChange`,
+					vcdi.`refUserType` AS userType ,
+					vcdi.`refMemberId` AS memberId
+				FROM v_clear_detail_item vcdi
+				WHERE  vcdi.`isValid` = '1' AND vcdi.`feeType` = '100005' AND vcdi.`szType` = '1'
+				
+			) s 
+			left join pay_trade pt on pt.`orderNo` = s.orderNo
+			left join v_clear_detail2 vcd on s.orderNo = vcd.orderNo and vcd.memberId = pt.`payeeUserId`
+			left join member_baseinfo mb on mb.`memberId` = s.memberId
+			
+			WHERE 1=1 AND s.userType IS NOT NULL
+           
+           <#if userType?exists && userType!="">
+				AND s.userType = :userType
+		   </#if>
+		
+		   <#if orderNo?exists && orderNo!="">
+				AND s.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND pt.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND pt.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND pt.orderTime<=:orderTimeEnd
+		   </#if>
+		   
+		   group by s.orderNo, s.userType
+		
+		   ) tab
+		 ]]>
+	</sql>
+	
+	<!-- 平台佣金记录总数 -->
+	<!-- <sql id="queryPlatCommissionCount">
+		 <![CDATA[ 
+		 select count(1) from 
+	     (select
+           cd.orderNo
+         from 
+           clear_detail cd 
+         left join 
+           pay_trade pt 
+         on 
+           cd.orderNo = pt.orderNo
+         where 
+                cd.isValid = 1 and cd.szType = 2 and (cd.userType = 'nsy' or cd.userType = 'nps')
+           
+           <#if userType?exists && userType!="">
+				AND cd.userType = :userType
+		   </#if>
+		
+		   <#if orderNo?exists && orderNo!="">
+				AND cd.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND pt.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND pt.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND pt.orderTime<=:orderTimeEnd
+		   </#if>
+		   
+		   group by 
+		     cd.orderNo, cd.userType
+		     ) t 
+		 ]]>
+	</sql> -->
+
+	<!-- 平台佣金记录总数 -->
+	<sql id="queryRefundCount">
+		 <![CDATA[ 
+		 select count(1) from
+			(select * from (
+	      select
+	          pt.id,
+            cd.orderNo,
+            pt.payerMobile,
+            pt.payAmt as totalAmt,
+            sum(cd.tradeAmt) AS commission,
+            pt.orderTime,
+            cd.userType
+          from 
+            clear_detail cd 
+          left join
+             pay_trade pt on cd.orderNo = pt.orderNo
+          where 
+             cd.isValid = 1 and cd.szType = 1 and pt.requestNo = 1 and cd.userType = 'plat' and cd.feeType = '100006'
+		   
+		    <#if orderNo?exists && orderNo!="">
+				AND cd.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND pt.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND pt.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND pt.orderTime<=:orderTimeEnd
+		   </#if>
+		group by
+             cd.orderNo, cd.userType 
+		order 
+		     by pt.orderTime desc
+		)tab where tab.commission > 0
+             ) t
+		 ]]>
+	</sql>
+
+    <!-- <sql id="queryRefundCount">
+		 <![CDATA[ 
+		select count(1) from (select * from (
+	      select tab.id, 
+       sum((case when (cdetail.feeType = '100006') then cdetail.tradeAmt else 0 end)) AS commission
+       from 
+            clear_detail cdetail 
+       join 
+            (select
+	                  pt.id,
+                    cd.orderNo,
+                    pt.payerMobile,
+                    pt.payAmt as totalAmt,
+                    pt.orderTime,
+                    cd.userType
+             from 
+                    clear_detail cd 
+             left join
+                    pay_trade pt on cd.orderNo = pt.orderNo
+             where 
+                    cd.isValid = 1 and cd.szType = 2 and pt.requestNo = 1
+                    
+		         group by
+                    cd.orderNo, cd.userType 
+		         order 
+		                by pt.orderTime desc
+           ) tab on cdetail.orderNo = tab.orderNo
+
+           left join pay_trade ptrade on cdetail.orderNo = ptrade.orderNo
+                    
+    where 
+        cdetail.isValid = 1 and cdetail.szType = 1 and cdetail.userType = 'plat' and ptrade.requestNo = 1
+        
+		    <#if orderNo?exists && orderNo!="">
+				AND cdetail.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND ptrade.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND ptrade.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND ptrade.orderTime<=:orderTimeEnd
+		   </#if>   
+		   
+		group by
+             cdetail.orderNo, cdetail.userType 
+		order by
+		     tab.orderTime desc
+		) t where t.commission > 0
+	 ) refund_t
+		 ]]>
+	</sql> -->
+	<sql id="queryRefund">
+	<![CDATA[
+	 select * from (
+	      select
+	          pt.id,
+            cd.orderNo,
+            pt.payerMobile,
+            pt.payAmt as totalAmt,
+            sum(cd.tradeAmt) AS commission,
+            pt.orderTime,
+            cd.userType
+          from 
+            clear_detail cd 
+          left join
+             pay_trade pt on cd.orderNo = pt.orderNo
+          where 
+             cd.isValid = 1 and cd.szType = 1 and pt.requestNo = 1 and cd.userType = 'plat' and cd.feeType = '100006'
+		   
+		    <#if orderNo?exists && orderNo!="">
+				AND cd.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND pt.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND pt.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND pt.orderTime<=:orderTimeEnd
+		   </#if>
+		group by
+             cd.orderNo, cd.userType 
+		order 
+		     by pt.orderTime desc
+		)tab where tab.commission > 0
+		
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+				limit :startRow,:endRow 
+		</#if>
+	]]>
+	</sql>
+
+    <!-- <sql id="queryRefund">
+	<![CDATA[
+	  select * from (
+	      select tab.id, 
+       tab.orderNo, 
+       tab.payerMobile, 
+       tab.totalAmt, 
+       sum((case when (cdetail.feeType = '100006') then cdetail.tradeAmt else 0 end)) AS commission,
+       tab.orderTime, 
+       tab.userType
+       from 
+            clear_detail cdetail 
+       join 
+            (select
+	                  pt.id,
+                    cd.orderNo,
+                    pt.payerMobile,
+                    pt.payAmt as totalAmt,
+                    pt.orderTime,
+                    cd.userType
+             from 
+                    clear_detail cd 
+             left join
+                    pay_trade pt on cd.orderNo = pt.orderNo
+             where 
+                    cd.isValid = 1 and cd.szType = 2 and pt.requestNo = 1
+                    
+		         group by
+                    cd.orderNo, cd.userType 
+		         order 
+		                by pt.orderTime desc
+           ) tab on cdetail.orderNo = tab.orderNo
+
+           left join pay_trade ptrade on cdetail.orderNo = ptrade.orderNo
+                    
+    where 
+        cdetail.isValid = 1 and cdetail.szType = 1 and cdetail.userType = 'plat' and ptrade.requestNo = 1
+        
+		    <#if orderNo?exists && orderNo!="">
+				AND cdetail.orderNo = :orderNo
+		   </#if>
+		   
+		   <#if payerMobile?exists && payerMobile!="">
+				AND ptrade.payerMobile = :payerMobile
+		   </#if>
+		
+		   <#if orderTimeBegin?exists && orderTimeBegin!="">
+				AND ptrade.orderTime>=:orderTimeBegin
+		   </#if>
+		   
+		   <#if orderTimeEnd?exists && orderTimeEnd!="">
+				AND ptrade.orderTime<=:orderTimeEnd
+		   </#if>   
+		   
+		group by
+             cdetail.orderNo, cdetail.userType 
+		order by
+		     tab.orderTime desc
+		) t where t.commission > 0
+		
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+				limit :startRow,:endRow 
+		</#if>
+	]]>
+	</sql> -->
+</sqlMap>

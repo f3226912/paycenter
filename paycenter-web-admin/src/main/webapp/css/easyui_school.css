@@ -1,0 +1,141 @@
+.tabs{
+	padding-left:10px;
+}
+.datagrid-toolbar{
+	padding-left:10px !important;
+}
+.tabs-header.tabs-header-noborder{
+	margin-left:1px;
+}
+
+
+/* icon */
+.icon-back{
+	background-image:url('../images/sch/back.png') !important;
+}
+.icon-cancel{
+	background-image:url('../images/sch/cancel.png') !important;
+}
+.icon-add{
+	background-image:url('../images/sch/edit_add.png') !important;
+}
+.icon-remove{
+	background-image:url('../images/sch/edit_remove.png') !important;
+}
+.icon-save{
+	background-image:url('../images/sch/filesave.png') !important;
+}
+.icon-no{
+	background-image:url('../images/sch/no.png') !important;
+}
+.icon-ok{
+	background-image:url('../images/sch/ok.png') !important;
+}
+.icon-edit{
+	background-image:url('../images/sch/pencil.png') !important;
+}
+.icon-redo{
+	background-image:url('../images/sch/redo.png') !important;
+}
+.icon-reload{
+	background-image:url('../images/sch/reload.png') !important;
+}
+
+.menu a.menu-lv1.i1>i{
+    background-position: 0 0;
+}
+.menu a.menu-lv1.i1.c>i{
+    background-position: -60px 0;
+}
+
+.menu a.menu-lv1.i2>i{
+    background-position: 0 -20px;
+}
+.menu a.menu-lv1.i2.c>i{
+    background-position: -60px -20px;
+}
+
+
+.menu a.menu-lv1.i3>i{
+    background-position: 0 -40px;
+}
+.menu a.menu-lv1.i3.c>i{
+    background-position: -60px -40px;
+}
+
+
+.menu a.menu-lv1.i4>i{
+    background-position: 0 -60px;
+}
+.menu a.menu-lv1.i4.c>i{
+    background-position: -60px -60px;
+}
+
+
+.menu a.menu-lv1.i5>i{
+    background-position: 0 -80px;
+}
+.menu a.menu-lv1.i5.c>i{
+    background-position: -60px -80px;
+}
+
+.menu a.menu-lv1.i6>i{
+    background-position: 0 -100px;
+}
+.menu a.menu-lv1.i6.c>i{
+    background-position: -60px -100px;
+}
+
+.menu a.menu-lv1.i7>i{
+    background-position: 0 -120px;
+}
+.menu a.menu-lv1.i7.c>i{
+    background-position: -60px -120px;
+}
+
+.menu a.menu-lv1.i8>i{
+    background-position: 0 -140px;
+}
+.menu a.menu-lv1.i8.c>i{
+    background-position: -60px -140px;
+}
+
+.menu a.menu-lv1.i9>i{
+    background-position: 0 -160px;
+}
+.menu a.menu-lv1.i9.c>i{
+    background-position: -60px -160px;
+}
+
+
+.menu a.menu-lv1.i10>i{
+    background-position: 0 -180px;
+}
+.menu a.menu-lv1.i10.c>i{
+    background-position: -60px -180px;
+}
+
+
+.menu a.menu-lv1.i11>i{
+    background-position: 0 -200px;
+}
+.menu a.menu-lv1.i11.c>i{
+    background-position: -60px -200px;
+}
+
+
+.menu a.menu-lv1.i12>i{
+    background-position: 0 -220px;
+}
+.menu a.menu-lv1.i12.c>i{
+    background-position: -60px -220px;
+}
+
+
+.menu a.menu-lv1.i13>i{
+    background-position: 0px -240px;
+}
+.menu a.menu-lv1.i13.c>i{
+    background-position: -60px -240px;
+}
+

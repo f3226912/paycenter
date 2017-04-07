@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd"
+	>
+	
+	<bean id="reconciliationTask"
+		class="cn.gdeng.paycenter.task.reconciliation.ReconciliationTask"></bean>
+	
+	<bean id="sendStatementTask" class="cn.gdeng.paycenter.task.reconciliation.SendStatementTask"></bean>
+
+	
+	<bean id="closeTradeTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="closeTradeTaskJobDetail"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="reconciliationTask" />
+				<property name="targetMethod" value="payCloseTradeTask" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每5分钟] -->
+		<property name="cronExpression" value="0 0/5 * * * ?" />
+	</bean>	
+	
+	<bean id="resendTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="resendTaskJobDetail"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="reconciliationTask" />
+				<property name="targetMethod" value="payResendTask" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每30分钟] -->
+		<property name="cronExpression" value="0 0/30 * * * ?" />
+	</bean>	
+	
+	
+	<bean id="reconciAipayTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="reconciAipayJobDetail"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="reconciliationTask" />
+				<property name="targetMethod" value="checkBill" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每天三点] -->
+		<property name="cronExpression" value="0 0 * * * ?" />
+	</bean>
+	
+	<bean id="sendStatementTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="closeTradeTaskJobDetail"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="sendStatementTask" />
+				<property name="targetMethod" value="execute" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每3分钟] -->
+		<property name="cronExpression" value="0 0/3 * * * ?" />
+	</bean>	
+	
+	<bean id="signTaskBean" class="cn.gdeng.paycenter.task.reconciliation.SignTask"></bean>
+	<bean id="signTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="signTaskTriggerBean"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="signTaskBean" />
+				<property name="targetMethod" value="batchValSign" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每天5点] -->
+		<property name="cronExpression" value="0 0 5 ? * *" />
+	</bean>
+	
+	<bean id="signInitTaskBean" class="cn.gdeng.paycenter.task.reconciliation.SignInitTask"></bean>
+	<bean id="signInitTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean id="signTaskTriggerBean"
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="signInitTaskBean" />
+				<property name="targetMethod" value="batchSign" />
+				<property name="concurrent" value="false" />
+			</bean>
+		</property>
+		<!-- cron表达式[每15分钟] -->
+		<property name="cronExpression" value="0 0/15 * * * ?" />
+	</bean>			
+	
+	<bean id="quartzScheduler" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="closeTradeTaskTrigger" />
+				<ref bean="resendTaskTrigger" />
+				<ref bean="reconciAipayTaskTrigger" />
+				<ref bean="sendStatementTrigger" />
+				<ref bean="signTaskTrigger" />
+				<ref bean="signInitTaskTrigger" />
+			</list>
+		</property>
+	</bean>			
+
+	
+</beans>

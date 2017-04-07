@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context  
+       http://www.springframework.org/schema/context/spring-context.xsd
+	   http://www.springframework.org/schema/tx
+	   http://www.springframework.org/schema/tx/spring-tx.xsd"
+	   default-lazy-init="false">
+
+	  <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">      
+      	<property name="maxTotal" value="${jedis.maxTotal}" />
+        <property name="maxIdle" value="${jedis.maxIdle}" />
+        <property name="minIdle" value="${jedis.minIdle}" />
+        <property name="numTestsPerEvictionRun" value="${jedis.numTestsPerEvictionRun}" />
+        <property name="timeBetweenEvictionRunsMillis" value="${jedis.timeBetweenEvictionRunsMillis}" />
+        <property name="minEvictableIdleTimeMillis" value="${jedis.minEvictableIdleTimeMillis}" />
+        <property name="softMinEvictableIdleTimeMillis" value="${jedis.softMinEvictableIdleTimeMillis}" />
+        <property name="maxWaitMillis" value="${jedis.maxWaitMillis}" />
+        <property name="testOnBorrow" value="${jedis.testOnBorrow}" />
+        <property name="testWhileIdle" value="${jedis.testWhileIdle}" />
+        <property name="testOnReturn" value="${jedis.testOnReturn}" />
+        <property name="jmxEnabled" value="${jedis.jmxEnabled}" />
+        <property name="jmxNamePrefix" value="${jedis.jmxNamePrefix}" />
+        <property name="blockWhenExhausted" value="${jedis.blockWhenExhausted}" />
+        <property name="testOnCreate" value="${jedis.testOnCreate}" /> 
+    </bean> 
+    
+    <!-- redis配置 -->
+	  <bean id="roundRobinJedisPool" class="cn.gdeng.paycenter.util.server.jodis.JodisPoolProxy">
+         <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="${redis.zkAddr}"/>
+        <constructor-arg index="2" value="${redis.zkSessionTimeoutMs}"/>
+        <constructor-arg index="3" value="${redis.timeoutMs}"/>
+        <constructor-arg index="4" value="${redis.zkProxyDir}"/>
+    </bean>
+    
+    <!--redis操作模板  -->
+    <bean id="jodisTemplate" class="cn.gdeng.paycenter.util.server.jodis.JodisTemplate">
+    	<property name="proxy" ref="roundRobinJedisPool"></property>
+    </bean>
+    
+</beans>

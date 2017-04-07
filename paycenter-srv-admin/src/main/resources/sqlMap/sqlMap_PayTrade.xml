@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayTrade">
+	<sql id="queryTradePageList">
+	<![CDATA[
+		select pt.id,pt.orderTime,pt.appKey,pt.orderNo,pt.payCenterNumber,pt.totalAmt,pt.payerAccount,pt.thirdPayNumber,pt.payType,pt.payAmt,
+			pt.payStatus, pt.receiptAmt, rr.payAmt transferAmt, if(isnull(rr.payAmt),'1','2') transferStatus, pt.payeeAccount
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+		where 1 = 1
+		<#if payType?exists && payType!="">
+			and pt.payType=:payType
+		</#if>
+		<#if appKey?exists && appKey!="">
+			and pt.appKey=:appKey
+		</#if>
+		<#if payerAccount?exists && payerAccount!="">
+			and pt.payerAccount=:payerAccount
+		</#if>
+		<#if payeeAccount?exists && payeeAccount!="">
+			and pt.payeeAccount=:payeeAccount
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			and pt.orderNo=:orderNo
+		</#if>
+		<#if payCenterNumber?exists && payCenterNumber!="">
+			and pt.payCenterNumber=:payCenterNumber
+		</#if>
+		<#if thirdPayNumber?exists && thirdPayNumber!="">
+			and pt.thirdPayNumber=:thirdPayNumber
+		</#if>
+		<#if startDate?exists && startDate!="">
+			and pt.orderTime>=:startDate
+		</#if>
+		<#if endDate?exists && endDate!="">
+			and pt.orderTime<=:endDate
+		</#if>
+ 		ORDER BY pt.orderTime DESC
+		limit :startRow,:endRow 
+	]]>
+	</sql>
+	<!-- 记录总数 -->
+	<sql id="getTradePageTotal">
+		 <![CDATA[  
+			SELECT count(*) as total 		
+			from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+			where 1 = 1
+			<#if payType?exists && payType!="">
+				and pt.payType=:payType
+			</#if>
+			<#if appKey?exists && appKey!="">
+				and pt.appKey=:appKey
+			</#if>
+			<#if payerAccount?exists && payerAccount!="">
+				and pt.payerAccount=:payerAccount
+			</#if>
+			<#if payeeAccount?exists && payeeAccount!="">
+				and pt.payeeAccount=:payeeAccount
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				and pt.orderNo=:orderNo
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber!="">
+				and pt.payCenterNumber=:payCenterNumber
+			</#if>
+			<#if thirdPayNumber?exists && thirdPayNumber!="">
+				and pt.thirdPayNumber=:thirdPayNumber
+			</#if>
+			<#if startDate?exists && startDate!="">
+				and pt.orderTime>=:startDate
+			</#if>
+			<#if endDate?exists && endDate!="">
+				and pt.orderTime<=:endDate
+			</#if>
+		 ]]>
+	</sql>
+	<sql id="queryTradeDetail">
+	<![CDATA[
+		select rr.id, pt.title, pt.orderTime, pt.appKey, pt.orderNo, pt.payCenterNumber, pt.totalAmt, pt.payerAccount, pt.feeAmt, pt.thirdPayNumber, 
+			pt.payType,pt.payAmt,pt.payeeAccount, pt.payStatus, pt.receiptAmt,pt.payTime, pt.payeeMobile, pt.payerMobile, rr.payAmt transferAmt, 
+			if(isnull(rr.payAmt),'1','2') transferStatus, rr.payTime transferTime, if(rr.updateUserId is null, mbi.realName, rr.bankRealName) realName, 
+			if(rr.updateUserId is null, mbi.bankCardNo, rr.bankCardNo) bankCardNo, if(rr.updateUserId is null, mbi.depositBankName, rr.depositBankName) depositBankName, 
+			if(rr.updateUserId is null, mbi.provinceName, rr.provinceName) provinceName, if(rr.updateUserId is null, mbi.cityName, rr.cityName) cityName, 
+			if(rr.updateUserId is null, mbi.areaName, rr.areaName) areaName, if(rr.updateUserId is null, mbi.subBankName, rr.subBankName) subBankName, 
+			if(rr.updateUserId is null, mbi.mobile, rr.bankMobile) userBankMobile, rr.payerBankName, rr.payerName transferPayerName, 
+			rr.feeAmt transferFeeAmt, rr.bankTradeNo, (select userName from sysregisteruser where userid = rr.updateUserId) operUserName, 
+			(select userName from sysregisteruser where userid = rr.auditUserId) auditUserName, pt.payeeUserId, rr.updateUserId
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+		left join (select * from member_bankcard_info where regtype = 1 AND status = '1') mbi on mbi.memberId = pt.payeeUserId
+		where pt.id = :id
+	]]>
+	</sql>
+	<sql id="queryTradeList">
+	<![CDATA[
+		select rr.id, pt.orderNo, pt.payCenterNumber, rr.auditUserId
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+		where pt.id=:id
+	]]>
+	</sql>
+	<sql id="queryPayTradePageList">
+	<![CDATA[
+		select pt.id,pt.orderTime,pt.appKey,pt.orderNo,pt.payCenterNumber,pt.totalAmt,pt.payerAccount,pt.feeAmt,
+			pt.thirdPayNumber,pt.payType,pt.payAmt,pt.payeeAccount, pt.payStatus, pt.receiptAmt,pt.payTime, 
+			pt.payeeMobile, pt.payerMobile, rr.payAmt transferAmt, if(isnull(rr.payAmt),'1','2') transferStatus, 
+			rr.payTime transferTime, if(rr.updateUserId is null, mbi.realName, rr.bankRealName) realName, 
+			if(rr.updateUserId is null, mbi.bankCardNo, rr.bankCardNo) bankCardNo, if(rr.updateUserId is null, mbi.depositBankName, rr.depositBankName) depositBankName, 
+			if(rr.updateUserId is null, mbi.provinceName, rr.provinceName) provinceName, if(rr.updateUserId is null, mbi.cityName, rr.cityName) cityName, 
+			if(rr.updateUserId is null, mbi.areaName, rr.areaName) areaName, if(rr.updateUserId is null, mbi.subBankName, rr.subBankName) subBankName, 
+			if(rr.updateUserId is null, mbi.mobile, rr.bankMobile) userBankMobile, rr.payerBankName,
+			rr.feeAmt transferFeeAmt, rr.bankTradeNo, u1.userName operUserName, u2.userName auditUserName
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+			left join (select * from member_bankcard_info where regtype = 1 AND status = '1') mbi on mbi.memberId = pt.payeeUserId
+			left join sysregisteruser u1 on u1.userid = rr.updateUserId
+			left join sysregisteruser u2 on u2.userid = rr.auditUserId
+		where 1 = 1
+		<#if payeeAccount?exists && payeeAccount!="">
+			and pt.payeeAccount=:payeeAccount
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and pt.payeeMobile=:payeeMobile
+		</#if>
+		<#if realName?exists && realName!="">
+			and mbi.realName=:realName
+		</#if>
+		<#if startDate?exists && startDate!="">
+			and pt.payTime>=:startDate
+		</#if>
+		<#if endDate?exists && endDate!="">
+			and pt.payTime<=:endDate
+		</#if>
+ 		ORDER BY pt.payTime DESC
+		limit :startRow,:endRow 
+	]]>
+	</sql>
+
+
+	<sql id="getPayTradePageTotal">
+	 <![CDATA[  
+		SELECT count(*) as total 
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+		left join (select * from member_bankcard_info where regtype = 1 AND status = '1') mbi on mbi.memberId = pt.payeeUserId
+		where 1 = 1
+		<#if payeeAccount?exists && payeeAccount!="">
+			and pt.payeeAccount=:payeeAccount
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and pt.payeeMobile=:payeeMobile
+		</#if>
+		<#if realName?exists && realName!="">
+			and mbi.realName=:realName
+		</#if>
+		<#if startDate?exists && startDate!="">
+			and pt.payTime>=:startDate
+		</#if>
+		<#if endDate?exists && endDate!="">
+			and pt.payTime<=:endDate
+		</#if>
+	]]>
+	</sql>
+
+	<sql id="queryPayTradeList">
+	<![CDATA[
+		select pt.id,pt.title,pt.orderTime,pt.appKey,pt.orderNo,pt.payCenterNumber,pt.totalAmt,pt.payerAccount,pt.feeAmt,
+			pt.thirdPayNumber,pt.payType,pt.payAmt,pt.payeeAccount, pt.payStatus, pt.receiptAmt,pt.payTime, 
+			pt.payeeMobile, pt.payerMobile, pt.thirdPayerAccount, rr.payAmt transferAmt, if(isnull(rr.payAmt),'1','2') transferStatus, 
+			rr.payTime transferTime, if(rr.updateUserId is null, mbi.realName, rr.bankRealName) realName, 
+			if(rr.updateUserId is null, mbi.bankCardNo, rr.bankCardNo) bankCardNo, if(rr.updateUserId is null, mbi.depositBankName, rr.depositBankName) depositBankName, 
+			if(rr.updateUserId is null, mbi.provinceName, rr.provinceName) provinceName, if(rr.updateUserId is null, mbi.cityName, rr.cityName) cityName, 
+			if(rr.updateUserId is null, mbi.areaName, rr.areaName) areaName, if(rr.updateUserId is null, mbi.subBankName, rr.subBankName) subBankName, 
+			if(rr.updateUserId is null, mbi.mobile, rr.bankMobile) userBankMobile, rr.payerBankName,
+			rr.feeAmt transferFeeAmt, rr.bankTradeNo, u1.userName createUserName, u2.userName auditUserName
+		from pay_trade pt left join remit_record rr on pt.payCenterNumber = rr.payCenterNumber
+			left join (select * from member_bankcard_info where regtype =1 AND status = '1') mbi on mbi.memberId = pt.payeeUserId
+			left join sysregisteruser u1 on u1.userid = rr.createUserId
+			left join sysregisteruser u2 on u2.userid = rr.auditUserId
+		where 1 = 1
+		<#if payType?exists && payType!="">
+			and pt.payType=:payType
+		</#if>
+		<#if appKey?exists && appKey!="">
+			and pt.appKey=:appKey
+		</#if>
+		<#if payerAccount?exists && payerAccount!="">
+			and pt.payerAccount=:payerAccount
+		</#if>
+		<#if payeeAccount?exists && payeeAccount!="">
+			and pt.payeeAccount=:payeeAccount
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			and pt.orderNo=:orderNo
+		</#if>
+		<#if payCenterNumber?exists && payCenterNumber!="">
+			and pt.payCenterNumber=:payCenterNumber
+		</#if>
+		<#if thirdPayNumber?exists && thirdPayNumber!="">
+			and pt.thirdPayNumber=:thirdPayNumber
+		</#if>
+		<#if exportType?exists && exportType=="1">
+			<#if startDate?exists && startDate!="">
+				and pt.orderTime>=:startDate
+			</#if>
+			<#if endDate?exists && endDate!="">
+				and pt.orderTime<=:endDate
+			</#if>
+		</#if>
+		<#if exportType?exists && exportType=="2">
+			<#if startDate?exists && startDate!="">
+				and pt.payTime>=:startDate
+			</#if>
+			<#if endDate?exists && endDate!="">
+				and pt.payTime<=:endDate
+			</#if>
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and pt.payeeMobile=:payeeMobile
+		</#if>
+		<#if realName?exists && realName!="">
+			and mbi.realName=:realName
+		</#if>
+		<#if exportType?exists && exportType=="1">
+ 			ORDER BY pt.orderTime DESC
+		</#if>
+		<#if exportType?exists && exportType=="2">
+ 			ORDER BY pt.payTime DESC
+		</#if>
+	]]>
+	</sql>
+
+	<sql id="queryPayTradeByNumber">
+	<![CDATA[
+		select id,version,orderNo,title,payType,payCenterNumber,thirdPayNumber,timeOut,payTime,
+		closeTime,payStatus,appKey,notifyStatus,reParam,returnUrl,notifyUrl,totalAmt,
+		payAmt,receiptAmt,orderTime,closeUserId,thirdPayerAccount,payerUserId,payerAccount, payerName,
+		payeeUserId, payeeAccount,payeeName,thirdPayeeAccount,rate,feeAmt,refundUserId,refundTime,
+		extendJson,requestIp,payerMobile,payeeMobile from pay_trade
+		where 1=1
+		
+ 		<#if payCenterNumber?exists && payCenterNumber!="" > 
+ 					and payCenterNumber=:payCenterNumber 
+ 		</#if>
+	]]>
+	</sql>
+
+	<!--djb start -->
+
+	<!-- 交易记录列表查询 -->
+	<sql id="queryTradeRecordList">
+	<![CDATA[
+	
+	SELECT
+				 p.id,
+				 p.orderNo             AS orderNo,
+				 /* 订单号*/
+				 e.orderType,
+				 /* 订单类型 */
+				 p.orderTime,
+				 /* 下单时间 */
+				 IFNULL(vpe.orderAmt, '-') AS orderAmt,
+				 /* 下单金额 */
+				 p.totalAmt            AS totalAmt,
+				 /* 订单金额 */
+				 p.payerMobile,
+				 /* 付款方手机 */
+				 IFNULL(vpr.commissionAmt, '-') AS payerCommissionAmt,
+				 /* 付款方支付市场佣金 */
+				 IFNULL(vpr.platCommissionAmt, '-') AS payerPlatCommissonAmt,
+				 /*付款方支付平台佣金*/
+				SUM(p.payAmt)              AS payerAmt,
+				/*付款方实付金额*/
+				 SUM(p.`feeAmt`)            AS gdFeeAmt,
+				 /* 谷登代收支付手续费 */
+				 p.payeeMobile,
+				 /* 收款方手机 */
+				 IFNULL(vpe.commissionAmt, '-') AS payeeCommissionAmt,
+				 /* 收款方支付市场佣金 */
+				 IFNULL(vpe.platCommissionAmt, '-') AS payeePlatCommissonAmt,
+				 /*收款方支付平台佣金*/
+				 IFNULL(vpe.subsidyAmt, '-')        AS payeeSubsidyAmt,
+				 /* 刷卡补贴 */
+				 (CASE WHEN vpe.orderAmt IS NULL THEN '-' ELSE (IFNULL(vpe.orderAmt,0.00) - IFNULL(vpe.`feeAmt`,0.00) - IFNULL(vpe.`commissionAmt`,0.00) - IFNULL(vpe.`platCommissionAmt`, 0.00) + IFNULL(vpe.`subsidyAmt`,0.00)) END) AS payeeAmt,
+				 /* 收款方应收金额 */
+				 (CASE WHEN vcd.commissionAmt IS NULL THEN '-' ELSE IFNULL(vcd.commissionAmt, 0.00) END) AS marketCommissionAmt,
+				 /* 市场实收金额 */
+				 m.marketName,
+				 /* 所属市场 */
+				 p.appKey
+			   FROM gd_pay.pay_trade p
+				 LEFT JOIN gd_pay.pay_trade_extend e ON p.orderNo = e.orderNo
+				 LEFT JOIN gd_pay.v_clear_detail2 vpr ON vpr.orderNo = p.orderNo AND vpr.memberId = p.payerUserId
+				 LEFT JOIN gd_pay.v_clear_detail2 vpe ON vpe.orderNo = p.orderNo AND vpe.memberId = p.payeeUserId
+				 LEFT JOIN gd_pay.market_bank_acc_info m ON e.marketId = m.marketId AND m.isDeleted = 0
+				LEFT JOIN gd_pay.v_clear_detail2 vcd ON vcd.orderNo = p.orderNo AND m.memberId = vcd.memberId
+			   WHERE 1 = 1 AND p.payStatus = 2
+        	  	<#if payerOrderSource?exists && payerOrderSource!="">
+					and e.orderType=:payerOrderSource
+				</#if>
+				<#if marketId?exists && marketId!="">
+					and e.marketId=:marketId
+				</#if>
+				<#if orderType?exists && orderType!="">
+					and e.orderType=:orderType
+				</#if>
+				<#if payeeMobile?exists && payeeMobile!="">
+					and p.payeeMobile=:payeeMobile
+				</#if>
+					<#if payerMobile?exists && payerMobile!="">
+					and p.payerMobile=:payerMobile
+				</#if>
+				<#if orderNo?exists && orderNo!="">
+					and p.orderNo=:orderNo
+				</#if>
+				<#if startDate?exists && startDate!="">
+						and p.orderTime>=:startDate
+				</#if>
+				<#if endDate?exists && endDate!="">
+						and p.orderTime<=:endDate
+				</#if>
+        	   GROUP BY p.orderNo
+        	   ORDER BY p.orderTime DESC
+        	   LIMIT :startRow, :endRow
+	]]>
+	</sql>
+	<!-- 交易记录列表统计 -->
+	<sql id="countTradeRecord">
+	<![CDATA[
+	SELECT count(td.id)
+	FROM (
+	       SELECT
+	         p.id,
+	         p.orderNo
+	       FROM gd_pay.pay_trade p
+	         LEFT JOIN gd_pay.pay_trade_extend e ON p.orderNo = e.orderNo
+	         LEFT JOIN gd_pay.v_clear_detail2 vpr ON vpr.orderNo = p.orderNo AND vpr.memberId = p.payerUserId
+	         LEFT JOIN gd_pay.v_clear_detail2 vpe ON vpe.orderNo = p.orderNo AND vpe.memberId = p.payeeUserId
+	         LEFT JOIN gd_pay.market_bank_acc_info m ON e.marketId = m.marketId AND m.isDeleted = 0
+	         LEFT JOIN gd_pay.v_clear_detail2 vcd ON vcd.orderNo = p.`orderNo` AND m.`memberId` = vcd.memberId
+	       WHERE 1 = 1 AND p.payStatus = 2
+	       	<#if payerOrderSource?exists && payerOrderSource!="">
+				and e.orderType=:payerOrderSource
+			</#if>
+			<#if marketId?exists && marketId!="">
+				and e.marketId=:marketId
+			</#if>
+			<#if orderType?exists && orderType!="">
+				and e.orderType=:orderType
+			</#if>
+			<#if payeeMobile?exists && payeeMobile!="">
+				and p.payeeMobile=:payeeMobile
+			</#if>
+				<#if payerMobile?exists && payerMobile!="">
+				and p.payerMobile=:payerMobile
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				and p.orderNo=:orderNo
+			</#if>
+			<#if startDate?exists && startDate!="">
+					and p.orderTime>=:startDate
+			</#if>
+			<#if endDate?exists && endDate!="">
+					and p.orderTime<=:endDate
+			</#if>
+	       GROUP BY p.orderNo
+	     ) AS td
+	]]>
+	</sql>
+	
+	<!--交易记录详情  -->
+	<sql id="queryTradeRecordDetail">
+	<![CDATA[
+		SELECT
+    	p.id,
+		p.orderNo,
+		vpe.orderNo as vpeOrderNo,
+		p.appKey,
+		p.orderTime,
+		e.orderType,
+		p.title,
+		p.totalAmt,
+		vpe.orderAmt,
+		p.payerAccount,
+		vpr.commissionAmt AS payerCommissionAmt,
+		vpr.platCommissionAmt AS payerPlatCommissionAmt,
+		p.payerMobile,
+    	sum(p.payAmt)  AS payerAmt, /*付款方应付金额*/
+		sum(p.payAmt) AS  payAmt,
+		p.payType,
+		t.payTypeName as payTypeStr,
+		p.payTime,
+		p.payCenterNumber,
+		p.thirdPayNumber,
+		p.payeeAccount,
+		p.payeeMobile,
+		p.payerName,
+		e.businessId,
+		e.businessName,
+		vpe.feeAmt AS gdFeeAmt,
+		vpe.commissionAmt AS payeeCommissionAmt,
+		vpe.platCommissionAmt AS payeePlatCommissionAmt,
+		vpe.subsidyAmt AS payeeSubsidyAmt,
+		(case when vpe.orderAmt is null then '-' ELSE IFNULL(vpe.orderAmt,0)-IFNULL(vpe.feeAmt,0)-IFNULL(vpe.commissionAmt,0)-IFNULL(vpe.platCommissionAmt,0) +IFNULL(vpe.subsidyAmt,0) END ) AS payeeAmt, /* 收款方应收金额 */
+		bpe.realName as payeeRealName,
+		bpe.depositBankName as payeeDepositBankName,
+		bpe.bankCardNo as payeeBankCardNo,
+		mb.account as marketAccount,
+		mb.mobile as marketMobile,
+		m.marketName,
+		m.realName as marketRealName,
+		m.depositBankName  as marketDepositBankName,
+		m.bankCardNo as marketBankCardNo,
+		(CASE WHEN vcd.commissionAmt IS NULL THEN '-' ELSE IFNULL(vcd.commissionAmt, 0.00) END) AS marketCommissionAmt
+		 FROM gd_pay.pay_trade p
+			  LEFT JOIN gd_pay.pay_trade_extend e ON p.orderNo=e.orderNo
+			  LEFT JOIN gd_pay.pay_type t ON p.payType=t.payType
+			  LEFT JOIN gd_pay.v_clear_detail_trade  vpr ON vpr.orderNo=p.orderNo AND vpr.memberId=p.payerUserId
+			  LEFT JOIN gd_pay.v_clear_detail_trade  vpe ON vpe.orderNo=p.orderNo AND vpe.memberId=p.payeeUserId
+			  LEFT JOIN gd_pay.member_bankcard_info bpe ON bpe.memberId=p.payeeUserId AND bpe.status = '1'
+			  LEFT JOIN gd_pay.market_bank_acc_info m ON e.marketId=m.marketId AND m.isDeleted = 0
+			  LEFT JOIN gd_pay.v_clear_detail_trade vcd ON vcd.orderNo = p.`orderNo` AND m.`memberId` = vcd.memberId
+			  LEFT JOIN member_baseinfo mb ON  mb.memberId=m.memberId
+		where 1=1 and p.orderNo=:orderNo GROUP BY p.orderNo
+	]]>
+	</sql>
+	
+	<!-- 导出数据 --> 
+	<sql id="queryTradeRecordExportData">
+	<![CDATA[
+		SELECT
+    	p.id,
+	  	p.orderNo,
+		p.appKey,
+		vpe.orderNo as vpeOrderNo,
+		p.orderTime,
+		e.orderType,
+		p.title,
+		p.totalAmt,
+		vpe.orderAmt,
+		p.payerAccount,
+		vpr.commissionAmt AS payerCommissionAmt,
+		vpr.platCommissionAmt AS payerPlatCommissionAmt,
+		p.payerMobile,
+		sum(p.payAmt) AS payAmt,
+    	sum(p.payAmt) AS payerAmt,
+		p.payType,
+		t.payTypeName as payTypeStr,
+		p.payTime,
+		p.payCenterNumber,
+		p.thirdPayNumber,
+		p.payeeAccount,
+		p.payeeMobile,
+		p.payerName,
+		e.businessId,
+		e.businessName,
+		e.marketName,
+		vpe.feeAmt AS gdFeeAmt,
+		vpe.commissionAmt AS payeeCommissionAmt,
+		vpe.platCommissionAmt AS payeePlatCommissionAmt,
+		vpe.subsidyAmt AS payeeSubsidyAmt,
+		(case when vpe.orderAmt is NULL then NULL ELSE IFNULL(vpe.orderAmt,0) - IFNULL(vpe.feeAmt,0) - IFNULL(vpe.commissionAmt,0) - IFNULL(vpe.vpe.platCommissionAmt,0)  + IFNULL(vpe.subsidyAmt,0) END ) AS payeeAmt,
+		bpe.realName as payeeRealName,
+		bpe.depositBankName as payeeDepositBankName,
+		bpe.bankCardNo as payeeBankCardNo,
+		mb.account as marketAccount,
+		mb.mobile as marketMobile,
+		m.realName as marketRealName,
+		m.depositBankName  as marketDepositBankName,
+		m.bankCardNo as marketBankCardNo,
+		vm.commissionAmt AS marketCommissionAmt,
+		(case when vpe.commissionAmt is null AND vpr.commissionAmt IS NULL    THEN NULL ELSE IFNULL(vpe.commissionAmt,0) + IFNULL(vpr.commissionAmt,0) END ) AS marketReceivableCommissionAmt
+	 	FROM gd_pay.pay_trade p
+  		  LEFT JOIN gd_pay.pay_trade_extend e ON p.orderNo=e.orderNo
+		  LEFT JOIN gd_pay.pay_type t ON p.payType=t.payType
+		  LEFT JOIN gd_pay.v_clear_detail2  vpr ON vpr.orderNo=p.orderNo AND vpr.memberId=p.payerUserId
+		  LEFT JOIN gd_pay.v_clear_detail2  vpe ON vpe.orderNo=p.orderNo AND vpe.memberId=p.payeeUserId
+		  LEFT JOIN gd_pay.member_bankcard_info bpe ON bpe.memberId=p.payeeUserId AND bpe.status = '1'
+
+		  LEFT JOIN gd_pay.market_bank_acc_info m ON e.marketId=m.marketId AND m.isDeleted = 0
+		  LEFT JOIN ( SELECT  SUM(vmd.commissionAmt) AS commissionAmt,orderNo ,memberId    FROM gd_pay.v_clear_detail vmd GROUP BY orderNo,memberId  )  AS vm ON vm.orderNo = p.orderNo AND vm.memberId = m.memberId
+		  LEFT JOIN gd_pay.member_baseinfo mb ON  mb.memberId=m.memberId
+		  where 1=1 and p.payStatus=2
+		  <#if payerOrderSource?exists && payerOrderSource!="">
+			and e.orderType=:payerOrderSource
+		</#if>
+		<#if marketId?exists && marketId!="">
+			and e.marketId=:marketId
+		</#if>
+		<#if orderType?exists && orderType!="">
+			and e.orderType=:orderType
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and p.payeeMobile=:payeeMobile
+		</#if>
+			<#if payerMobile?exists && payerMobile!="">
+			and p.payerMobile=:payerMobile
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			and p.orderNo=:orderNo
+		</#if>
+		<#if startDate?exists && startDate!="">
+				and p.orderTime >=:startDate
+		</#if>
+		<#if endDate?exists && endDate!="">
+				and p.orderTime <=:endDate
+		</#if>
+		  GROUP BY p.orderNo 
+		  ORDER BY p.orderTime DESC
+	]]>
+	</sql>
+	<!--获取导出数据的总数  -->
+	<sql id="getTradeRecordExportDataTotal">
+	 <![CDATA[  
+		SELECT count(td.id) FROM (
+		SELECT p.id,p.orderNo
+    	FROM gd_pay.pay_trade p
+  		LEFT JOIN gd_pay.pay_trade_extend e ON p.orderNo=e.orderNo
+		  LEFT JOIN gd_pay.pay_type t ON p.payType=t.payType
+		  LEFT JOIN gd_pay.v_clear_detail2  vpr ON vpr.orderNo=p.orderNo AND vpr.memberId=p.payerUserId
+		  LEFT JOIN gd_pay.v_clear_detail2  vpe ON vpe.orderNo=p.orderNo AND vpe.memberId=p.payeeUserId
+		  LEFT JOIN gd_pay.member_bankcard_info bpe ON bpe.memberId=p.payeeUserId
+
+		  LEFT JOIN gd_pay.market_bank_acc_info m ON e.marketId=m.marketId
+		  LEFT JOIN ( SELECT  SUM(vmd.commissionAmt) AS commissionAmt,orderNo ,memberId    FROM gd_pay.v_clear_detail vmd GROUP BY orderNo,memberId  )  AS vm ON vm.orderNo = p.orderNo AND vm.memberId = m.memberId
+		  LEFT JOIN gd_pay.member_baseinfo mb ON  mb.memberId=m.memberId
+		  where 1=1 and p.payStatus=2
+		  <#if payerOrderSource?exists && payerOrderSource!="">
+			and e.orderType=:payerOrderSource
+		</#if>
+		<#if marketId?exists && marketId!="">
+			and e.marketId=:marketId
+		</#if>
+		<#if orderType?exists && orderType!="">
+			and e.orderType=:orderType
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and p.payeeMobile=:payeeMobile
+		</#if>
+			<#if payerMobile?exists && payerMobile!="">
+			and p.payerMobile=:payerMobile
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			and p.orderNo=:orderNo
+		</#if>
+		<#if startDate?exists && startDate!="">
+				and p.orderTime >=:startDate
+		</#if>
+		<#if endDate?exists && endDate!="">
+				and p.orderTime <=:endDate
+		</#if>
+      GROUP BY p.orderNo
+) AS td
+	]]>
+	</sql>
+	<sql id="getTradeListByOrderNo">
+		<![CDATA[ 
+			select 
+				pt.id,
+				pe.payTypeName AS  payType,
+				pt.payAmt,
+				pt.payTime,
+				pt.thirdPayNumber,
+				pt.payCenterNumber
+				from pay_trade pt
+				LEFT JOIN pay_type pe on pt.payType = pe.payType
+				where 1 = 1
+				<#if orderNo?exists && orderNo!="">
+					and pt.orderNo=:orderNo
+				</#if>
+		]]> 
+	</sql>
+	<!-- 获取所有付款方来源  -->
+<!-- 	<sql id="getAppKeyAll">
+		 <![CDATA[  
+			SELECT  a.appKey,a.name FROM access_sys_config  a where a.status=1 
+		]]>
+		</sql> -->
+
+	<!-- 根据订单号查询(退款使用) -->
+	<sql id="getTradeByOrderNoForRecord">
+		<![CDATA[ 
+			select 
+				pt.id,
+				pe.payTypeName AS  payType,
+				pt.payAmt,
+				pt.payTime,
+				pt.thirdPayNumber,
+				pt.payCenterNumber
+				from pay_trade pt
+				LEFT JOIN pay_type pe on pt.payType = pe.payType
+				where pt.requestNo != 2
+				<#if orderNo?exists && orderNo!="">
+					and pt.orderNo=:orderNo
+				</#if>
+				limit 1
+		]]> 
+	</sql>
+</sqlMap>

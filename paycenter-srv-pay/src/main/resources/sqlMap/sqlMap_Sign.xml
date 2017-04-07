@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="sign_map">
+
+	<sql id="queryListByUUID">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			<#assign content=tableName />
+			${content}
+			where sign=:sign
+	]]>
+	</sql>
+	
+	<sql id="updateSignByUUID">
+	<![CDATA[
+		update 
+			<#assign content=tableName />
+				${content}
+		 set sign=:sign where id=:id
+	]]>
+	</sql>
+	
+	<sql id="queryListByIds">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			<#assign content=tableName />
+			${content}
+			where 1=1
+			<#assign listSize = idList?size />
+				AND id IN (
+					<#list idList as ids>
+						<#if ids_index != listSize-1>
+								${ids} ,
+							<#else>
+								${ids}
+						</#if>
+					</#list>
+				)
+			
+	]]>
+	</sql>
+	
+	<sql id="insertSignError">
+	<![CDATA[
+		INSERT INTO sign_error (tableName,bizType,content,remark) VALUES (:tableName,:bizType,:content,:error);
+	]]>
+	</sql>
+	
+</sqlMap>

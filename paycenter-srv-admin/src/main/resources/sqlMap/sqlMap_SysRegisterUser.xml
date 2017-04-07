@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysRegisterUser">
+	<sql id="pageWhere">
+		<where>
+			AND sru.deleted="0"			
+			<if test="userCode != null">
+				AND sru.userCode like "%":userCode"%"
+			</if>
+			<if test="userName != null">
+				AND sru.userName like "%":userName"%" 
+			</if>
+			<if test="locked != null">
+				AND sru.locked =:locked
+			</if>
+			<if test="type != null">
+				AND sru.type =:type
+			</if>
+			<if test="orgUnitId != null">
+				and sru.orgUnitId =:orgUnitId
+			</if>
+			<if test="roleTotal == 1">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) > 0
+			</if>
+			<if test="roleTotal == 0">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) = 0
+			</if>
+			<if test="mobile != null">
+				AND sru.mobile LIKE "%":mobile"%"
+			</if>
+		</where>
+	</sql>
+	<!-- 查询所有实体 -->
+	<select id="getAll">
+	     <![CDATA[
+	        SELECT sru.userID,sru.userCode,sru.userName,sru.userPassWord,sru.mobile,sru.orgUnitId,
+					 sru.locked,sru.deleted,sru.pwdErrorTimes,sru.createUserID, 
+					 sru.createTime,sru.updateUserID,sru.updateTime,sru.deletedUserID,sru.deletedTime,
+					 sru.type,sru.orgUnitId,sru.type
+			 FROM sysregisteruser sru
+	      ]]>
+	      <include refid="pageWhere"/>
+	      ORDER BY sru.createTime DESC
+    </select>
+    <!-- 查询一个用户实体 -->
+    <sql id="get">
+	     <![CDATA[
+	         SELECT sru.userID,sru.userCode,sru.userName,sru.userPassWord,sru.mobile,sru.orgUnitId,
+					 sru.locked,sru.deleted,sru.pwdErrorTimes,sru.createUserID, 
+					 sru.createTime,sru.updateUserID,sru.updateTime,sru.deletedUserID,sru.deletedTime,
+					 sru.type,sru.orgUnitId
+			
+			 FROM sysregisteruser sru
+		 	 WHERE sru.userID=:userID
+	      ]]>
+    </sql>
+    
+    <sql id="insert">
+		INSERT INTO sysregisteruser
+		(
+			userID,userCode,userName,userPassWord,locked,deleted,pwdErrorTimes,createUserID,createTime,
+			updateUserID,updateTime,deletedUserID,deletedTime,type,orgUnitId,mobile
+		)
+		VALUES 
+		(
+			:userID,:userCode,:userName,:userPassWord,0,0,0,:createUserID,SYSDATE(),   
+			null,null,null,null,:type,:orgUnitId,:mobile
+		)
+	</sql>
+	
+	<sql id="update">
+		UPDATE sysregisteruser 
+		SET 
+			userName=:userName, 
+			mobile=:mobile,
+			orgUnitId=:orgUnitId,
+			updateUserID=:updateUserID, 
+			updateTime=SYSDATE()  
+		WHERE 
+			userID=:userID
+	</sql>
+	
+	<sql id="delete">
+		delete from SysLog where logId=:logId
+	</sql>
+	
+	<!-- 批量用户删除 -->
+	<sql id="updateDelFlag">
+		DELETE FROM sysregisteruser 
+		WHERE 
+			userID=:userID
+	</sql>
+	
+	<!-- 分页查询 -->	
+	<sql id="getByCondition">
+		 <![CDATA[  
+			SELECT sru.userID,sru.userCode,sru.userName,sru.userPassWord,sru.mobile,
+					 sru.locked,sru.deleted,sru.pwdErrorTimes,sru.createUserID, 
+					 sru.createTime,sru.updateUserID,sru.updateTime,sru.deletedUserID,sru.deletedTime,
+					 sru.type,sru.orgUnitId,
+					 (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) AS total
+			 FROM sysregisteruser sru
+			 WHERE 1=1 
+			 AND sru.deleted="0"
+			 <#if userCode?exists && userCode!="" >
+			      AND sru.userCode like "%":userCode"%"
+			</#if>
+			<#if userName?exists && userName!="" >
+				AND sru.userName like "%":userName"%" 
+			</#if>
+			<#if locked?exists && locked!="" >
+				AND sru.locked =:locked
+			</#if>
+			<#if roleTotal?exists && roleTotal == "1">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) > 0
+			</#if>
+			<#if roleTotal?exists && roleTotal == "0">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) = 0
+			</#if>
+			<#if mobile?exists && mobile!="" >
+				AND sru.mobile LIKE "%":mobile"%"
+			</#if>
+		 	ORDER BY sru.createTime DESC
+			limit :startRow,:endRow
+		 ]]>
+	</sql>
+	
+	<!-- 记录总数 -->
+	<sql id="getTotal">
+		 <![CDATA[  
+			SELECT count(*) as total FROM sysregisteruser sru
+			WHERE 1=1 
+			 AND sru.deleted="0"
+			 <#if userCode?exists && userCode!="" >
+			      AND sru.userCode like "%":userCode"%"
+			</#if>
+			<#if userName?exists && userName!="" >
+				AND sru.userName like "%":userName"%" 
+			</#if>
+			<#if locked?exists && locked!="" >
+				AND sru.locked =:locked
+			</#if>
+			<#if roleTotal?exists && roleTotal == "1">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) > 0
+			</#if>
+			<#if roleTotal?exists && roleTotal == "0">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID) = 0
+			</#if>
+			<#if mobile?exists && mobile!="" >
+				AND sru.mobile LIKE "%":mobile"%"
+			</#if>
+		 ]]>
+	</sql>
+	
+	<!-- 通过ID,编号,名字查找ID,编号,名字 -->	
+	<sql id="getIDAndNameAndCodeByCondition">
+		 <![CDATA[  
+			SELECT sru.userID,sru.userCode,sru.userName,sru.userPassWord,sru.mobile, 
+					 sru.locked,sru.deleted,sru.pwdErrorTimes,sru.createUserID, 
+					 sru.createTime,sru.updateUserID,sru.updateTime,sru.deletedUserID,sru.deletedTime,
+					 sru.type,sru.orgUnitId,sru.type
+			 FROM sysregisteruser sru
+		 ]]>
+		<where>
+			<if test="qryUserID != null">
+				and sru.userID = :qryUserID
+			</if>
+			<if test="qryUserCode != null">
+				and sru.userCode = :qryUserCode
+			</if>
+			<if test="qryUserName != null">
+				or sru.userName = :qryUserName
+			</if>
+		</where>	
+		ORDER BY sru.userCode
+	</sql>
+	
+	<!-- 新增时检查用户名是否存在 -->
+	<sql id="checkUserName">
+	<![CDATA[  
+		select count(*) from sysregisteruser where userName=:userName
+	
+	 ]]>
+	</sql>
+	
+	<!-- 新增时检查用户编码是否存在 -->
+	<sql id="checkUserCode">
+	<![CDATA[  
+		select count(*) from sysregisteruser where userCode=:userCode
+	 ]]>
+	</sql>
+	
+	<!-- 修改时检查用户名是否存在 -->
+	<sql id="checkUpdUserName">
+		<![CDATA[  
+			SELECT COUNT(1) FROM sysregisteruser 
+			WHERE userName=:userName AND userID!=:userID
+		 ]]>
+	</sql>
+	
+	<!-- 锁定用户 -->
+	<sql id="lockUser">
+		UPDATE sysregisterUser 
+		SET 
+			locked=1, 
+			updateUserID=:updateUserID, 
+			updateTime=SYSDATE()  
+		WHERE 
+			userID=:userID and locked!=1
+	</sql>
+	
+	<!-- 解锁用户 -->
+	<sql id="unlockUser">
+		UPDATE sysregisterUser 
+		SET 
+			locked=0, 
+			pwdErrorTimes=0,
+			updateUserID=:updateUserID, 
+			updateTime=SYSDATE()  
+		WHERE 
+			userID=:userID and locked!=0
+	</sql>
+	
+	<!-- 密码重置 888888(md5) -->
+	<sql id="resetPassword">
+		UPDATE sysregisteruser 
+		SET 
+			userPassWord=:userPassWord, 
+			updateUserID=:updateUserID, 
+			updateTime=SYSDATE()  
+		WHERE 
+			userID=:userID and userPassWord!=:userPassWord
+	</sql>
+	
+	<!-- 查询密码是否正确by tanjun -->
+	<select id="getUserByPWD">
+		<![CDATA[
+			SELECT COUNT(1) FROM sysregisteruser sr
+			WHERE sr.userID=:userID AND sr.userPassWord=:userPassWord
+		]]>
+	</select>
+	
+	<!-- 修改用户密码 by tanjun -->
+	<update id="updateUserPwd">
+		<![CDATA[
+		UPDATE 	sysregisteruser 
+		SET 	userPassWord=:userNewPassWord
+		WHERE   userID=:userID
+		]]>
+	</update>
+	
+	<sql id="getUserPwd">
+		SELECT userPassWord FROM sysregisteruser 
+		WHERE 
+			userID=:userID
+	</sql>
+</sqlMap>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="demon_map">
+
+	<sql id="queryAll">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			<#assign content=tableName />
+			${content}
+			order by id desc
+			-- limit 1000
+	]]>
+	</sql>
+	
+	<sql id="updateById">
+	<![CDATA[
+		update 
+			<#assign content=tableName />
+				${content}
+		 set sign=:sign where id=:id
+	]]>
+	</sql>
+	
+</sqlMap>

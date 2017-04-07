@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysMenuButton">	
+	<select id="getSysButtonByID">
+		 <![CDATA[  
+			SELECT btnID, btnCode, btnName,menuID,createUserID,createTime 
+				FROM SysMenuButton 
+			where btnID = :btnID
+		 ]]>
+	</select>
+	
+	<!-- 记录总数 -->
+	<select id="getTotal">
+		 <![CDATA[  
+			SELECT count(*) as total FROM SysMenuButton
+			WHERE 1=1
+			<#if menuID?exists && menuID!="" >
+			     AND menuID =:menuID
+			</#if>
+		 	<#if btnCode?exists && btnCode!="" >
+			     AND btnCode =:btnCode
+			</#if>
+		 	<#if btnName?exists && btnName!="" >
+			     AND btnName =:btnName
+			</#if>
+		 ]]>
+	</select>
+	
+	<!-- 分页查询 -->	
+	<select id="getByCondition">
+		 <![CDATA[  
+			SELECT btnID, btnCode, btnName,menuID,createUserID,createTime FROM SysMenuButton where 1=1 
+		 	<#if menuID?exists && menuID!="" >
+			     AND menuID =:menuID
+			</#if>
+		 	<#if btnCode?exists && btnCode!="" >
+			     AND btnCode =:btnCode
+			</#if>
+		 	<#if btnName?exists && btnName!="" >
+			     AND btnName =:btnName
+			</#if>
+		 ]]>
+		 ORDER BY btnCode ASC
+		 limit :startRow,:endRow
+	</select>
+	
+	<!-- 检查按钮编码是否存在 -->
+	<select id="checkButtonCode">
+	<![CDATA[  
+		select count(*) from SysMenuButton where btnCode=:btnCode and btnID<>:btnID
+	]]>
+	</select>
+	<!-- 检查按钮是否与角色相关联 -->
+	<select id="checkButtonIsApplyRole">
+	<![CDATA[
+		select btnName from SysMenuButton sm 
+		INNER JOIN SysRightBtn sr ON sm.btnID=sr.btnID 
+		where 
+	]]>
+		<foreach collection="list" item="btnID" open=" ( " separator=" OR " close=")">
+		    sm.btnID=:btnID
+		</foreach>
+	limit 1
+	</select>
+	
+	<insert id="insert">
+		insert into SysMenuButton
+		(btnID, btnCode, btnName,menuID,createUserID,createTime) 
+		values 
+		(:btnID,:btnCode,:btnName,:menuID,:createUserID,SYSDATE())
+	</insert>
+	
+	<update id="update">
+		UPDATE SysMenuButton 
+			SET btnCode=:btnCode, btnName = :btnName
+		WHERE 
+			btnID=:btnID
+	</update>
+	
+	<delete id="delete">
+		delete from SysMenuButton where btnID=:btnID
+	</delete>
+<!-- 		<foreach collection="list" item="btnID" open=" ( " separator=" OR " close=")"> -->
+<!-- 		    btnID=#{btnID} -->
+<!-- 		</foreach> -->
+	
+	<!-- 根据菜单ID删除按钮 -->
+	<delete id="deleteByMenuID">
+		DELETE FROM SysMenuButton WHERE menuID=:menuID
+	</delete>
+	
+</sqlMap>

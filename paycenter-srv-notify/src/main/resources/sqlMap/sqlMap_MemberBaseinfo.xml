@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="MemberBaseinfo">
+	<!-- 根据ID 精确查找 -->
+	<sql id="getByMemberId">
+	<![CDATA[
+		SELECT 
+			t.memberId,account,password,level,nickName,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime,t.userType,t.integral,t.subShow,c.status as isAuth,
+			c.linkMan as companyContact ,c.companyName,cCityId	as ccityId,c.idCard	,t.nsyUserType, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend 
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE
+			t.memberId  =:memberId 
+	]]>
+	</sql>
+	
+	<!-- 根据 mobile 精确查找 -->
+	<sql id="getByMobile">
+	<![CDATA[
+		SELECT 
+			t.memberId,t.account,password,level,nickName,realName,t.nsyUserType,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime,userType,integral,subShow, c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId as ccityId,c.idCard		
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE 
+			t.mobile  =:mobile 
+			or t.account=:mobile
+	]]>
+	</sql>
+	
+	<sql id="getRecordByMemberInfo">
+	<![CDATA[
+		SELECT 
+			count(1)	
+		FROM 
+			integral
+		WHERE 
+         memberId_ed=:id
+			and type=3
+	]]>
+	</sql>
+	
+	<!-- 根据 mobile and Level  精确查找 -->
+	<sql id="getByMobileAndLevel">
+	<![CDATA[
+		SELECT 
+			t.memberId,t.account,password,t.level,nickName,t.nsyUserType,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime,userType,subShow, c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId	as ccityId,c.idCard	
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE 
+			t.mobile  =:mobile 
+			and t.level=:level
+		or 
+			t.account  =:account 
+			and t.level=:level
+	]]>
+	</sql>
+	
+	<!-- 全查找 -->
+	<sql id="getAll">
+	<![CDATA[
+		SELECT 
+			t.memberId,account,password,level,nickName,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime, t.integral,t.subShow,c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId	as ccityId,c.idCard	
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	<!-- 根据昵称查找 -->
+	<sql id="getByNickName">
+	<![CDATA[
+		SELECT 
+			t.memberId,account,password,level,nickName,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime,t.integral,t.subShow, c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId	as ccityId,c.idCard	
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE
+			nickName like "%":nickName"%"
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	
+	<!-- 根据账号查找 -->
+	<sql id="getByAccount">
+	<![CDATA[
+		SELECT 
+			t.memberId,account,password,level,nickName,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime,userType,subShow, c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId	as ccityId,c.idCard	
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE
+			account =:account 
+	]]>
+	</sql>
+	
+	<!-- 根据账号查找用户 -->
+	<sql id="getByAccountNoCer">
+	<![CDATA[
+		SELECT
+			t.*,rbm.marketId as marketId
+		FROM
+			member_baseinfo AS t
+		right JOIN business_baseinfo bb  ON bb.userId = t.memberId
+		left JOIN re_business_market rbm ON rbm.businessId = bb.businessId
+		WHERE t.account = :account 
+	]]>
+	</sql>	
+	
+		<!-- 根据账号like查找 -->
+	<sql id="getByAccountLike">
+	<![CDATA[
+		SELECT 
+			t.memberId,account,password,level,nickName,realName,sex,birthday,t.mobile,telephone,email,qq,weixin,t.regetype,t.ip,t.device_tokens,t.zipCode, t.memberGrade, t.validTime, t.expireTime, t.shopRecommend,
+			weibo,icon,provinceId,cityId,areaId,address,lon,lat,t.status,t.createUserId,t.createTime,t.updateUserId,t.updateTime, t.integral,t.subShow,c.status as isAuth,c.linkMan as companyContact,c.companyName,cCityId	as ccityId,c.idCard	
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE
+			account like "%":account"%"
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	
+	
+	<!-- 统计总共记录数  -->
+	<sql id="getTotalNew">
+	<![CDATA[
+		SELECT 
+			count(1)  
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		WHERE  1=1 
+			<#if account?exists && account!="" >
+			     AND account like "%":account"%"
+			</#if>
+			<#if level?exists && level!="" >
+				 AND    level=:level
+			</#if>	 
+			<#if openId?exists && openId!="" >
+				 AND (openId  IS ＮOT  NULL OR openId!="")
+			</#if>	 
+			<#if nickName?exists && nickName!="" >
+			     AND nickName like "%":nickName"%"
+			</#if>	     
+			<#if realName?exists && realName!="" >
+			     AND realName like "%":realName"%"
+			</#if>	     
+			<#if mobile?exists && mobile!="" >
+			     AND t.mobile like  "%":mobile"%"
+			</#if>	    
+			<#if telephone?exists && telephone!="" >
+				 AND telephone like  "%":telephone"%"
+			</#if>	    
+			<#if email?exists && email!="" >
+				 AND email like  "%":email"%"
+			</#if>	    
+			<#if qq?exists && qq!="" >
+				 AND qq like  "%":qq"%"
+			</#if>	    
+			<#if weixin?exists && weixin!="" >
+				 AND weixin like  "%":weixin"%"
+			</#if>	    
+			<#if weibo?exists && weibo!="" >
+				 AND weibo like  "%":weibo"%"
+			</#if>	    
+			<#if provinceId?exists && provinceId!="" >
+				AND provinceId=:provinceId
+			</#if>	    
+			<#if cityId?exists && cityId!="" >
+				AND  cityId=:cityId
+			</#if>	    
+			<#if areaId?exists && areaId!="" >
+				AND  areaId=:areaId
+			</#if>	    
+			<#if address?exists && address!="" >
+				 AND address like  "%":address"%"
+			</#if>	    
+			<#if lon?exists && lon!="" >
+				 AND lon=:lon
+			</#if>	    
+			<#if lat?exists && lat!="" >
+				 AND lat=:lat
+			</#if>	    
+			<#if status?exists && status!="" >
+				 AND t.status=:status
+			</#if>
+			<#if startdate?exists && startdate!="" >
+			     AND DATE_FORMAT(t.createTime,'%Y-%m-%d') >= DATE_FORMAT(:startdate,'%Y-%m-%d')
+			</#if>
+			<#if enddate?exists && enddate!="" >
+			     AND DATE_FORMAT(t.createTime,'%Y-%m-%d') <= DATE_FORMAT(:enddate,'%Y-%m-%d')
+			</#if>	 
+			<#if isAuth?exists && isAuth!=""&& isAuth!="0" >
+				AND c.status = :isAuth
+			</#if>
+			<#if isAuth?exists && isAuth=="0" >
+			      AND (c.status = 0 OR c.status is NULL)
+			</#if>
+	]]>
+	</sql>
+	
+	<sql id="getTotal">
+	<![CDATA[
+		SELECT 
+			count(1)
+		FROM 
+			member_baseinfo  t 
+		LEFT JOIN
+			member_certifi c
+		ON
+			t.memberId=c.memberId
+		LEFT JOIN
+			business_baseinfo b 
+		on 
+		b.userId=t.memberId
+		LEFT JOIN
+		re_business_market rbm
+		on
+		rbm.businessId=b.businessId
+		LEFT JOIN
+		market mar
+		on 
+		rbm.marketId=mar.id
+
+		WHERE  1=1 
+			<#if account?exists && account!="" >
+			     AND account like "%":account"%"
+			</#if>
+			<#if level?exists && level!="" >
+				 AND    level=:level
+			</#if>	 
+			<#if regetype?exists && regetype!="" >
+				 AND regetype=:regetype 
+			</#if>	
+			<#if nickName?exists && nickName!="" >
+			     AND nickName like "%":nickName"%"
+			</#if>	     
+			<#if realName?exists && realName!="" >
+			     AND realName like "%":realName"%"
+			</#if>	     
+			<#if mobile?exists && mobile!="" >
+			     AND t.mobile like  "%":mobile"%"
+			</#if>	    
+			<#if telephone?exists && telephone!="" >
+				 AND telephone like  "%":telephone"%"
+			</#if>	    
+			<#if email?exists && email!="" >
+				 AND email like  "%":email"%"
+			</#if>	    
+			<#if qq?exists && qq!="" >
+				 AND qq like  "%":qq"%"
+			</#if>	    
+			<#if weixin?exists && weixin!="" >
+				 AND weixin like  "%":weixin"%"
+			</#if>	    
+			<#if weibo?exists && weibo!="" >
+				 AND weibo like  "%":weibo"%"
+			</#if>	    
+			<#if provinceId?exists && provinceId!="" >
+				AND provinceId=:provinceId
+			</#if>	    
+			<#if cityId?exists && cityId!="" >
+				AND  cityId=:cityId
+			</#if>	    
+			<#if areaId?exists && areaId!="" >
+				AND  areaId=:areaId
+			</#if>	    
+			<#if address?exists && address!="" >
+				 AND address like  "%":address"%"
+			</#if>	    
+			<#if lon?exists && lon!="" >
+				 AND lon=:lon
+			</#if>	    
+			<#if lat?exists && lat!="" >
+				 AND lat=:lat
+			</#if>	    
+			<#if status?exists && status!="" >
+				 AND t.status=:status
+			</#if>
+			<#if startdate?exists && startdate!="" >
+			     AND DATE_FORMAT(t.createTime,'%Y-%m-%d') >= DATE_FORMAT(:startdate,'%Y-%m-%d')
+			</#if>
+			<#if enddate?exists && enddate!="" >
+			     AND DATE_FORMAT(t.createTime,'%Y-%m-%d') <= DATE_FORMAT(:enddate,'%Y-%m-%d')
+			</#if>	 
+			<#if isAuth?exists && isAuth!=""&& isAuth!="0" >
+				AND c.status = :isAuth
+			</#if>
+			<#if isAuth?exists && isAuth=="0" >
+			      AND (c.status = 0 OR c.status is NULL)
+			</#if>
+			<#if marketId?exists && marketId!="">
+				And mar.id = :marketId And t.level != 4 
+			</#if>
+			<#if memberGrade?exists && memberGrade!="" >
+				AND t.memberGrade = :memberGrade
+			</#if>
+			<#if shopsName?exists && shopsName!="" >
+				AND b.shopsName like "%":shopsName"%"
+			</#if>
+			<#if certstatus?exists && certstatus!="0" && certstatus!="3" >
+				 AND c.STATUS=:certstatus
+			</#if>
+			<#if certstatus?exists && certstatus=="0" >
+				 AND c.status=:certstatus
+			</#if>
+			<#if certstatus?exists && certstatus=="3" >
+				 AND c.status is NULL
+			</#if>
+	]]>
+	</sql>
+	
+	<!-- 增加记录，注意date类型的，使用  _string 字段的值，代替date类型的值  -->
+	<sql id="addMemberBaseinfo">
+	<![CDATA[
+	    INSERT INTO  
+	    	member_baseinfo
+	    	(
+	    	memberId,realName,level,mobile,account,regetype,status,updateTime
+			)
+	    VALUES
+	    	(
+	    	:memberId,:realName,:level,:mobile,:account,:regetype,:status,:updateTime
+			)
+	]]>
+	</sql>
+	
+	<!-- 根据 memberId 更新记录，全部更新用此 sql -->
+	<!-- 	2015年11月30日16:51:22 确认，不管什么情况下，level 角色不能变，在update语句中，去掉level的更新
+			<#if level?exists && level!="" >
+					     level=:level,
+			</#if>	
+			 -->
+	<sql id="updateMemberBaseinfo">
+	<![CDATA[
+	    UPDATE  
+	    	member_baseinfo
+	    SET 
+			<#if account?exists && account!="" >
+					     account=:account,
+			</#if>	    
+			<#if password?exists && password!="" >
+					     password=:password,
+			</#if>	    
+			<#if nsyUserType?exists && nsyUserType!="" >
+					     nsyUserType=:nsyUserType,
+			</#if>	    
+			<#if nickName?exists && nickName!="" >
+					     nickName=:nickName,
+			</#if>	 
+			<#if realName?exists && realName!="" >
+					     realName=:realName,
+			</#if>	
+			<#if  ccityId?exists && ccityId!=""  && ccityId!=0 >
+					    cCityId=:ccityId,
+			</#if>    
+			<#if sex?exists && sex!="" >
+					     sex=:sex,
+			</#if>	    
+			<#if birthday?exists && birthday!="" >
+					     birthday=:birthday_string,
+			</#if>	    
+			<#if mobile?exists && mobile!="" >
+					     mobile=:mobile,
+			</#if>	    
+			<#if telephone?exists  >
+					     telephone=:telephone,
+			</#if>	    
+			<#if email?exists  >
+					     email=:email,
+			</#if>	    
+			<#if qq?exists && qq!="" >
+					     qq=:qq,
+			</#if>	    
+			<#if weixin?exists && weixin!="" >
+					     weixin=:weixin,
+			</#if>	
+			<#if openId?exists && openId!="" >
+					     openId=:openId,
+			</#if>	
+			<#if regetype?exists && regetype!="" >
+					     regetype=:regetype,
+			</#if>
+			<#if ip?exists && ip!="" >
+					     ip=:ip,
+			</#if>
+			<#if zipCode?exists >
+					     zipCode=:zipCode,
+			</#if>
+			<#if device_tokens?exists && device_tokens!="" >
+					     device_tokens=:device_tokens,
+			</#if>    
+			<#if weibo?exists && weibo!="" >
+					     weibo=:weibo,
+			</#if>	   
+			<#if icon?exists && icon!="" >
+					     icon=:icon,
+			</#if>	    
+			<#if provinceId?exists && provinceId!="" >
+					     provinceId=:provinceId,
+			</#if>	    
+			<#if cityId?exists && cityId!="">
+					     cityId=:cityId,
+			</#if>	    
+			<#if areaId?exists && areaId!="" >
+					     areaId=:areaId,
+			</#if>	    
+			<#if address?exists   >
+					     address=:address,
+			</#if>	    
+			<#if lon?exists && lon!="" >
+					     lon=:lon,
+			</#if>	    
+			<#if lat?exists && lat!="" >
+					     lat=:lat,
+			</#if>	 
+			<#if updateUserId?exists && updateUserId!="" >
+					     updateUserId=:updateUserId,
+			</#if>
+			<#if userType?exists && userType!="" &&userType!=0>
+					     userType=:userType,
+			</#if>
+			<#if andupurl?exists && andupurl!="" >
+					     andupurl=:andupurl,
+			</#if>
+			<#if nstCreateTimeFlag?exists && nstCreateTimeFlag!="" && nstCreateTimeFlag==1>
+					     nstCreateTime=SYSDATE(),
+			</#if>
+			<#if unionid?exists && unionid!="">
+					     unionid=:unionid,
+			</#if>
+			<#if gh_id?exists && gh_id!="">
+					     gh_id=:gh_id,
+			</#if>
+			<#if memberGrade?exists && memberGrade==0>
+					     memberGrade=0,
+					     validTime=null,
+					     expireTime=null,
+			</#if>
+			<#if memberGrade?exists && memberGrade==1>
+					     memberGrade=1,
+					     validTime=sysdate(),
+					     expireTime=DATE_ADD(DATE_ADD(sysdate(),INTERVAL 1 year),INTERVAL -1 day),
+			</#if>
+			<#if shopRecommend?exists && shopRecommend!="">
+					     shopRecommend=:shopRecommend,
+			</#if>
+						 updateTime = SYSDATE()
+			WHERE 
+		    	memberId=:memberId
+	]]>
+	</sql>
+	
+<!-- 	 			
+2015年12月3日 用户莫名奇妙被禁用，单独开个sql 更新status.
+ -->	 
+	 <sql id="updateStatus">
+	<![CDATA[
+	    UPDATE  
+	    	member_baseinfo
+	    SET 
+			<#if status?exists && status!="" >
+				status=:status,
+			</#if>	   
+				updateTime = SYSDATE()
+		WHERE 
+		    memberId=:memberId
+	]]>
+	</sql>
+</sqlMap>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PosMachineConfig">
+	<sql id="queryByCondition">
+	<![CDATA[
+		SELECT 
+			pm.machineNum,pm.businessId,pm.shopsName,pm.marketName,pm.marketId,pm.createTime,
+			mb.account,mb.mobile,mb.level
+		FROM 
+			pos_machine_config pm
+		LEFT JOIN member_baseinfo mb ON pm.memberId = mb.memberId
+		WHERE
+	    	pm.`state` = '1' 
+	    AND pm.hasClear=1
+	    AND pm.machineNum <> ""
+		AND EXISTS (
+		    SELECT
+		        1
+		    FROM
+		        (
+		            SELECT
+		                MAX(id) AS maxId
+		            FROM
+		                pos_machine_config t
+		            GROUP BY
+		                t.`machineNum`
+		        ) s
+		    WHERE
+		        s.maxId = pm.id
+		)
+		<#if machineNum?exists && machineNum!="" >
+			AND pm.machineNum like "%":machineNum"%"
+		</#if>
+		<#if shopsName?exists && shopsName!="" >
+			AND pm.shopsName like "%":shopsName"%"
+		</#if>
+		<#if marketId?exists && marketId!="" >
+			AND pm.marketId=:marketId
+		</#if>
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	
+	<sql id="queryCount">
+	<![CDATA[
+		SELECT 
+			count(1)
+		FROM 
+			pos_machine_config pm
+		LEFT JOIN member_baseinfo mb ON pm.memberId = mb.memberId	
+		WHERE
+	    	pm.`state` = '1' 
+	    AND pm.hasClear=1
+	    AND pm.machineNum <> ""
+		AND EXISTS (
+		    SELECT
+		        1
+		    FROM
+		        (
+		            SELECT
+		                MAX(id) AS maxId
+		            FROM
+		                pos_machine_config t
+		            GROUP BY
+		                t.`machineNum`
+		        ) s
+		    WHERE
+		        s.maxId = pm.id
+		)
+		<#if machineNum?exists && machineNum!="" >
+			AND pm.machineNum like "%":machineNum"%"
+		</#if>
+		<#if shopsName?exists && shopsName!="" >
+			AND pm.shopsName like "%":shopsName"%"
+		</#if>
+		<#if marketId?exists && marketId!="" >
+			AND pm.marketId=:marketId
+		</#if>
+	]]>
+	</sql>
+</sqlMap>

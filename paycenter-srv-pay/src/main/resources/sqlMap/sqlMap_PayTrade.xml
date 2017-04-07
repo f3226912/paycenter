@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayTrade">
+	<sql id="queryPayCenterNumber">
+	<![CDATA[
+		SELECT	nextval('gd_pay')
+	]]>
+	</sql>
+	
+	<sql id="queryById">
+	<![CDATA[
+		select id,version,orderNo,title,payType,payCenterNumber,thirdPayNumber,timeOut,payTime,
+		closeTime,payStatus,appKey,notifyStatus,reParam,returnUrl,notifyUrl,totalAmt,
+		payAmt,receiptAmt,orderTime,closeUserId,thirdPayerAccount,payerUserId,payerAccount, payerName,
+		payeeUserId, payeeAccount,payeeName,thirdPayeeAccount,rate,feeAmt,refundUserId,refundTime,
+		extendJson,requestIp,payerMobile,payeeMobile,requestNo,payCount,logisticsUserId from pay_trade
+		where id=:id
+	]]>
+	</sql>
+	
+	<sql id="queryPayTrade">
+	<![CDATA[
+		select id,version,orderNo,title,payType,payCenterNumber,thirdPayNumber,timeOut,payTime,
+		closeTime,payStatus,appKey,notifyStatus,reParam,returnUrl,notifyUrl,totalAmt,
+		payAmt,receiptAmt,orderTime,closeUserId,thirdPayerAccount,payerUserId,payerAccount, payerName,
+		payeeUserId, payeeAccount,payeeName,thirdPayeeAccount,rate,feeAmt,refundUserId,refundTime,
+		extendJson,requestIp,payerMobile,payeeMobile,requestNo,payCount,logisticsUserId from pay_trade
+		where 1=1
+		<#if orderNo?exists && orderNo!="" > 
+ 					and orderNo=:orderNo 
+ 		</#if>
+ 		<#if appKey?exists && appKey!="" > 
+ 					and appKey=:appKey 
+ 		</#if>
+ 		<#if requestNo?exists && requestNo!="" > 
+ 					and requestNo=:requestNo 
+ 		</#if>
+ 		<#if payCenterNumber?exists && payCenterNumber!="" > 
+ 					and payCenterNumber=:payCenterNumber 
+ 		</#if>
+ 		<#if thirdPayNumber?exists && thirdPayNumber!="" > 
+ 					and thirdPayNumber=:thirdPayNumber 
+ 		</#if>
+ 		<#if payStatus?exists && payStatus!="" > 
+ 					and payStatus=:payStatus 
+ 		</#if>
+	]]>
+	</sql>
+	
+	<sql id="updateByOrderNo">
+	<![CDATA[
+		update pay_trade set 
+		<#if title?exists && title!="" > 
+ 			title=:title,
+ 		</#if>
+		<#if payType?exists && payType!="" > 
+ 			payType=:payType,
+ 		</#if>
+		<#if thirdPayNumber?exists && thirdPayNumber!="" > 
+ 			thirdPayNumber=:thirdPayNumber,
+ 		</#if>
+		<#if timeOut?exists && timeOut!="" > 
+ 			timeOut=:timeOut,
+ 		</#if>
+ 		<#if payTime?exists && payTime!="" > 
+ 			payTime=:payTime,
+ 		</#if>
+ 		<#if closeTime?exists && closeTime!="" > 
+ 			closeTime=:closeTime,
+ 		</#if>
+ 		<#if payStatus?exists && payStatus!="" > 
+ 			payStatus=:payStatus,
+ 		</#if>
+ 		<#if notifyStatus?exists && notifyStatus!="" > 
+ 			notifyStatus=:notifyStatus,
+ 		</#if>
+ 		<#if reParam?exists && reParam!="" > 
+ 			reParam=:reParam,
+ 		</#if>
+ 		<#if returnUrl?exists && returnUrl!="" > 
+ 			returnUrl=:returnUrl,
+ 		</#if>
+ 		<#if totalAmt?exists && totalAmt!="" > 
+ 			totalAmt=:totalAmt,
+ 		</#if>
+ 		<#if payAmt?exists && payAmt!="" > 
+ 			payAmt=:payAmt,
+ 		</#if>
+ 		<#if receiptAmt?exists && receiptAmt!="" > 
+ 			receiptAmt=:receiptAmt,
+ 		</#if>
+ 		<#if orderTime?exists && orderTime!="" > 
+ 			orderTime=:orderTime,
+ 		</#if>
+ 		<#if closeUserId?exists && closeUserId!="" > 
+ 			closeUserId=:closeUserId,
+ 		</#if>
+ 		<#if thirdPayerAccount?exists && thirdPayerAccount!="" > 
+ 			thirdPayerAccount=:thirdPayerAccount,
+ 		</#if>
+ 		<#if payerUserId?exists && payerUserId!="" > 
+ 			payerUserId=:payerUserId,
+ 		</#if>
+ 		<#if payerAccount?exists && payerAccount!="" > 
+ 			payerAccount=:payerAccount,
+ 		</#if>
+ 		<#if payerName?exists && payerName!="" > 
+ 			payerName=:payerName,
+ 		</#if>
+ 		
+ 		<#if payeeUserId?exists && payeeUserId!="" > 
+ 			payeeUserId=:payeeUserId,
+ 		</#if>
+ 		<#if payeeAccount?exists && payeeAccount!="" > 
+ 			payeeAccount=:payeeAccount,
+ 		</#if>
+ 		<#if payeeName?exists && payeeName!="" > 
+ 			payeeName=:payeeName,
+ 		</#if>
+ 		
+ 		<#if thirdPayeeAccount?exists && thirdPayeeAccount!="" > 
+ 			thirdPayeeAccount=:thirdPayeeAccount,
+ 		</#if>
+ 		<#if rate?exists && rate!="" > 
+ 			rate=:rate,
+ 		</#if>
+ 		<#if feeAmt?exists && feeAmt!="" > 
+ 			feeAmt=:feeAmt,
+ 		</#if>
+ 		
+ 		<#if refundUserId?exists && refundUserId!="" > 
+ 			refundUserId=:refundUserId,
+ 		</#if>
+ 		<#if refundTime?exists && refundTime!="" > 
+ 			refundTime=:refundTime,
+ 		</#if>
+ 		<#if requestIp?exists && requestIp!="" > 
+ 			requestIp=:requestIp,
+ 		</#if>
+ 		<#if payerMobile?exists && payerMobile!="" > 
+ 			payerMobile=:payerMobile,
+ 		</#if>
+ 		<#if payeeMobile?exists && payeeMobile!="" > 
+ 			payeeMobile=:payeeMobile,
+ 		</#if>
+ 		<#if payType?exists && payType!="" > 
+ 			payType=:payType,
+ 		</#if>
+ 		<#if sign?exists && sign!="" > 
+ 			sign=:sign,
+ 		</#if>
+ 		updateTime = now()
+		where 1 = 1 
+			and payCenterNumber=:payCenterNumber
+			and orderNo=:orderNo
+	]]>
+	</sql>
+	
+	<!-- 根据订单号进行更新 -->
+	<sql id="updateTradeByPayCenterNumber">
+	<![CDATA[
+		update pay_trade set 
+		<#if title?exists && title!="" > 
+ 			title=:title,
+ 		</#if>
+		<#if payType?exists && payType!="" > 
+ 			payType=:payType,
+ 		</#if>
+		<#if thirdPayNumber?exists && thirdPayNumber!="" > 
+ 			thirdPayNumber=:thirdPayNumber,
+ 		</#if>
+		<#if timeOut?exists && timeOut!="" > 
+ 			timeOut=:timeOut,
+ 		</#if>
+ 		<#if payTime?exists && payTime!="" > 
+ 			payTime=:payTime,
+ 		</#if>
+ 		<#if closeTime?exists && closeTime!="" > 
+ 			closeTime=:closeTime,
+ 		</#if>
+ 		<#if payStatus?exists && payStatus!="" > 
+ 			payStatus=:payStatus,
+ 		</#if>
+ 		<#if notifyStatus?exists && notifyStatus!="" > 
+ 			notifyStatus=:notifyStatus,
+ 		</#if>
+ 		<#if reParam?exists && reParam!="" > 
+ 			reParam=:reParam,
+ 		</#if>
+ 		<#if returnUrl?exists && returnUrl!="" > 
+ 			returnUrl=:returnUrl,
+ 		</#if>
+ 		<#if totalAmt?exists && totalAmt!="" > 
+ 			totalAmt=:totalAmt,
+ 		</#if>
+ 		<#if payAmt?exists && payAmt!="" > 
+ 			payAmt=:payAmt,
+ 		</#if>
+ 		<#if receiptAmt?exists && receiptAmt!="" > 
+ 			receiptAmt=:receiptAmt,
+ 		</#if>
+ 		<#if orderTime?exists && orderTime!="" > 
+ 			orderTime=:orderTime,
+ 		</#if>
+ 		<#if closeUserId?exists && closeUserId!="" > 
+ 			closeUserId=:closeUserId,
+ 		</#if>
+ 		<#if thirdPayerAccount?exists && thirdPayerAccount!="" > 
+ 			thirdPayerAccount=:thirdPayerAccount,
+ 		</#if>
+ 		<#if payerUserId?exists && payerUserId!="" > 
+ 			payerUserId=:payerUserId,
+ 		</#if>
+ 		<#if payerAccount?exists && payerAccount!="" > 
+ 			payerAccount=:payerAccount,
+ 		</#if>
+ 		<#if payerName?exists && payerName!="" > 
+ 			payerName=:payerName,
+ 		</#if>
+ 		
+ 		<#if payeeUserId?exists && payeeUserId!="" > 
+ 			payeeUserId=:payeeUserId,
+ 		</#if>
+ 		<#if payeeAccount?exists && payeeAccount!="" > 
+ 			payeeAccount=:payeeAccount,
+ 		</#if>
+ 		<#if payeeName?exists && payeeName!="" > 
+ 			payeeName=:payeeName,
+ 		</#if>
+ 		
+ 		<#if thirdPayeeAccount?exists && thirdPayeeAccount!="" > 
+ 			thirdPayeeAccount=:thirdPayeeAccount,
+ 		</#if>
+ 		<#if rate?exists && rate!="" > 
+ 			rate=:rate,
+ 		</#if>
+ 		<#if feeAmt?exists && feeAmt!="" > 
+ 			feeAmt=:feeAmt,
+ 		</#if>
+ 		
+ 		<#if refundUserId?exists && refundUserId!="" > 
+ 			refundUserId=:refundUserId,
+ 		</#if>
+ 		<#if refundTime?exists && refundTime!="" > 
+ 			refundTime=:refundTime,
+ 		</#if>
+ 		<#if requestIp?exists && requestIp!="" > 
+ 			requestIp=:requestIp,
+ 		</#if>
+ 		<#if payerMobile?exists && payerMobile!="" > 
+ 			payerMobile=:payerMobile,
+ 		</#if>
+ 		<#if payeeMobile?exists && payeeMobile!="" > 
+ 			payeeMobile=:payeeMobile,
+ 		</#if>
+ 		<#if payType?exists && payType!="" > 
+ 			payType=:payType,
+ 		</#if>
+ 		<#if sign?exists && sign!="" > 
+ 			sign=:sign,
+ 		</#if>
+ 		updateTime = now()
+		where payCenterNumber=:payCenterNumber
+
+	]]>
+	</sql>
+	<sql id="insertPayTradeExtend">
+	<![CDATA[
+		insert into pay_trade_extend(appKey,orderNo,marketId,businessId,orderType,businessName,marketName,version)
+		values(:appKey,:orderNo,:marketId,:businessId,:orderType,:businessName,:marketName,:version)
+	]]>
+	</sql>
+	<sql id="insertPayTradePos">
+	<![CDATA[
+		insert into pay_trade_pos(payCenterNumber,posClientNo,payChannelCode,bankCardNo)
+		values(:payCenterNumber,:posClientNo,:payChannelCode,:bankCardNo)
+	]]>
+	</sql>
+	
+	<sql id="getPayTradePos">
+		<![CDATA[
+			select payCenterNumber,posClientNo,payChannelCode,bankCardNo
+			from pay_trade_pos where payCenterNumber=:payCenterNumber
+	]]>
+	</sql>
+	
+	<sql id="getPayTradeExtend">
+		<![CDATA[
+			select orderNo,orderType
+			from pay_trade_extend where orderNo=:orderNo and appKey=:appKey
+	]]>
+	</sql>
+	
+	<sql id="getPayChannelByChannelCode">
+		<![CDATA[
+			select id,payChannelCode,gdBankCardNo,bankName
+			from pay_channel where payChannelCode=:payChannelCode
+	]]>
+	</sql>
+	
+	<sql id="getPosMachineConfigCount">
+		<![CDATA[
+			select count(*)
+			from pos_machine_config where machineNum=:posClientNo
+	]]>
+	</sql>
+	
+	<sql id="getPosMachineConfig">
+		<![CDATA[
+			select businessId
+			from pos_machine_config where machineNum=:posClientNo
+	]]>
+	</sql>
+	
+	<sql id="getMemberBaseinfo">
+		<![CDATA[
+			select memberId,account,realName,mobile from member_baseinfo where memberId=:memberId
+	]]>
+	</sql>
+	
+	<sql id="deletePayTrade">
+		<![CDATA[
+			delete from pay_trade where payCenterNumber=:payCenterNumber
+		]]>
+	</sql>
+	
+	<sql id="deletePayTradePos">
+		<![CDATA[
+			delete from pay_trade_pos where payCenterNumber=:payCenterNumber
+		]]>
+	</sql>
+	
+	<sql id="getMaxIdByPosCientNo">
+		<![CDATA[
+			select max(id) from pos_machine_config where machineNum=:machineNum
+		]]>
+	</sql>
+	
+	<sql id="updatePayTradeExtend">
+		<![CDATA[
+			update pay_trade_extend set version=:version where appKey=:appKey and  orderNo in 
+			(select orderNo from pay_trade where payCenterNumber=:payCenterNumber)
+		]]>
+	</sql>
+</sqlMap>

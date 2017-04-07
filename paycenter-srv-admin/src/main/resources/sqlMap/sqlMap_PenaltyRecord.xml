@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PenaltyRecord">
+	<!--  分页查询违约金记录 -->
+	<sql id="selPenaltyRecordByPage">
+	<![CDATA[
+		select * from (
+			select 
+				IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType ,
+				s.memberId,
+				s.orderNo, 
+				pt.orderTime, 
+				IFNULL(pt.payAmt, 0.00) AS payAmt, 
+				IFNULL(s.penaltyAmt, 0.00) AS tradeAmt, 
+				rr.payStatus, 
+				rr.payTime,
+				CONCAT(rr.payerBankName, SUBSTRING(rr.bankCardNo, 16, 4)) AS payBankAndNo,
+				mb.`mobile` AS payeeMobile,
+				s.userType,
+				s.hasChange,
+				s.batNo,
+				IFNULL(rr.bankTradeNo, '-') as thirdPayNumber
+			from (
+				SELECT
+				  t.`orderNo` ,
+				  t.`userType`,
+				  t.`memberId`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `batNo` END) AS `batNo`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `hasChange` END) AS `hasChange`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `szType` END) AS `szType`,
+				  SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+				FROM `clear_detail` t
+				WHERE t.`isValid` = '1'				
+				GROUP BY t.`orderNo`,t.`userType`,t.`memberId` 
+			 )s
+			LEFT JOIN pay_trade pt ON s.orderNo = pt.orderNo 
+			LEFT JOIN pay_trade_extend pte ON s.orderNo=pte.orderNo 
+			LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId
+			LEFT JOIN member_baseinfo mb ON mb.`memberId` = s.memberId
+			WHERE (s.penaltyAmt > 0)  AND s.`szType` = '1' and s.memberId <> 1	
+			GROUP BY s.`orderNo`, s.memberId
+			ORDER BY pt.orderTime DESC 
+		) t
+		WHERE 1=1 
+		<#if payStatus?exists && payStatus!="" && payStatus=='1' >
+			AND t.payStatus=:payStatus
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			AND t.orderNo =:orderNo
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			AND t.payeeMobile =:payeeMobile
+		</#if>
+		<#if startOrderTime?exists && startOrderTime!="">
+			AND DATE_FORMAT(t.orderTime,'%Y-%m-%d') >=:startOrderTime
+		</#if>
+		<#if endOrderTime?exists && endOrderTime!="">
+			AND DATE_FORMAT(t.orderTime,'%Y-%m-%d') <=:endOrderTime
+		</#if>
+		<#if startPayTime?exists && startPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') >=:startPayTime
+		</#if>
+		<#if endPayTime?exists && endPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') <=:endPayTime
+		</#if>
+		<#if memberId?exists && memberId!="">
+			AND t.memberId =:memberId
+		</#if>
+		<#if batNo?exists && batNo!="">
+			AND t.batNo =:batNo
+		</#if>
+		<#if hasChange?exists && hasChange!="">
+			AND t.hasChange =:hasChange
+		</#if>
+		<#if userType?exists && userType!="">
+			AND t.userType =:userType
+		</#if>
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+			LIMIT :startRow,:endRow
+		</#if>
+	]]>
+	</sql>
+	
+	<!-- 根据条件查询违约金记录总数 -->
+	<sql id="selPenaltyRecordCount">
+	<![CDATA[
+		select count(*) from (
+			select 
+				IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType ,
+				s.memberId,
+				s.orderNo, 
+				pt.orderTime, 
+				(case when pt.requestNo = 1 then pt.payAmt else pt.payAmt end) AS payAmt,
+				IFNULL(s.penaltyAmt, 0.00) AS tradeAmt, 
+				rr.payStatus, 
+				rr.payTime,
+				CONCAT(rr.payerBankName, SUBSTRING(rr.bankCardNo, 16, 4)) AS payBankAndNo,
+				mb.`mobile` AS payeeMobile,
+				s.userType,
+				s.hasChange,
+				s.batNo,
+				IFNULL(rr.bankTradeNo, '-') as thirdPayNumber
+			from (
+				SELECT
+				  t.`orderNo` ,
+				  t.`userType`,
+				  t.`memberId`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `batNo` END) AS `batNo`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `hasChange` END) AS `hasChange`,
+				  (CASE WHEN (t.`feeType` = '100006') THEN `szType` END) AS `szType`,
+				  SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+				  SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+				FROM `clear_detail` t
+				WHERE t.`isValid` = '1'				
+				GROUP BY t.`orderNo`,t.`userType`,t.`memberId` 
+			 )s
+			LEFT JOIN pay_trade pt ON s.orderNo = pt.orderNo 
+			LEFT JOIN pay_trade_extend pte ON s.orderNo=pte.orderNo 
+			LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId
+			LEFT JOIN member_baseinfo mb ON mb.`memberId` = s.memberId
+			WHERE (s.penaltyAmt > 0)  AND s.`szType` = '1' and s.memberId <> 1	
+			GROUP BY s.`orderNo`, s.memberId 
+			ORDER BY pt.orderTime DESC 
+		) t
+		WHERE 1=1 
+		<#if payStatus?exists && payStatus!="" && payStatus=='1' >
+			AND t.payStatus=:payStatus
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			AND t.orderNo =:orderNo
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			AND t.payeeMobile =:payeeMobile
+		</#if>
+		<#if startOrderTime?exists && startOrderTime!="">
+			AND DATE_FORMAT(t.orderTime,'%Y-%m-%d') >=:startOrderTime
+		</#if>
+		<#if endOrderTime?exists && endOrderTime!="">
+			AND DATE_FORMAT(t.orderTime,'%Y-%m-%d') <=:endOrderTime
+		</#if>
+		<#if startPayTime?exists && startPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') >=:startPayTime
+		</#if>
+		<#if endPayTime?exists && endPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') <=:endPayTime
+		</#if>
+		<#if memberId?exists && memberId!="">
+			AND t.memberId =:memberId
+		</#if>
+		<#if batNo?exists && batNo!="">
+			AND t.batNo =:batNo
+		</#if>
+		<#if hasChange?exists && hasChange!="">
+			AND t.hasChange =:hasChange
+		</#if>
+		<#if userType?exists && userType!="">
+			AND t.userType =:userType
+		</#if>
+	]]>
+	</sql>
+
+</sqlMap>

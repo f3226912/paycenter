@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysRoleManager">
+	<!-- 查询所有的菜单 -->
+	<sql id="getAll">
+	<![CDATA[ 
+		SELECT ssm.menuID,ssm.menuCode,ssm.menuName,srm.rmID,
+		(SELECT COUNT(1) FROM sysRoleMenu sr WHERE sr.menuID = ssm.menuID AND sr.roleID = :roleID) AS menuTotal
+		FROM sysMenu ssm
+		LEFT JOIN sysRolemenu srm ON ssm.menuID = srm.menuID AND srm.roleID = :roleID 
+		WHERE 1=1
+		<#if menuCode?exists && menuCode!="" >
+			and ssm.menuCode like "%":menuCode"%"
+		</#if>
+		<#if menuName?exists && menuName!="" >
+			and ssm.menuName like "%":menuName"%"
+		</#if>
+		<#if menuTotal?exists && menuTotal!="" >
+			and (SELECT COUNT(1) FROM sysRoleMenu sr WHERE sr.menuID = ssm.menuID AND sr.roleID = :roleID) > 0
+		</#if>
+		ORDER BY ssm.menuCode,ssm.updateTime DESC
+		 ]]>
+	</sql>
+	
+<!-- 	WHERE ssm.menuModuleID IS NOT NULL -->
+	
+	<!-- 根据菜单ID查询所有的按钮（返回值中有一个用户是否拥有此菜单和按钮功能的标志） -->
+	<select id="getButton">
+		SELECT smb.btnID,smb.btnCode,smb.btnName,
+				(SELECT COUNT(1) FROM sysRightBtn srb WHERE srb.btnID = smb.btnID AND srb.rmID = :rmID) AS total
+		FROM sysMenuButton smb
+		LEFT JOIN sysMenu ssm ON smb.menuID = ssm.menuID
+		WHERE smb.menuID = :menuID
+		<if test="total != null">
+			AND (SELECT COUNT(1) FROM sysRightBtn srb WHERE srb.btnID = smb.btnID AND srb.rmID = :rmID) > 0
+		</if>
+		ORDER BY smb.btnCode
+	</select>
+	<!-- 根据角色查询所有的按钮 -->
+	<select id="getButtonByRole">
+		SELECT DISTINCT 
+		  m.btnCode,
+		  m.btnName ,
+		  m.`btnID`,
+		  m.`menuID`,
+		  m.`createUserID`,
+		  m.`createTime`
+		FROM
+		  SysMenuButton m 
+		WHERE m.`btnID` IN 
+		  (SELECT 
+		    t.`btnID` 
+		  FROM
+		    `sysrightbtn` t 
+		  WHERE t.`roleID` =:roleID)
+	</select>
+	
+	<!-- 根据roleID批量删除角色拥有的按钮记录 -->
+	<delete id="deleteBtn" >
+		DELETE FROM sysRightBtn WHERE roleID = :roleID
+	</delete>
+	
+	<!-- 批量插入用户的按钮数据 -->
+	<insert id="insertBtn" >
+		INSERT INTO sysRightBtn (id,roleID,userID,btnID,createUserID,createTime)
+		VALUES(:id,:roleID,:userID,:btnID,:createUserID,SYSDATE())
+	</insert>
+	
+	<!-- 根据roleID删除用户拥有的菜单关系 -->
+	<delete id="deleteMenu">
+		DELETE FROM sysRoleMenu WHERE roleID = :roleID
+	</delete>
+	
+	<!-- 批量插入数据到角色菜单关系表 -->
+	<insert id="insertMenu">
+		INSERT INTO sysRoleMenu(rmID,roleID,menuID,createUserID,createTime)
+		VALUES(:rmID,:roleID,:menuID,:createUserID,SYSDATE())
+	</insert>
+</sqlMap>

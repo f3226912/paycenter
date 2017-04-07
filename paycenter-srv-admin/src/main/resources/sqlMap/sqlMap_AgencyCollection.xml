@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlMap namespace="AgencyCollection">
+   
+   <!-- <sql id="countTotal">
+     <![CDATA[ 
+            SELECT COUNT(DISTINCT pt.id) FROM pay_trade pt 
+			LEFT JOIN pay_trade_pos ptp ON pt.`payCenterNumber`=ptp.`payCenterNumber` 
+			LEFT JOIN bill_check_detail bcd ON pt.`payCenterNumber`=bcd.`payCenterNumber`
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			LEFT JOIN `v_clear_detail` vcd ON vcd.orderNo=pt.`orderNo`
+			WHERE 1=1 
+			<#if marketId?exists && marketId != "">
+			     AND pte.`marketId`=:marketId
+		    </#if>
+		    <#if payType?exists && payType != "">
+			     AND pt.`payType`=:payType
+		    </#if>
+		    <#if payStatus?exists && payStatus != "">
+			     AND pt.`payStatus`=:payStatus
+			<#else>
+				 AND (pt.`payStatus`= 2)
+		    </#if>
+		    <#if checkStatus?exists && checkStatus != "">
+			    AND bcd.`checkStatus`=:checkStatus
+			<#else>
+			    	AND bcd.`checkStatus` = 1 
+		    </#if>
+		   	<#if payerMobile?exists && payerMobile !="">
+			    AND pt.payerMobile like '%' :payerMobile '%' 
+		    </#if>
+		    <#if thirdPayNumber?exists && thirdPayNumber != "">
+			    AND pt.thirdPayNumber like '%' :thirdPayNumber '%' 
+		    </#if>
+		    <#if payCenterNumber?exists && payCenterNumber!="">
+			    AND pt.payCenterNumber like '%' :payCenterNumber '%' 
+		    </#if>
+		    <#if orderNo?exists && orderNo != "">
+			    AND pt.`orderNo` like '%' :orderNo '%' 
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND pt.`payTime` >= :startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND pt.`payTime` <= :endDate
+		    </#if>
+		    <#if orderType?exists && orderType != "">
+			    AND pte.`orderType`=:orderType
+		    </#if>
+		    <#if checkStatus?exists && checkStatus != "">
+			    AND bcd.`checkStatus`=:checkStatus 
+		    </#if>
+		    group by pt.thirdPayNumber, pt.payCenterNumber
+     ]]>
+   </sql> -->
+   
+   <sql id="countTotal">
+      <![CDATA[ 
+        select 
+    count(1) from (
+            SELECT 
+                pt.id, 
+                pt.thirdPayNumber,
+                pt.payCenterNumber,
+                group_concat(pt.orderNo) AS orderNo,
+                sum(pt.payAmt) AS payAmt,
+                pt.receiptAmt,
+			    pt.payerMobile,
+			    pt.payType,
+			    pt.payTime,
+			    ptp.posClientNo,
+			    pt.payStatus,
+			    bcd.checkStatus,
+			    pte.marketName,
+			    pt.appKey,
+			    pt.feeAmt
+			FROM pay_trade pt 
+			LEFT JOIN pay_trade_pos ptp ON pt.`payCenterNumber`=ptp.`payCenterNumber` 
+			LEFT JOIN bill_check_detail bcd ON pt.`payCenterNumber`=bcd.`payCenterNumber`
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			WHERE 1=1 
+			<#if marketId?exists && marketId != "">
+			     AND pte.`marketId`=:marketId
+		    </#if>
+		    <#if payType?exists && payType != "">
+			     AND pt.`payType`=:payType
+		    </#if>
+		    <#if payStatus?exists && payStatus != "">
+			     AND pt.`payStatus`=:payStatus
+			<#else>
+				 AND (pt.`payStatus`= 2)
+		    </#if>
+		    <#if checkStatus?exists && checkStatus != "">
+			    AND bcd.`checkStatus`=:checkStatus 
+			<#else>
+			    	AND bcd.`checkStatus` = 1 
+		    </#if>
+		    <#if payerMobile?exists && payerMobile !="">
+			    AND pt.payerMobile like '%' :payerMobile '%' 
+		    </#if>
+		    <#if thirdPayNumber?exists && thirdPayNumber != "">
+			    AND pt.thirdPayNumber like '%' :thirdPayNumber '%' 
+		    </#if>
+		    <#if payCenterNumber?exists && payCenterNumber!="">
+			    AND pt.payCenterNumber like '%' :payCenterNumber '%' 
+		    </#if>
+		    <#if orderNo?exists && orderNo != "">
+			    AND pt.`orderNo` like '%' :orderNo '%' 
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND pt.`payTime` >= :startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND pt.`payTime` <= :endDate
+		    </#if>
+		    <#if orderType?exists && orderType != "">
+			    AND pte.`orderType`=:orderType
+		    </#if>
+		    GROUP BY pt.payCenterNumber
+		    ORDER BY pt.payTime DESC
+			<#if startRow?exists && startRow!="">
+			    LIMIT :startRow , :endRow
+		    </#if>
+		    ) tab 
+      ]]>
+   </sql>
+   
+   <sql id="queryList">
+      <![CDATA[ 
+        SELECT 
+                pt.id, 
+                pt.thirdPayNumber,
+                pt.payCenterNumber,
+                group_concat(pt.orderNo) AS orderNo,
+                sum(pt.payAmt) AS payAmt,
+                pt.receiptAmt,
+			    pt.payerMobile,
+			    pt.payType,
+			    pt.payTime,
+			    ptp.posClientNo,
+			    pt.payStatus,
+			    bcd.checkStatus,
+			    pte.marketName,
+			    pt.appKey,
+			    pt.feeAmt
+			FROM pay_trade pt 
+			LEFT JOIN pay_trade_pos ptp ON pt.`payCenterNumber`=ptp.`payCenterNumber` 
+			LEFT JOIN bill_check_detail bcd ON pt.`payCenterNumber`=bcd.`payCenterNumber`
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			WHERE 1=1 
+			<#if marketId?exists && marketId != "">
+			     AND pte.`marketId`=:marketId
+		    </#if>
+		    <#if payType?exists && payType != "">
+			     AND pt.`payType`=:payType
+		    </#if>
+		    <#if payStatus?exists && payStatus != "">
+			     AND pt.`payStatus`=:payStatus
+			<#else>
+				 AND (pt.`payStatus`= 2)
+		    </#if>
+		    <#if checkStatus?exists && checkStatus != "">
+			    AND bcd.`checkStatus`=:checkStatus 
+			<#else>
+			    	AND bcd.`checkStatus` = 1 
+		    </#if>
+		    <#if payerMobile?exists && payerMobile !="">
+			    AND pt.payerMobile like '%' :payerMobile '%' 
+		    </#if>
+		    <#if thirdPayNumber?exists && thirdPayNumber != "">
+			    AND pt.thirdPayNumber like '%' :thirdPayNumber '%' 
+		    </#if>
+		    <#if payCenterNumber?exists && payCenterNumber!="">
+			    AND pt.payCenterNumber like '%' :payCenterNumber '%' 
+		    </#if>
+		    <#if orderNo?exists && orderNo != "">
+			    AND pt.`orderNo` like '%' :orderNo '%' 
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND pt.`payTime` >= :startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND pt.`payTime` <= :endDate
+		    </#if>
+		    <#if orderType?exists && orderType != "">
+			    AND pte.`orderType`=:orderType
+		    </#if>
+		    GROUP BY pt.payCenterNumber
+		    ORDER BY pt.payTime DESC
+		    <#if startRow?exists && startRow!="">
+			    LIMIT :startRow , :endRow
+		    </#if>
+      ]]>
+   </sql>
+   
+    <sql id="exportData">
+      <![CDATA[ 
+            SELECT DISTINCT
+                pt.thirdPayNumber,
+                pt.payCenterNumber,
+                pt.orderNo,
+                pt.payAmt,
+                pt.payAmt as colleAmt,
+                vcd.`feeAmt`,
+			    pt.payerMobile,
+			    pt.payType,
+			    DATE_FORMAT(pt.payTime,'%Y-%m-%d %H:%i:%s'),
+			    ptp.posClientNo,
+			    pt.payStatus,
+			    bcd.checkStatus,
+			    pte.marketName,
+			    pt.appKey
+			FROM pay_trade pt 
+			LEFT JOIN pay_trade_pos ptp ON pt.`payCenterNumber`=ptp.`payCenterNumber` 
+			LEFT JOIN bill_check_detail bcd ON pt.`payCenterNumber`=bcd.`payCenterNumber`
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			LEFT JOIN v_clear_detail vcd ON vcd.`orderNo`=pt.`orderNo` AND vcd.`memberId`=:memberId
+			WHERE 1=1 
+			<#if marketId?exists && marketId != "">
+			     AND pte.`marketId`=:marketId
+		    </#if>
+		    <#if payType?exists && payType != "">
+			     AND pt.`payType`=:payType
+		    </#if>
+		    <#if payStatus?exists && payStatus != "">
+			     AND pt.`payStatus`=:payStatus
+		    </#if>
+		    <#if checkStatus?exists && checkStatus != "">
+			    AND bcd.`checkStatus`=:checkStatus
+		    </#if>
+		    <#if payerMobile?exists && payerMobile !="">
+			    AND pt.payerMobile like '%' :payerMobile '%' 
+		    </#if>
+		    <#if thirdPayNumber?exists && thirdPayNumber != "">
+			    AND pt.thirdPayNumber like '%' :thirdPayNumber '%' 
+		    </#if>
+		    <#if payCenterNumber?exists && payCenterNumber!="">
+			    AND pt.payCenterNumber like '%' :payCenterNumber '%' 
+		    </#if>
+		    <#if orderNo?exists && orderNo != "">
+			    AND pt.`orderNo` like '%' :orderNo '%' 
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND pt.`payTime` >= :startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND pt.`payTime` <= :endDate
+		    </#if>
+			ORDER BY pt.orderTime DESC
+			<#if startRow?exists && startRow!="">
+			    LIMIT :startRow , :endRow
+		    </#if>
+      ]]>
+   </sql>
+   
+   <sql id="payInfo">
+        <![CDATA[ 
+            SELECT 
+                pt.payerAccount,
+                pt.payerMobile,
+                SUM(pt.payAmt) as payAmt,
+                pt.payStatus,
+                pt.payTime,
+			    pt.payType,
+			    ptp.`posClientNo`,
+			    pt.payCenterNumber,
+			    pt.thirdPayNumber,
+			    bcd.`checkStatus`,
+			    pt.orderNo,
+			    pt.payerUserId,
+			    pt.payeeUserId,
+			    pt.requestNo
+			FROM pay_trade pt 
+			LEFT JOIN pay_trade_pos ptp ON pt.`payCenterNumber`=ptp.`payCenterNumber`
+			LEFT JOIN bill_check_detail bcd ON pt.`payCenterNumber`=bcd.`payCenterNumber`
+			WHERE pt.`payCenterNumber`=:payCenterNumber
+			GROUP BY pt.payCenterNumber
+        ]]>
+   </sql>
+   
+   <!-- <sql id="payerInfoList">
+        <![CDATA[ 
+            SELECT 
+                 pt.`orderNo`,
+                 pt.`orderTime`,
+                 pte.orderType,
+                 pt.appKey,
+                 vcd.orderAmt,
+                 IFNULL(vcd.commissionAmt,0.00) AS commissionAmt,
+                 IFNULL(vcd.orderAmt,0.00)+IFNULL(vcd.commissionAmt,0.00) AS actualAmt,
+                 IFNULL((select tradeAmt from clear_detail where orderNo = pt.orderNo and feeType = 100002 and memberId=pt.payerUserId), 0.00) as 'marketCommission',
+	 			 IFNULL((select tradeAmt from clear_detail where orderNo = pt.orderNo and feeType = 100005 and memberId=pt.payerUserId), 0.00) as 'platformCommission',
+	 			 (select count(*) from v_clear_detail where orderNo = pt.orderNo and memberId=pt.payerUserId) as clearStatus,
+	 			 pt.requestNo
+			FROM `pay_trade` pt
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			INNER JOIN v_clear_detail vcd ON vcd.`orderNo`=pt.`orderNo`
+			WHERE pt.`payCenterNumber`=:payCenterNumber AND vcd.`orderNo`=:orderNo AND vcd.`memberId`=:payerUserId
+        ]]>
+   </sql> -->
+   <sql id="payerInfoList">
+        <![CDATA[ 
+        SELECT 
+			pt.`orderNo`,
+			pt.`orderTime`,
+			pte.orderType,
+			pt.appKey,
+			vcd.orderAmt,
+			vcd.commissionAmt AS marketCommissionAmt,
+			vcd.platCommissionAmt,
+			IFNULL(pt.payAmt,0.00) AS actualAmt,
+			pt.requestNo,
+			pt.payCount,
+			(SELECT pmc.hasClear FROM pos_machine_config pmc WHERE FIND_IN_SET(pmc.id, pte.version) AND ptp.`posClientNo` = pmc.machineNum) AS hasClearPos,
+			(SELECT ptc.hasClear FROM pay_type_config ptc WHERE pt.`appKey` = ptc.appKey AND pt.`payType` = ptc.payType) AS hasClearOnline,
+			(SELECT CASE WHEN COUNT(1) > 0 THEN '1' ELSE '0' END FROM v_clear_detail WHERE orderNo = pt.orderNo) AS hasClearStatus
+		FROM `pay_trade` pt
+		LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+		LEFT JOIN pay_trade_pos ptp ON ptp.`payCenterNumber` = pt.`payCenterNumber`
+		LEFT JOIN v_clear_detail2 vcd ON vcd.`orderNo`=pt.`orderNo` and vcd.memberId = pt.payerUserId
+		WHERE pt.`payCenterNumber`=:payCenterNumber
+        ]]>
+   </sql>
+   
+    <sql id="queryOrderClearInfo">
+        <![CDATA[ 
+        SELECT 
+			pt.`orderNo`,
+			pt.appKey,
+			(SELECT pmc.hasClear FROM pos_machine_config pmc WHERE FIND_IN_SET(pmc.id, pte.version) AND ptp.`posClientNo` = pmc.machineNum) AS hasClearPos,
+			(SELECT ptc.hasClear FROM pay_type_config ptc WHERE pt.`appKey` = ptc.appKey AND pt.`payType` = ptc.payType) AS hasClearOnline
+		FROM `pay_trade` pt
+		LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+		LEFT JOIN pay_trade_pos ptp ON ptp.`payCenterNumber` = pt.`payCenterNumber`
+		LEFT JOIN v_clear_detail2 vcd ON vcd.`orderNo`=pt.`orderNo` and vcd.memberId = pt.payerUserId
+		WHERE pt.`orderNo`=:orderNo
+        ]]>
+   </sql>
+   
+   
+   <sql id="valleyOfCollectingInfoList">
+        <![CDATA[ 
+			SELECT 
+				mb.memberId,
+				mb.realName,
+				pt.`payTime`,
+				pt.`payType`,
+				pty.`gdBankCardNo`,
+				SUM(IFNULL(pt.payAmt,0.00)) AS payAmt,
+				SUM(IFNULL(pt.`feeAmt`,0.00)) AS feeAmt,
+				SUM(IFNULL(pt.payAmt,0.00) - IFNULL(pt.`feeAmt`,0.00)) AS receivableAmt
+			FROM `pay_trade` pt
+			LEFT JOIN `member_baseinfo` mb ON mb.memberId =:memberId
+			LEFT JOIN `pay_type` pty ON pty.payType=pt.payType
+			WHERE pt.`payCenterNumber`=:payCenterNumber
+			GROUP BY mb.memberId
+        ]]>
+   </sql>
+   <!-- 查询单个谷登代收信息 -->
+   <sql id="valleyOfCollectingInfo">
+        <![CDATA[ 
+			SELECT 
+				mb.realName,
+				pt.`payTime`,
+				pt.`payType`,
+				pty.`gdBankCardNo`,
+				IFNULL(pt.payAmt,0.00) payAmt,
+				IFNULL(vcd.`feeAmt`,0.00) feeAmt,
+				IFNULL(pt.payAmt,0.00) - IFNULL(vcd.`feeAmt`,0.00) AS receivableAmt
+			FROM `pay_trade` pt 
+			LEFT JOIN v_clear_detail vcd ON vcd.`orderNo`=pt.`orderNo` AND vcd.memberId=:memberId 
+			LEFT JOIN `member_baseinfo` mb ON mb.memberId =:memberId
+			LEFT JOIN `pay_type` pty ON pty.payType=pt.payType
+			WHERE pt.`payCenterNumber`=:payCenterNumber
+			and pt.requestNo = :requestNo 
+        ]]>
+   </sql>
+   
+   <!-- <sql id="beneficiaryInfoList">
+        <![CDATA[ 
+             SELECT 
+			     pt.`payeeAccount`,
+			     pt.`payeeMobile`,
+			     pte.`businessId`,
+			     pte.businessName,
+			     pte.marketName,
+			     pt.`orderNo`,
+			     vcd.orderAmt,
+			     pt.`feeAmt`,
+			     vcd.`commissionAmt`,
+			     IFNULL((select tradeAmt from clear_detail where orderNo = pt.orderNo and feeType = 100002 and memberId=pt.payeeUserId), 0.00) as 'marketCommission',
+	 			 IFNULL((select tradeAmt from clear_detail where orderNo = pt.orderNo and feeType = 100005 and memberId=pt.payeeUserId), 0.00) as 'platformCommission',
+			     vcd.`subsidyAmt`,
+			     IFNULL(vcd.orderAmt,0.00) - IFNULL(vcd.`feeAmt`,0.00) - IFNULL(vcd.`commissionAmt`,0.00) - IFNULL(vcd.`platCommissionAmt`, 0.00) + IFNULL(vcd.`subsidyAmt`,0.00) AS receivableAmt
+			FROM `pay_trade` pt 
+			LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+			INNER JOIN v_clear_detail vcd ON vcd.`orderNo`=pt.`orderNo`
+            WHERE pt.`payCenterNumber`=:payCenterNumber AND vcd.`orderNo`=:orderNo AND vcd.`memberId`=:payeeUserId
+        ]]>
+   </sql> -->
+   <sql id="beneficiaryInfoList">
+        <![CDATA[
+        SELECT 
+        	pt.requestNo,
+			pt.payCount,
+			pt.`payeeAccount`,
+			pt.`payeeMobile`,
+			pte.`businessId`,
+			pte.businessName,
+			pte.marketName,
+			pt.`orderNo`,
+			vcd.orderAmt,
+			pt.`feeAmt`,
+			vcd.commissionAmt AS marketCommissionAmt,
+			vcd.platCommissionAmt,
+			vcd.`subsidyAmt`,
+			(SELECT pt2.payAmt FROM pay_trade pt2 WHERE pt2.orderNo = pt.orderNo AND pt2.requestNo = '1') AS prePayAmt,
+			(CASE WHEN vcd.orderAmt IS NULL THEN NULL ELSE (IFNULL(vcd.orderAmt,0.00) - IFNULL(vcd.`feeAmt`,0.00) - IFNULL(vcd.`commissionAmt`,0.00) - IFNULL(vcd.`platCommissionAmt`, 0.00) + IFNULL(vcd.`subsidyAmt`,0.00)) END) AS receivableAmt
+		FROM `pay_trade` pt 
+		LEFT JOIN pay_trade_extend pte ON pt.`orderNo`=pte.`orderNo`
+		LEFT JOIN v_clear_detail2 vcd ON vcd.`orderNo`=pt.`orderNo` AND vcd.`memberId`=pt.payeeUserId
+					WHERE pt.`payCenterNumber`=:payCenterNumber 
+        ]]>
+   </sql>
+   
+   <sql id="marketInfoList">
+        <![CDATA[ 								
+			SELECT 
+				   mb.account, 
+				   mb.mobile, 
+				   mi.marketName, 
+				   pt.orderNo, 
+				   vc.orderAmt, 
+				   vcd.commissionAmt, 
+				   IFNULL(vcd.`commissionAmt`,0.00) AS receivableAmt
+			FROM 
+			`pay_trade` pt
+			LEFT JOIN `pay_trade_extend` pte ON pte.`orderNo` = pt.`orderNo`
+			LEFT JOIN `market_bank_acc_info` mi ON pte.`marketId` = mi.`marketId` AND mi.isDeleted = 0
+			LEFT JOIN `member_baseinfo` mb ON mb.memberId=mi.memberId
+			INNER JOIN v_clear_detail2 vcd ON vcd.`orderNo`=pt.`orderNo` AND vcd.`memberId`=mi.memberId
+			LEFT JOIN v_clear_detail2 vc ON  vc.`orderNo`=pt.`orderNo` AND vc.`memberId`=pt.`payeeUserId`
+			WHERE pt.`payCenterNumber`=:payCenterNumber
+			GROUP BY pt.`orderNo`
+        ]]>
+   </sql>
+   
+</sqlMap>

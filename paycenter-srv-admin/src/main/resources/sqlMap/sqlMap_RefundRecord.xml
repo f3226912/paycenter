@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="RefundRecord">
+	<!--  分页查询退款记录 -->
+	<sql id="selRefundRecordByPage">
+	<![CDATA[
+		select * from (
+			SELECT 
+				pt.payType as payWay,
+				IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType ,
+				rere.id,
+				rere.refundNo,
+				rere.orderNo,
+				rere.refundType,
+				rere.createTime,
+				rere.refundAmt,
+				IFNULL(rere.thirdRefundNo, '-') AS thirdRefundNo,
+				pt.payeeMobile,
+				rere.refundTime,
+				(CASE WHEN rere.refundType = 1 THEN rere.`refundTime`
+					WHEN rere.refundType = 2 THEN rr.`payTime` end) AS payTime,
+				rr.`payerBankName`,
+				rr.`bankCardNo`,
+				pt.payerUserId as memberId,
+				mb.`mobile`,
+				(CASE WHEN rere.refundType = 1 THEN (CASE WHEN rere.`status` = 2 THEN '1' ELSE '0' END )
+				ELSE  IFNULL(cd.`hasChange`, 0)
+				END) AS hasChange,
+				(CASE WHEN rere.refundType = 1 THEN 'nsy'
+				ELSE  IFNULL(cd.`userType`, 'nsy')
+				END) AS userType,
+				(CASE WHEN rere.refundType = 1 THEN (CASE WHEN rere.status = 2 THEN '1' ELSE '0' END)
+				WHEN rere.refundType = 2 THEN IFNULL(rr.payStatus,0) 
+				END) AS payStatus,
+				cd.`hasChange` AS clearHasChange
+			FROM refund_record rere 
+			LEFT JOIN pay_trade pt ON rere.`orderNo` = pt.`orderNo`
+			LEFT JOIN clear_detail cd ON rere.`orderNo` = cd.`orderNo` AND pt.`payerUserId` = cd.`memberId` AND cd.`feeType` = '100007'
+			LEFT JOIN member_baseinfo mb ON mb.`memberId` = pt.`payerUserId`
+			LEFT JOIN remit_record rr ON rr.`memberId` = pt.`payerUserId` AND cd.`batNo` = rr.`batNo`
+			GROUP BY rere.`orderNo`
+			ORDER BY rere.createTime DESC
+		) t
+		where 1=1 
+		<#if clearHasChange?exists && clearHasChange!="">
+			and t.`clearHasChange` = :clearHasChange
+		</#if>
+		<#if memberId?exists && memberId!="">
+			and t.memberId = :memberId 
+		</#if>
+		<#if userType?exists && userType!="">
+			and t.userType = :userType
+		</#if>
+		<#if payStatus?exists && payStatus!="">
+			and t.payStatus = :payStatus
+		</#if>
+		<#if hasChange?exists && hasChange!="">
+			and t.hasChange = :hasChange 
+		</#if>
+		<#if payeeMobile?exists && payeeMobile!="">
+			and t.payeeMobile = :payeeMobile
+		</#if>
+		<#if refundNo?exists && refundNo!="">
+			and t.refundNo = :refundNo
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			and t.orderNo = :orderNo
+		</#if>
+		<#if thirdRefundNo?exists && thirdRefundNo!="">
+			and t.thirdRefundNo = :thirdRefundNo
+		</#if>
+		<#if startCreateTime?exists && startCreateTime!="">
+			AND DATE_FORMAT(t.createTime,'%Y-%m-%d') >=:startCreateTime
+		</#if>
+		<#if endCreateTime?exists && endCreateTime!="">
+			AND DATE_FORMAT(t.createTime,'%Y-%m-%d') <=:endCreateTime
+		</#if>
+		<#if startPayTime?exists && startPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') >=:startPayTime
+		</#if>
+		<#if endPayTime?exists && endPayTime!="">
+			AND DATE_FORMAT(t.payTime,'%Y-%m-%d') <=:endPayTime
+		</#if>
+		<#if refundType?exists && refundType!="">
+			and t.refundType = :refundType
+		</#if>
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+			LIMIT :startRow,:endRow
+		</#if>
+	]]>
+	</sql>
+	
+	<!-- 根据条件查询退款记录总数 -->
+	<sql id="selRefundRecordCount">
+	<![CDATA[
+		select count(1) from (
+			select * from (
+				SELECT 
+					pt.payType as payWay,
+					IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType ,
+					rere.id,
+					rere.refundNo,
+					rere.orderNo,
+					rere.refundType,
+					rere.createTime,
+					rere.refundAmt,
+					IFNULL(rere.thirdRefundNo, '-') AS thirdRefundNo,
+					pt.payeeMobile,
+					rere.refundTime,
+					(CASE WHEN rere.refundType = 1 THEN rere.`refundTime`
+						WHEN rere.refundType = 2 THEN rr.`payTime` end) AS payTime,
+					rr.`payerBankName`,
+					rr.`bankCardNo`,
+					pt.payerUserId as memberId,
+					mb.`mobile`,
+					(CASE WHEN rere.refundType = 1 THEN (CASE WHEN rere.`status` = 2 THEN '1' ELSE '0' END )
+					ELSE  IFNULL(cd.`hasChange`, 0)
+					END) AS hasChange,
+					(CASE WHEN rere.refundType = 1 THEN 'nsy'
+					ELSE  IFNULL(cd.`userType`, 'nsy')
+					END) AS userType,
+					(CASE WHEN rere.refundType = 1 THEN (CASE WHEN rere.status = 2 THEN '1' ELSE '0' END)
+					WHEN rere.refundType = 2 THEN IFNULL(rr.payStatus,0) 
+					END) AS payStatus,
+					cd.`hasChange` AS clearHasChange
+				FROM refund_record rere 
+				LEFT JOIN pay_trade pt ON rere.`orderNo` = pt.`orderNo`
+				LEFT JOIN clear_detail cd ON rere.`orderNo` = cd.`orderNo` AND pt.`payerUserId` = cd.`memberId` AND cd.`feeType` = '100007'
+				LEFT JOIN member_baseinfo mb ON mb.`memberId` = pt.`payerUserId`
+				LEFT JOIN remit_record rr ON rr.`memberId` = pt.`payerUserId` AND cd.`batNo` = rr.`batNo`
+				GROUP BY rere.`orderNo`
+				ORDER BY rere.createTime DESC
+			) t
+			where 1=1
+			<#if clearHasChange?exists && clearHasChange!="">
+				and t.`clearHasChange` = :clearHasChange
+			</#if>
+			<#if memberId?exists && memberId!="">
+				and t.memberId = :memberId 
+			</#if>
+			<#if userType?exists && userType!="">
+				and t.userType = :userType
+			</#if>
+			<#if payStatus?exists && payStatus!="">
+				and t.payStatus = :payStatus
+			</#if>
+			<#if hasChange?exists && hasChange!="">
+				and t.hasChange = :hasChange 
+			</#if>
+			<#if payeeMobile?exists && payeeMobile!="">
+				and t.payeeMobile = :payeeMobile
+			</#if>
+			<#if refundNo?exists && refundNo!="">
+				and t.refundNo = :refundNo
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				and t.orderNo = :orderNo
+			</#if>
+			<#if thirdRefundNo?exists && thirdRefundNo!="">
+				and t.thirdRefundNo = :thirdRefundNo
+			</#if>
+			<#if startCreateTime?exists && startCreateTime!="">
+				AND DATE_FORMAT(t.createTime,'%Y-%m-%d') >=:startCreateTime
+			</#if>
+			<#if endCreateTime?exists && endCreateTime!="">
+				AND DATE_FORMAT(t.createTime,'%Y-%m-%d') <=:endCreateTime
+			</#if>
+			<#if startPayTime?exists && startPayTime!="">
+				AND DATE_FORMAT(t.payTime,'%Y-%m-%d') >=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime!="">
+				AND DATE_FORMAT(t.payTime,'%Y-%m-%d') <=:endPayTime
+			</#if>
+			<#if refundType?exists && refundType!="">
+				and t.refundType = :refundType
+			</#if>
+		) tt
+	]]>
+	</sql>
+</sqlMap>

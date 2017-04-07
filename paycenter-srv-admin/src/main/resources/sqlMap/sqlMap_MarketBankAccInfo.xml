@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="MarketBankAccInfo">
+	
+	<sql id="queryByCondition">
+	<![CDATA[
+		SELECT 
+			mi.id,mi.marketId,mi.marketName,mi.realName,mi.depositBankName,mi.addr,mi.subBankName,mi.bankCardNo,
+			mb.account,mb.mobile
+		FROM 
+			market_bank_acc_info mi
+		LEFT JOIN member_baseinfo mb ON mi.memberId = mb.memberId
+		WHERE mi.isDeleted = 0
+		<#if marketId?exists && marketId!="" >
+			AND mi.marketId=:marketId
+		</#if>
+		<#if mobile?exists && mobile!="" >
+			AND mb.mobile like "%":mobile"%"
+		</#if>
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	
+	<sql id="queryCount">
+	<![CDATA[
+		SELECT 
+			count(1)
+		FROM 
+			market_bank_acc_info mi
+		LEFT JOIN member_baseinfo mb ON mi.memberId = mb.memberId
+		WHERE mi.isDeleted = 0
+		<#if marketId?exists && marketId!="" >
+			AND mi.marketId=:marketId
+		</#if>
+		<#if mobile?exists && mobile!="" >
+			AND mb.mobile like "%":mobile"%"
+		</#if>
+	]]>
+	</sql>
+	
+	<sql id="batchDelete">
+ 	<![CDATA[ 
+ 		UPDATE 
+ 			market_bank_acc_info
+ 		SET isDeleted=1,sign=:sign
+ 		WHERE 
+ 			id = :id
+ 	]]>
+ 	</sql>
+ 	
+ 	<sql id="queryById">
+ 	<![CDATA[ 
+		SELECT 
+			mi.id,mi.marketId,mi.marketName,mi.realName,mi.depositBankName,mi.addr,mi.subBankName,mi.bankCardNo,mi.reservePhone,
+			mb.account,mb.mobile
+		FROM 
+			market_bank_acc_info mi
+		LEFT JOIN member_baseinfo mb ON mi.memberId = mb.memberId
+		WHERE mi.id = :id
+ 	]]>
+ 	</sql>
+</sqlMap>

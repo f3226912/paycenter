@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="MemberBaseinfo">
+	
+	<!-- 根据 mobile 精确查找 -->
+	<sql id="getByMobile">
+	<![CDATA[
+		SELECT 
+			t.*
+		FROM
+			member_baseinfo  t 
+		WHERE 
+			t.mobile = :mobile 
+	]]>
+	</sql>
+	
+	<!-- 根据 account 精确查找 -->
+	<sql id="getByAccount">
+	<![CDATA[
+		SELECT 
+			t.*
+		FROM
+			member_baseinfo  t 
+		WHERE 
+			t.account = :account
+	]]>
+	</sql>
+	
+</sqlMap>

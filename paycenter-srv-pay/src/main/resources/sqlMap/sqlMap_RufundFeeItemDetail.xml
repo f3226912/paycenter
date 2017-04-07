@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="RefundFeeItemDetail"> 
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,refundNo,feeType,feeAmt,remitTime,clearState,createTime,createUser
+		  FROM refund_fee_item_detail
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if feeType?exists && feeType != "" >
+			   AND feeType=:feeType
+			</#if>
+			<#if feeAmt?exists && feeAmt != "" >
+			   AND feeAmt=:feeAmt
+			</#if>
+			<#if remitTime?exists && remitTime != "" >
+			   AND remitTime=:remitTime
+			</#if>
+			<#if clearState?exists && clearState != "" >
+			   AND clearState=:clearState
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUser?exists && createUser != "" >
+			   AND createUser=:createUser
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,refundNo,feeType,feeAmt,remitTime,clearState,createTime,createUser
+		  FROM refund_fee_item_detail
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if feeType?exists && feeType != "" >
+			   AND feeType=:feeType
+			</#if>
+			<#if feeAmt?exists && feeAmt != "" >
+			   AND feeAmt=:feeAmt
+			</#if>
+			<#if remitTime?exists && remitTime != "" >
+			   AND remitTime=:remitTime
+			</#if>
+			<#if clearState?exists && clearState != "" >
+			   AND clearState=:clearState
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUser?exists && createUser != "" >
+			   AND createUser=:createUser
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM refund_fee_item_detail
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if refundNo?exists && refundNo != "" >
+			   AND refundNo=:refundNo
+			</#if>
+			<#if feeType?exists && feeType != "" >
+			   AND feeType=:feeType
+			</#if>
+			<#if feeAmt?exists && feeAmt != "" >
+			   AND feeAmt=:feeAmt
+			</#if>
+			<#if remitTime?exists && remitTime != "" >
+			   AND remitTime=:remitTime
+			</#if>
+			<#if clearState?exists && clearState != "" >
+			   AND clearState=:clearState
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUser?exists && createUser != "" >
+			   AND createUser=:createUser
+			</#if>
+	   ]]>
+	</sql>
+
+</sqlMap>

@@ -1,0 +1,23 @@
+/* btn */
+
+.b-btn{
+    display: inline-block;
+    text-decoration: none;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    width: 105px;
+    color: #fff;
+    font-size: 14px;
+}
+.b-btn:hover{
+    color: #fff;
+}
+
+/* bg-color */
+.bg-green{
+    background-color: #6fc735;
+}
+.bg-yellow{
+    background-color: #ea9f29;
+}

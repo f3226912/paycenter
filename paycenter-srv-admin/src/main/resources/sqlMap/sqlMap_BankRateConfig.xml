@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="BankRateConfig">
+	<!-- 分页查询 -->	
+	<select id="getByCondition">
+		 <![CDATA[  
+			SELECT  brc.id,brc.status
+					,brc.payChannel
+					,brc.cardType
+					,brc.areaBankFlag
+					,brc.type
+					,brc.feeRuleJson
+					,brc.remark
+					,pt.payTypeName payChannelName
+		   FROM bank_rate_config brc
+		   left join pay_type pt
+		   on pt.id =brc.payChannel
+		   where 1=1
+		   <#if payChannel?exists && payChannel!="">
+		   and  brc.payChannel=:payChannel
+		   </#if>
+		   <#if cardType?exists && cardType!="">
+		   and  brc.cardType=:cardType
+		   </#if>
+		   <#if areaBankFlag?exists && areaBankFlag!="">   
+		   and  brc.areaBankFlag=:areaBankFlag
+		   </#if>
+		   <#if type?exists && type!=""> 
+		   and  brc.type=:type
+		   </#if>    
+		   
+ 		ORDER BY id DESC
+		limit :startRow,:endRow 
+		]]>
+	</select>
+	
+	<!-- 记录总数 -->
+	<select id="getTotal">
+		 <![CDATA[  
+			SELECT
+			 count(1)
+			FROM bank_rate_config brc
+			where 1=1
+			 <#if payChannel?exists && payChannel!="">
+		   and  brc.payChannel=:payChannel
+		   </#if>
+		   <#if cardType?exists && cardType!="">
+		   and  brc.cardType=:cardType
+		   </#if>
+		   <#if areaBankFlag?exists && areaBankFlag!="">   
+		   and  brc.areaBankFlag=:areaBankFlag
+		   </#if>
+		   <#if type?exists && type!=""> 
+		   and  brc.type=:type
+		   </#if>   
+		 ]]>
+	</select>
+	
+	
+	<sql id="insert"> 
+ 	<![CDATA[ 
+          INSERT INTO bank_rate_config (
+			         
+					payChannel
+					,cardType
+					,areaBankFlag
+					,type
+					,feeRuleJson
+					,status
+					,remark
+			)
+		  VALUES
+			  (	     
+					:payChannel
+					,:cardType
+					,:areaBankFlag
+					,:type
+					,:feeRuleJson
+					,:status
+					,:remark
+		  )
+	        
+ 		]]> 
+ 	</sql>
+ 	
+ 	<sql id="update"> 
+ 	<![CDATA[ 
+          UPDATE 
+          bank_rate_config 
+          SET 
+			 payChannel=:payChannel
+			,cardType=:cardType
+			,areaBankFlag=:areaBankFlag
+			,type=:type
+			,feeRuleJson=:feeRuleJson
+			,remark=:remark
+			,status=:status
+          WHERE 
+          id=:id
+ 		]]> 
+ 	</sql> 
+ 	
+	<sql id="selectById"> 
+ 	<![CDATA[ 
+       select 
+       	 id
+       	 ,status
+		,payChannel
+		,cardType
+		,areaBankFlag
+		,type
+		,feeRuleJson
+		,remark
+		from bank_rate_config 
+        WHERE
+         id=:id
+ 		]]> 
+ 	</sql> 
+ 	
+ 	<sql id="queryBankRateConfigSettingCount"> 
+ 	<![CDATA[ 
+       select 
+       	count(1)
+		from bank_rate_config 
+        WHERE
+             payChannel=:payChannel
+         and cardType=:cardType
+         and areaBankFlag=:areaBankFlag
+         and type=:type
+		<#if id?exists && id!="">
+		 and id !=:id
+		</#if>
+ 		]]> 
+ 	</sql>
+    
+</sqlMap>

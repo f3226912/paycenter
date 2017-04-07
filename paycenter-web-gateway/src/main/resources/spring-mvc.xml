@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:p="http://cxf.apache.org/policy" xmlns:ss="http://www.springframework.org/schema/security"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+   	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
+   	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
+   	http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
+     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+   	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+   	http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd 
+   	  http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+   	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd 
+   	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+   	http://code.alibabatech.com/schema/dubbo 
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<mvc:annotation-driven conversion-service="conversionService">
+		<mvc:message-converters register-defaults="true">
+			<bean
+				class="cn.gdeng.paycenter.gateway.web.interceptor.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+				   <list>
+				    <value>text/html;charset=UTF-8</value>
+				    <value>application/json</value>
+				   </list>
+				  </property>
+				<!--设置fastjson特性 -->
+				<property name="features">
+					<array>
+						<!--设置null值也要输出，fastjson默认是关闭的 -->
+						<value>WriteMapNullValue</value>
+						<!--设置使用文本方式输出日期，fastjson默认是long -->
+						<value>WriteDateUseDateFormat</value>
+					</array>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>	
+
+	<!-- 类型转换支持 -->
+	<bean id="conversionService"
+		class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="cn.gdeng.paycenter.web.api.converter.StringDateConverter" />
+				<bean class="cn.gdeng.paycenter.web.api.converter.DateStringConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<dubbo:annotation package="cn.gdeng.paycenter.gateway.web.controller" />
+	<context:component-scan base-package="cn.gdeng.paycenter.gateway.web.controller" />
+
+	<!-- <mvc:annotation-driven conversion-service="conversionService" /> -->
+	<!--===================== view resovler ===================== -->
+	<bean id="viewResolver" abstract="true">
+		<property name="attributes">
+			<props>
+				<prop key="resRoot">@{resRoot}</prop>
+				<prop key="uaaResRoot">@{uaaResRoot}</prop>
+				<prop key="minSuffix">@{minSuffix}</prop>
+				<prop key="appVersion">@{appVersion}</prop>
+				<prop key="imgHost">@{imgHost}</prop>
+				<prop key="imgHostTag">@{imgHostTag}</prop>
+				<prop key="imgHostNumber">@{imgHostNumber}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="jstlViewResolver"
+		class="org.springframework.web.servlet.view.UrlBasedViewResolver"
+		parent="viewResolver">
+		<property name="order" value="2" />
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+
+
+
+	<!-- 拦截器 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="cn.gdeng.paycenter.gateway.web.interceptor.SysInterceptor">
+				<property name="doNotCheckUrl">
+					<list>
+						<value>test</value>
+						<value>gw/initPage</value>
+						<value>gw/pay</value>
+						<value>alipay</value>
+						<value>gw</value>
+						
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- 配置默认的公共异常处理器 -->
+	<bean id="commonExceptionHandler"
+		class="cn.gdeng.paycenter.gateway.exception.hander.CommonExceptionHandler" />
+
+
+
+</beans>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayLogRecord">
+	
+	<sql id="qureyLogById">
+	<![CDATA[
+		select id,orderNo,oprType,payType,send,receive
+		 from pay_log_record where 1=1
+		and id=:id 
+	]]>
+	</sql>
+
+	
+	<sql id="updateLog">
+	<![CDATA[
+		update pay_log_record set 		
+		<#if send?exists && send!="" > 
+ 			 send=:send,
+ 		</#if>
+ 		<#if receive?exists && receive!="" > 
+ 			 receive=:receive,
+ 		</#if>
+
+ 		<#if payType?exists && payType!="" > 
+ 			payType=:payType,
+ 		</#if>
+ 		updateTime = now()
+ 		
+ 		 where id=:id
+		
+	]]>
+	</sql>
+	
+</sqlMap>

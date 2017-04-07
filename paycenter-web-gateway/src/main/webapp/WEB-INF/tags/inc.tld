@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+    <description>A tag library exercising SimpleTag handlers.</description>
+    <tlib-version>1.0</tlib-version>
+    <short-name>Component</short-name>
+    <tag>
+    	  <description>窗体控件</description>
+        <name>radioGroup</name>
+        <tag-class>com.gudeng.commerce.product.tags.RadioGroupTag</tag-class>
+        <body-content>empty</body-content>	
+        
+        
+        <attribute>
+        	<name>id</name>
+        	<required>true</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>false</rtexprvalue>
+        </attribute>
+        
+        
+         <attribute>
+        	<name>name</name>
+        	<required>true</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>false</rtexprvalue>
+        </attribute>
+        
+        <attribute>
+        	<name>datas</name>
+        	<required>true</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+         <attribute>
+        	<name>label</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+         <attribute>
+        	<name>code</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+         <attribute>
+        	<name>property</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+         <attribute>
+        	<name>onclick</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+    </tag>
+    
+    <tag>
+      <description>JS状态提示</description>
+        <name>status</name>
+        <tag-class>com.gudeng.commerce.product.tags.JsStatusTag</tag-class>
+        <body-content>empty</body-content>	
+        
+        
+        <attribute>
+        	<name>callback</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>false</rtexprvalue>
+        </attribute>
+        
+    </tag>
+    
+      <tag>
+      <description>翻页控制</description>
+        <name>Page</name>
+        <tag-class>com.gudeng.commerce.product.tags.PageTag</tag-class>
+        <body-content>empty</body-content>	
+        
+        
+        <attribute>
+        	<name>formName</name>
+        	<required>true</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+    </tag>
+    
+    <tag>
+        <description>窗体控件</description>
+        <name>Window</name>
+        <tag-class>com.gudeng.commerce.product.tags.WindowTag</tag-class>
+        <body-content>empty</body-content>	
+        <attribute>
+        	<name>id</name>
+        	<required>true</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+     	<attribute>
+        	<name>label</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+        	<name>title</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+        	<name>type</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+         <attribute>
+        	<name>width</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+        	<name>style</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        
+         <attribute>
+        	<name>height</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+        	<name>url</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+        	<name>before</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+         <attribute>
+        	<name>after</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+         <attribute>
+        	<name>callbackMethod</name>
+        	<required>false</required>
+	    	<fragment>false</fragment>
+	    	<rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    
+     <tag>
+    	  <description>城市</description>
+    	  <name>cityLabel</name>
+    	  <tag-class>com.gudeng.commerce.product.tags.CityLabelTag</tag-class>
+          <body-content>empty</body-content>
+          <attribute>
+			<name>cityId</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+	 </tag>	 
+	 
+	  <tag>
+    	  <description>分类展示</description>
+    	  <name>categoryLabel</name>
+    	  <tag-class>com.gudeng.commerce.product.tags.CategoryLabelTag</tag-class>
+          <body-content>empty</body-content>
+          <attribute>
+			<name>categoryId</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+	 </tag>	
+	 
+	 <tag>
+    	  <description>推荐位置展示</description>
+    	  <name>recomPlaceLabel</name>
+    	  <tag-class>com.gudeng.commerce.product.tags.RecmPlaceLabelTag</tag-class>
+          <body-content>empty</body-content>
+          <attribute>
+			<name>placeId</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+	 </tag>	 
+	  
+	 <tag>
+    	  <description>字典信息显示</description>
+    	  <name>dicLabel</name>
+    	  <tag-class>com.gudeng.commerce.product.tags.DicCodeLabelTag</tag-class>
+          <body-content>empty</body-content>
+          <attribute>
+			<name>code</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+	 </tag>	
+	 
+     <tag>
+    	  <description>上传
+    	  </description>
+    	  <name>upload</name>
+    	  <tag-class>com.gudeng.commerce.product.tags.UploadTag</tag-class>
+          <body-content>empty</body-content>
+          <attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		  <attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 <attribute>
+			<name>width</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 <attribute>
+			<name>resize</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 <attribute>
+			<name>height</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 <attribute>
+			<name>successCallBack</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 <attribute>
+			<name>dir</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		  <attribute>
+			<name>defaultValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		  <attribute>
+			<name>fileTypeExts</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		  <attribute>
+			<name>property</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		 </attribute>
+		 
+    </tag>
+  <tag>
+    	 <description>数据集合生成html select控件，其中name属性为控件的名字,property为
+    	 当前需要onselect的值,collection为集合对象,label为集合中的标签描述,code为集合中的代码值，如果select option中的值与property相匹配那么该option被
+    	 onselect
+    	 </description>
+        <name>CollectionSelect</name>
+        <tag-class>com.gudeng.commerce.product.tags.CollectionSelectTag</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+         <attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		 <attribute>
+			<name>collection</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		 <attribute>
+			<name>label</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		 <attribute>
+			<name>code</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>property</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+         <attribute>
+            <name>onchange</name>
+            <required>false</required>
+	    	<fragment>false</fragment>
+        </attribute>
+         <attribute>
+            <name>otherHtmlAttribute</name>
+            <required>false</required>
+	    	<fragment>false</fragment>
+        </attribute>
+    </tag>
+</taglib>
+

@@ -1,0 +1,843 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayJob">
+	<sql id="queryPayTradeForJob">
+	<![CDATA[
+		SELECT 
+		  id,version,orderNo,title,payType,payCenterNumber,thirdPayNumber,timeOut,payTime,
+		closeTime,payStatus,appKey,notifyStatus,reParam,returnUrl,notifyUrl,totalAmt,
+		payAmt,receiptAmt,orderTime,closeUserId,thirdPayerAccount,payerUserId,payerAccount, payerName,
+		payeeUserId, payeeAccount,payeeName,thirdPayeeAccount,rate,feeAmt,refundUserId,refundTime,
+		extendJson,requestIp
+		FROM
+		  pay_trade 
+		WHERE 1 = 1 
+ 		<#if notifyStatus?exists && notifyStatus!="" > 
+			and notifyStatus=:notifyStatus 
+ 		</#if>
+ 		<#if payStatus?exists && payStatus!="" > 
+			and payStatus=:payStatus 
+ 		</#if>
+	]]>
+	</sql>
+	
+	<sql id="updatePayTradeMoreForJob">
+	<![CDATA[
+		UPDATE
+			pay_trade
+		SET
+			notifyStatus = :notifyStatus
+		WHERE 
+		1 = 1
+		<#if tradeIds?exists>
+			<#assign n = tradeIds?size />
+			<#if n gt 0>
+				AND id IN (
+				<#list tradeIds as tradeId>
+					<#if tradeId_index != n-1>
+						${tradeId} ,
+					<#else>
+						${tradeId}
+					</#if>
+				</#list>
+				)
+			</#if>
+		</#if>
+			
+	]]>
+	</sql>
+	
+	<sql id="queryListForJobOuttime">
+	<![CDATA[
+		SELECT 
+		  id,version,orderNo,title,payType,payCenterNumber,thirdPayNumber,timeOut,payTime,
+		closeTime,payStatus,appKey,notifyStatus,reParam,returnUrl,notifyUrl,totalAmt,
+		payAmt,receiptAmt,orderTime,closeUserId,thirdPayerAccount,payerUserId,payerAccount, payerName,
+		payeeUserId, payeeAccount,payeeName,thirdPayeeAccount,rate,feeAmt,refundUserId,refundTime,
+		extendJson,requestIp
+		FROM
+		  pay_trade 
+		WHERE 1 = 1 
+			AND DATE_ADD(orderTime,INTERVAL timeOut * 60 MINUTE)<SYSDATE()
+			AND payStatus = "1"
+	]]>
+	</sql>
+	
+	<sql id="updatePayTradeForJob">
+	<![CDATA[
+		UPDATE
+			pay_trade
+		SET
+			<#if notifyStatus?exists && notifyStatus!="" > 
+				notifyStatus = :notifyStatus ,
+	 		</#if>
+	 		<#if payStatus?exists && payStatus!="" > 
+				payStatus = :payStatus ,
+	 		</#if>
+	 		<#if closeUserId?exists && closeUserId!="" > 
+				closeUserId = :closeUserId ,
+	 		</#if>
+	 		closeTime = SYSDATE()
+		WHERE 
+		id = :id
+			
+	]]>
+	</sql>
+	
+	<sql id="queryBillCheckDetail">
+	<![CDATA[
+		SELECT
+			payCenterNumber, thirdPayNumber, trans_date, goodsName, payAmt, checkStatus, billInfo, rate, failReason, payChannelCode   
+		FROM
+			bill_check_detail
+		WHERE 1 = 1 
+			<#if payCenterNumber?exists && payCenterNumber!="">
+			and payCenterNumber = :payCenterNumber
+			</#if>
+			<#if thirdPayNumber?exists && thirdPayNumber!="">
+			and thirdPayNumber = :thirdPayNumber
+			</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryClearBillList">
+	<![CDATA[
+		SELECT
+			pt.orderNo, pte.version posVersion,pt.payCount,pt.thirdPayNumber,pt.requestNo
+		FROM
+			bill_check_detail bcd join pay_trade pt on bcd.thirdPayNumber = pt.thirdPayNumber
+			left join pay_trade_extend pte on pt.orderNo = pte.orderNo
+		WHERE 1 = 1
+			<#if payChannelCode?exists && payChannelCode!="">
+				and bcd.payChannelCode = :payChannelCode
+			</#if>
+		    <#if transDate?exists && transDate!="">
+				and date(bcd.trans_date) = :transDate
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				and pt.orderNo = :orderNo
+			</#if>
+			and bcd.checkStatus = :checkStatus
+			
+	]]>
+	</sql>
+	<sql id="queryClearBillList1220">
+		<![CDATA[
+			select 
+				temp.orderNo  orderNo,
+				pte.version   posVersion,
+				temp.payCount,
+				temp.maxCount,
+				temp.thirdPayNumber,
+				temp.payAmt,
+				temp.payTime,
+				temp.payType,
+				temp.posClientNo
+				from bill_check_detail bcd 
+				join 
+				(
+					select 
+					pt.orderNo,
+					count(1) payCount,
+					max(pt.payCount) maxCount,
+					pt.thirdPayNumber,
+					pt.payAmt,
+					pt.payTime,pt.payType,
+					pt.payCenterNumber payCenterNumber,
+					ptp.posClientNo
+					from pay_trade pt 
+					left join pay_trade_pos ptp on pt.payCenterNumber = ptp.payCenterNumber
+					where pt.payStatus = '2'  group by orderNo
+				) temp on(bcd.thirdPayNumber = temp.thirdPayNumber)
+				left join pay_trade_extend pte on temp.orderNo = pte.orderNo
+			where temp.payCount = temp.maxCount
+			
+			<#if payChannelCode?exists && payChannelCode!="">
+				and bcd.payChannelCode = :payChannelCode
+			</#if>
+		    <#if transDate?exists && transDate!="">
+				and date(bcd.trans_date) = :transDate
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				and temp.orderNo = :orderNo
+			</#if>
+			and bcd.checkStatus = :checkStatus
+		]]>
+	</sql>
+	<sql id="queryClearBillCount">
+	<![CDATA[
+		SELECT
+			count(*)
+		FROM
+			pay_trade pt join bill_check_detail bcd on pt.thirdPayNumber = bcd.thirdPayNumber
+		WHERE 
+		bcd.checkStatus = :checkStatus and pt.thirdPayNumber = :thirdPayNumber
+	]]>
+	</sql>
+	
+	<sql id="getFeeRecordCount">
+	<![CDATA[
+		SELECT
+			COUNT(1)
+		FROM
+			fee_record
+		WHERE
+			feeType = 0
+			AND payCenterNumber = :payCenterNumber
+	]]>
+	</sql>
+	
+	<sql id="addMoreBillCheck">
+	<![CDATA[
+		INSERT INTO `bill_check_detail` (
+		  `payCenterNumber`,
+		  `thirdPayNumber`,
+		  `trans_date`,
+		  `goodsName`,
+		  `payAmt`,
+		  `checkStatus`,
+		  `billInfo`
+		) 
+		VALUES
+		  <#if billChecks?exists>
+			<#assign n = billChecks?size />
+			<#if n gt 0>
+				<#list billChecks as billCheck>
+				(
+					<#if billCheck.payCenterNumber?exists && billCheck.payCenterNumber!="">
+					${billCheck.payCenterNumber},
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.thirdPayNumber?exists && billCheck.thirdPayNumber!="">
+					${billCheck.thirdPayNumber},
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.trans_date_str?exists && billCheck.trans_date_str!="">
+					'${billCheck.trans_date_str}',
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.goodsName?exists && billCheck.goodsName!="">
+					'${billCheck.goodsName}',
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.payAmt?exists && billCheck.payAmt!="">
+					${billCheck.payAmt},
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.checkStatus?exists && billCheck.checkStatus!="">
+					'${billCheck.checkStatus}',
+					<#else>
+					 NULL,
+					</#if>
+					<#if billCheck.billInfo?exists && billCheck.billInfo!="">
+					'${billCheck.billInfo}'
+					<#else>
+					 NULL
+					</#if>
+					<#if billCheck_index != n-1>
+						), 
+					<#else>
+						)
+					</#if>
+				</#list>
+			</#if>
+		  </#if>
+			
+	]]>
+	</sql>
+	
+	<sql id="addBillCheck">
+	<![CDATA[
+		INSERT INTO `bill_check_detail` (
+		  `payCenterNumber`,
+		  `thirdPayNumber`,
+		  `trans_date`,
+		  `payTime`,
+		  `goodsName`,
+		  `payAmt`,
+		  `checkStatus`,
+		  `billInfo`,
+		  `failReason`,
+		  `remark`,
+		  `payChannelCode`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  `updateUserId`,
+		  `resultType`
+		) 
+		VALUES
+		(
+			<#if payCenterNumber?exists && payCenterNumber!="">
+			'${payCenterNumber}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if thirdPayNumber?exists && thirdPayNumber!="">
+			'${thirdPayNumber}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if trans_date_str?exists && trans_date_str!="">
+			'${trans_date_str}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if payTimeStr?exists && payTimeStr!="">
+			'${payTimeStr}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if goodsName?exists && goodsName!="">
+			'${goodsName}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if payAmt?exists && payAmt!="">
+			${payAmt},
+			<#else>
+			 NULL,
+			</#if>
+			<#if checkStatus?exists && checkStatus!="">
+			'${checkStatus}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if billInfo?exists && billInfo!="">
+			'${billInfo}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if failReason?exists && failReason!="">
+			'${failReason}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if remark?exists && remark!="">
+			'${remark}',
+			<#else>
+			 NULL,
+			</#if>
+			<#if payChannelCode?exists && payChannelCode!="">
+			'${payChannelCode}',
+			<#else>
+			 NULL,
+			</#if>
+			SYSDATE(),
+			:createUserId,
+			SYSDATE(),
+			:updateUserId,
+			<#if resultType?exists && resultType!="">
+			'${resultType}'
+			<#else>
+			 NULL
+			</#if>
+		)
+			
+	]]>
+	</sql>
+	
+	<sql id="updateBillCheck">
+	<![CDATA[
+		UPDATE 
+		  bill_check_detail
+		SET
+		<#if thirdPayNumber?exists && thirdPayNumber!="">
+			thirdPayNumber = :thirdPayNumber,
+		</#if>
+		<#if trans_date_str?exists && trans_date_str!="">
+			trans_date = :trans_date_str,
+		</#if>
+		<#if goodsName?exists && goodsName!="">
+			goodsName = :goodsName,
+		</#if>
+		<#if payAmt?exists && payAmt!="">
+			payAmt = :payAmt,
+		</#if>
+		<#if checkStatus?exists && checkStatus!="">
+			checkStatus = :checkStatus,
+		</#if>
+		<#if billInfo?exists && billInfo!="">
+			billInfo = :billInfo,
+		</#if>
+		<#if failReason?exists && failReason!="">
+			failReason = :failReason,
+		</#if>
+		<#if remark?exists && remark!="">
+			remark = :remark,
+		</#if>
+		<#if payChannelCode?exists && payChannelCode!="">
+			payChannelCode = :payChannelCode,
+		</#if>
+		updateTime = SYSDATE(),
+		updateUserId=:updateUserId 
+		WHERE payCenterNumber=:payCenterNumber
+	]]>
+	</sql>
+	
+	<sql id="addFeeRecord"> 
+ 	<![CDATA[ 
+		INSERT `fee_record` (
+		  `payCenterNumber`,
+		  `thridPayNumber`,
+		  `feeType`,
+		  `financeTime`,
+		  `payAmt`,
+		  `rate`,
+		  `feeAmt`,
+		  `operaUserId`,
+		  `operaTime`,
+		  `createUserId`,
+		  `updateUserId`
+		) 
+		VALUES
+		  (
+		    :payCenterNumber,
+		    :thridPayNumber,
+		    :feeType,
+		    :financeTime,
+		    :payAmt,
+		    :rate,
+		    :feeAmt,
+		    :operaUserId,
+		    SYSDATE(),
+		    :createUserId,
+		    :updateUserId
+		  )
+ 		]]> 
+ 	</sql>
+ 	
+	<sql id="updateFeeRecord"> 
+ 	<![CDATA[ 
+		update fee_record set payAmt = :payAmt, feeAmt = :feeAmt, updateTime = SYSDATE() 
+		where thridPayNumber = :thridPayNumber and feeType = :feeType
+ 		]]> 
+ 	</sql>
+ 	
+	<sql id="queryBillCheckSum">
+	<![CDATA[
+		SELECT
+			id, payType, payTime, checkNum, checkAmt, checkSuccessNum, checkSuccessAmt, checkFailNum, checkFailAmt, version 
+		FROM
+			bill_check_sum
+		WHERE
+			payType = :payType and payTime = :payTime
+	]]>
+	</sql>
+	
+	<sql id="addBillCheckSum">
+	<![CDATA[
+		insert into bill_check_sum (payType, payTime, checkNum, checkAmt, checkSuccessNum, checkSuccessAmt, 
+			checkFailNum, checkFailAmt, createTime, createUserId, updateTime, updateUserId, version)
+		values (:payType, :payTimeStr, :checkNum, :checkAmt, :checkSuccessNum, :checkSuccessAmt, 
+			:checkFailNum, :checkFailAmt, SYSDATE(), :createUserId, SYSDATE(), :createUserId, 1)
+	]]>
+	</sql>
+	
+	<sql id="updateBillCheckSum">
+	<![CDATA[
+		update bill_check_sum set checkNum = :checkNum,  checkAmt = :checkAmt, checkSuccessNum = :checkSuccessNum, 
+			checkSuccessAmt = :checkSuccessAmt, checkFailNum = :checkFailNum, checkFailAmt = :checkFailAmt, 
+			updateTime = SYSDATE(), updateUserId = :updateUserId, version = version + 1
+		where id = :id and version = :version
+	]]>
+	</sql>
+	
+	<sql id="addBillCheckLog">
+	<![CDATA[
+		insert into bill_check_log (checkTime, payType, payTime, checkNum, checkAmt, checkSuccessNum, checkSuccessAmt, 
+			checkFailNum, checkFailAmt, createTime, createUserId, updateTime, updateUserId)
+		values (SYSDATE(), :payType, :payTimeStr, :checkNum, :checkAmt, :checkSuccessNum, :checkSuccessAmt, 
+			:checkFailNum, :checkFailAmt, SYSDATE(), :createUserId, SYSDATE(), :createUserId)
+	]]>
+	</sql>
+	
+	<sql id="queryBankStatement">
+ 	<![CDATA[
+	    SELECT businessNo, businessName ,tradeType,tradeDay,cardNo,
+	    clientNo,tradeMoney,sysRefeNo,fee,createUserId,createTime,updateUserId,updateTime,cardType
+		FROM bank_statement t WHERE DATE_FORMAT(t.tradeDay,'%Y-%m-%d') = :tradeDay
+	]]>
+	</sql>
+	
+	<sql id="queryPosClearBillInfo">
+ 	<![CDATA[	
+	select pt.orderNo, pt.payAmt, pt.payerUserId buyerId, pt.payeeUserId sellerId, pt.feeAmt platFeeAmt, 
+		ptp.bankType, ptp.payChannelCode, ptp.areaType, ptp.cardType, mbai.memberId marketUserId,pt.logisticsUserId logisUserId
+	from pay_trade pt 
+		join (select orderNo, marketId from pay_trade_extend where orderType = '1') pte on pt.orderNo = pte.orderNo
+		join pay_trade_pos ptp on pt.payCenterNumber = ptp.payCenterNumber 
+		left join market_bank_acc_info mbai on mbai.marketId = pte.marketId AND mbai.isDeleted = 0
+	where pt.orderNo = :orderNo
+	]]>
+	</sql>
+	
+	<sql id="queryClearBillInfo">
+ 	<![CDATA[	
+	select 
+		pt.orderNo, pt.appKey, pt.payAmt payAmt, pt.payerUserId buyerId, pt.payeeUserId sellerId, 
+		pt.feeAmt platFeeAmt  
+	from pay_trade pt 
+	where pt.orderNo = :orderNo
+	]]>
+	</sql>
+	
+	<sql id="queryClearDetailValidCount">
+ 	<![CDATA[	
+	select count(1) from clear_detail where orderNo = :orderNo and isValid = '1'
+	]]>
+	</sql>
+	
+	<sql id="addClearDetail">
+ 	<![CDATA[	
+	insert into clear_detail (orderNo, memberId, userType, feeType, szType, tradeAmt, clearTime, 
+		isValid, createTime, createUserId, updateTime, updateUserId)
+	values (:orderNo, :memberId, :userType, :feeType, :szType, :tradeAmt, :clearTime, 
+		:isValid, SYSDATE(), :createUserId, SYSDATE(), :updateUserId)
+	]]>
+	</sql>
+	
+	<sql id="updateClearDetailInvalid">
+ 	<![CDATA[	
+	update clear_detail set isValid = '2', updateTime = SYSDATE(), updateUserId = 'SYS' 
+	where orderNo = :orderNo and isValid = '1'
+	]]>
+	</sql>
+	
+	<sql id="getClearDetailId">
+ 	<![CDATA[	
+	select id from clear_detail where orderNo = :orderNo and memberId = :memberId and userType = :userType
+		and feeType = :feeType and szType = :szType and isValid = '1'
+	]]>
+	</sql>
+	
+	<sql id="addRefClearRelate">
+ 	<![CDATA[	
+		insert into ref_clear_relate (clearId, refId) values (:clearId, :refId)
+	]]>
+	</sql>
+	
+	<sql id="updatePayTradePos">
+ 	<![CDATA[	
+		update pay_trade_pos set bankType = :bankType, cardType = :cardType, updateTime = SYSDATE(), updateUserId = 'SYS' 
+		where payCenterNumber = :payCenterNumber
+	]]>
+	</sql>
+	
+	<sql id="updatePayTrade">
+ 	<![CDATA[	
+		update pay_trade set payAmt = :payAmt, feeAmt = :feeAmt, receiptAmt = :payAmt - :feeAmt, payStatus = :payStatus, updateTime = SYSDATE(), updateUserId = :updateUserId
+		where thirdPayNumber = :thirdPayNumber and orderNo = :orderNo
+	]]>
+	</sql>
+	
+   <sql id="updateFailedBillCheckDetail">
+		 <![CDATA[  
+			update bill_check_detail set
+			<#if remark?exists && remark!="">
+				remark = :remark,
+			</#if>
+			<#if checkStatus?exists && checkStatus!="">
+				checkStatus = :checkStatus,
+			</#if>
+			<#if payAmt?exists && payAmt!="">
+				payAmt = :payAmt,
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber!="">
+				payCenterNumber = :payCenterNumber,
+			</#if>
+			updateUserId=:updateUserId, updateTime=SYSDATE()
+			where thirdPayNumber=:thirdPayNumber
+		 ]]>
+	</sql>
+	
+	<sql id="queryPayTypeCheckBill">
+ 	<![CDATA[	
+	select payType from pay_type where hasCheck = :hasCheck
+	]]>
+	</sql>
+	
+	<sql id="queryPayTypeCheckBillCount">
+ 	<![CDATA[	
+	select count(1) from pay_type where payType = :payType and hasCheck = :hasCheck
+	]]>
+	</sql>
+	
+	<sql id="queryPayTypeConfig">
+ 	<![CDATA[	
+	select appKey, payType, hasClear 
+	from pay_type_config 
+	where payType = :payType 
+	<#if appKey?exists && appKey!="">
+		and appKey = :appKey
+	</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryHasChangeCount">
+ 	<![CDATA[	
+	select count(1)
+	from clear_detail cd 
+	where cd.isValid = '1' and cd.hasChange = '1' and cd.orderNo = :orderNo	
+	]]>
+	</sql>
+	
+	<sql id="queryAgainClearOrderNo">
+ 	<![CDATA[	
+	select distinct cd.orderNo
+	from clear_detail cd join pay_trade pt on cd.orderNo = pt.orderNo
+		join bill_check_detail bcd on bcd.thirdPayNumber = pt.thirdPayNumber 
+	where cd.isValid = '1' and cd.hasChange = '0' and pt.payType = :payType 
+		and date(bcd.trans_date) = :transDate
+	]]>
+	</sql>
+	
+	<sql id="querySubsidyAmt">
+ 	<![CDATA[	
+	select IFNULL(sum(subsidyAmt), 0) from v_clear_detail where memberId = :memberId
+	]]>
+	</sql>
+	
+	<sql id="queryPayTrade">
+	<![CDATA[
+		select pt.id,pte.version posVersion,pt.orderNo,pt.title,pt.payType,pt.payCenterNumber,pt.thirdPayNumber,
+		pt.timeOut,pt.payTime,pt.closeTime,pt.payStatus,pt.appKey,pt.notifyStatus,pt.reParam,pt.returnUrl,
+		pt.notifyUrl,pt.totalAmt,pt.payAmt,pt.receiptAmt,pt.orderTime,pt.closeUserId,pt.thirdPayerAccount,
+		pt.payerUserId,pt.payerAccount, pt.payerName,pt.payeeUserId, pt.payeeAccount,pt.payeeName,
+		pt.thirdPayeeAccount,pt.rate,pt.feeAmt,pt.refundUserId,pt.refundTime,pt.extendJson,pt.requestIp,
+		pt.payerMobile,pt.payeeMobile,ptp.posClientNo 
+		from pay_trade pt left join pay_trade_extend pte on pt.orderNo = pte.orderNo 
+		left join pay_trade_pos ptp on pt.payCenterNumber = ptp.payCenterNumber
+		where 1=1
+		<#if orderNo?exists && orderNo!="" > 
+ 					and pt.orderNo=:orderNo 
+ 		</#if>
+ 		<#if appKey?exists && appKey!="" > 
+ 					and pt.appKey=:appKey 
+ 		</#if>
+ 		<#if payCenterNumber?exists && payCenterNumber!="" > 
+ 					and pt.payCenterNumber=:payCenterNumber 
+ 		</#if>
+ 		<#if thirdPayNumber?exists && thirdPayNumber!="" > 
+ 					and pt.thirdPayNumber=:thirdPayNumber 
+ 		</#if>
+ 		<#if payStatus?exists && payStatus!="" > 
+ 					and pt.payStatus=:payStatus 
+ 		</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryPosMachineConfig">
+	<![CDATA[
+		select pmc.state, pmc.hasClear 
+		from pos_machine_config pmc 
+		where pmc.machineNum = :machineNum and 
+			pmc.id IN
+			<#assign n = posVersions?size />
+			<#if n gt 0>
+				(
+					<#list posVersions as posVersion>
+						<#if posVersion_index != n-1>
+							${posVersion},
+						<#else>
+							${posVersion}
+						</#if>
+					</#list>
+				)
+			</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryOrderAmt">
+ 	<![CDATA[	
+	select orderAmt from v_clear_detail 
+	where orderNo = :orderNo and memberId = :memberId
+	]]>
+	</sql>
+	<sql id="queryPayTradeNoCheck">
+		select 
+			pt.payCenterNumber, 
+			pt.thirdPayNumber,
+			'2' as checkStatus,
+			'银行或第三方没有支付流水号' as failReason,
+			'2' as resultType,
+			pt.payType as payChannelCode,
+			sum(pt.payAmt) as payAmt,
+			pt.payTime,
+			ptp.posClientNo
+		from pay_trade pt 
+		left JOIN pay_trade_pos ptp on pt.payCenterNumber = ptp.payCenterNumber
+		where not exists (select thirdPayNumber from bill_check_detail bcd where pt.thirdPayNumber = bcd.thirdPayNumber) 
+		and pt.payStatus = '2' and pt.payType = :payChannelCode and date(pt.payTime) = :payTime GROUP BY thirdPayNumber;
+	</sql>
+	
+	<sql id="insertBillClearLog">
+		<![CDATA[ 
+		INSERT INTO bill_clear_log(
+		clearTime,
+		payTime,
+		clearNum,
+		clearAmt,
+		clearSuccessNum,
+		clearSuccessAmt,
+		clearFailNum,
+		clearFailAmt,
+		createTime,
+		createUserId,
+		sign
+		)
+		VALUES(
+		SYSDATE(),
+		:payTime,
+		:clearNum,
+		:clearAmt,
+		:clearSuccessNum,
+		:clearSuccessAmt,
+		:clearFailNum,
+		:clearFailAmt,
+		SYSDATE(),
+		:createUserId,
+		:sign)
+		]]> 
+	</sql>
+	
+	<sql id="clearSumObject">
+		<![CDATA[ 
+		select 
+			clearNum,
+			clearAmt,
+			clearSuccessNum,
+			clearSuccessAmt from bill_clear_sum 
+		where date(payTime) = :payTime
+		]]> 
+	</sql>
+	<sql id="insertClearSum">
+		<![CDATA[ 
+		INSERT INTO bill_clear_sum(
+		payTime,
+		clearNum,
+		clearAmt,
+		clearSuccessNum,
+		clearSuccessAmt,
+		clearFailNum,
+		clearFailAmt,
+		createTime,
+		createUserId,
+		sign
+		)
+		VALUES(
+		:payTime,
+		:clearNum,
+		:clearAmt,
+		:clearSuccessNum,
+		:clearSuccessAmt,
+		:clearFailNum,
+		:clearFailAmt,
+		SYSDATE(),
+		:createUserId,
+		:sign)
+		]]> 
+	</sql>
+	
+	<sql id="updateClearSum">
+		<![CDATA[ 
+		update bill_clear_sum set
+			clearNum = :clearNum ,
+			clearAmt = :clearAmt,
+			clearSuccessNum = :clearSuccessNum,
+			clearSuccessAmt = :clearSuccessAmt,
+			updateTime = SYSDATE(),
+			updateUserId = :updateUserId
+		where date(payTime) = :payTime
+		]]> 
+	</sql>
+	<sql id="isClearByOrderNo">
+		select count(*) from clear_detail cd where cd.orderNo = :orderNo
+	</sql>
+	
+	<sql id="haveClearOrderList">
+		<![CDATA[ 
+			select distinct orderNo, payCount from pay_trade 
+			where payStatus = '2' 
+			<#if orderNo?exists && orderNo!="" > 
+				and orderNo = :orderNo
+			<#else>
+				and date(payTime) = :payTime
+			</#if>
+		]]> 
+	</sql>
+	<sql id="clearDetialCountByOrderNo">
+		<![CDATA[ 
+			select count(1) from bill_check_detail bcd where bcd.orderNo = :orderNo and date(bcd.trans_date) <= :transDate 
+		]]> 
+	</sql>
+	<sql id="queryByOrderNo">
+		<![CDATA[ 
+			select
+				pt.thirdPayNumber
+			from pay_trade pt
+			where orderNo = :orderNo
+		]]> 
+	</sql>
+	
+	<sql id="queryCheckByThirdNum">
+		<![CDATA[ 
+			select
+				count(*)
+			from bill_check_detail bcd
+			where bcd.checkStatus = '1'
+			<#if thirdPayNumbers?exists>
+			<#assign n = thirdPayNumbers?size />
+			<#if n gt 0>
+				and bcd.thirdPayNumber in (
+				<#list thirdPayNumbers as thirdPayNumber>
+					<#if thirdPayNumber_index != n-1>
+						'${thirdPayNumber}' ,
+					<#else>
+						'${thirdPayNumber}'
+					</#if>
+				</#list>
+				)
+			</#if>
+		</#if>
+		]]> 
+	</sql>
+	
+	<sql id="isMergePay">
+		<![CDATA[ 
+			select 
+				count(*)
+			 from pay_trade pt 
+			 where pt.thirdPayNumber = (select thirdPayNumber from pay_trade temp where temp.orderNo = :orderNo and temp.payCount = :payCount)
+		]]> 
+	</sql>
+	<sql id="amtSum">
+	<![CDATA[ 
+	select sum(pt.payAmt) payAmt,sum(pt.feeAmt) platFeeAmt from pay_trade pt where pt.orderNo = :orderNo
+	]]> 
+	</sql>
+	<sql id="queryBasePayTradeObject">
+	<![CDATA[ 
+		select 
+			pt.orderNo  orderNo,
+			pte.version   posVersion,
+			pt.thirdPayNumber,
+			pt.payAmt,
+			pt.payTime,
+			pt.payType,
+			ptp.posClientNo,
+			pt.appKey
+		from pay_trade pt 
+		left join pay_trade_pos ptp on pt.payCenterNumber = ptp.payCenterNumber
+		left join pay_trade_extend pte on pt.orderNo = pte.orderNo
+		where pt.orderNo = :orderNo
+		<#if requestNo?exists && requestNo!="" > 
+			and pt.requestNo = :requestNo
+		</#if>
+	]]> 
+	</sql>
+</sqlMap>

@@ -1,0 +1,40 @@
+@charset "utf-8";
+.clearfix:after{content:".";display:block;font-size:0;height:0;clear:both;visibility:hidden}
+.clearfix{zoom:1}
+.bt-order-ct{font-size: 14px; color: #666;font-weight: bold;margin: 20px 0 10px 0}
+/**已付款**/
+.f-c-068139{ color: #068139}
+/**待支付**/
+.f-c-f33{ color: #f33}
+.bt-order-t{float: left;}
+.bt-order-time{float: right;}
+.bt-order-bigt{font-size: 30px; text-align: center;margin: 15px 0}
+.bt-order{padding: 15px}
+.comtable1 td{border-bottom: 1px dashed #ccc;line-height: 24px;padding: 10px}
+.comtable2 td{border-bottom: 1px dashed #ccc;line-height: 24px;padding: 10px;text-align: center;}
+.comtable2 th,.comtable1 th{text-align: center;}
+.comtable2{border:  1px dashed #ccc;}
+.pz-img img{ margin-right: 20px;}
+.input-text{font-size: 14px;line-height: normal;line-height: 38px\9;padding: 0 15px;height: 38px;border: 1px solid #d0d0d0;width: 150px;}
+.input-err{border: 1px solid #ff7a4d}
+.input-text:focus{border: 1px solid #3399fe;}
+.input-text:hover{border: 1px solid #3399fe;}
+.pz-input{margin: 20px 0 10px 0 }
+.pz-input .input-text{margin-right: 15px;}
+.pr40{padding-right: 40px;}
+.bt-order-tal{text-align: right;padding: 10px 20px 10px 0;line-height: 20px;}
+.input-order{margin-top: 15px;}
+.pz-img-box{float: left;margin: 0 15px 15px 0}
+
+.bt-notice{}
+.bt-notice-wrong{ color: #f33;}
+.bt-notice-right{ color: #00FF00}
+.bt-notice{border: 1px solid #ccc;padding:10px;font-weight: bold;font-size: 14px;margin-bottom: 10px; }
+.bt-notice span{float: left; line-height: 28px; width: 33%;text-align: center;}
+.bh-reason .leb-txt2{margin-right: 20px;line-height: 20px;}
+.bh-reason-chk{vertical-align: middle; margin-right: 5px;}
+.bh-tit{line-height: 24px;}
+
+.pz-img-t{float: left;padding-top: 138px;}
+.pz-img-item{margin-left: 85px;}
+.pz-img{margin-top: 20px;}

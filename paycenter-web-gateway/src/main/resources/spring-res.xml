@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ss="http://www.springframework.org/schema/security"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<bean id="loggingInitialization"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass"
+			value="com.gudeng.framework.core2.config.LogbackConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>
+				<value>${maven.logger}</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 属性文件 -->
+	<bean id="gdConfigs"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				 <value>classpath:properties/gd-setting.properties</value> 
+			</list>
+		</property>
+	</bean>
+
+	<bean id="commonPropertiesUtil" class="cn.gdeng.paycenter.util.web.api.CommonPropertiesUtil">
+		<property name="properties" ref="gdConfigs" />
+	</bean>
+
+	<bean id="messageUtil" class="cn.gdeng.paycenter.util.web.api.MessageUtil">
+		<property name="properties" ref="gdConfigs" />
+	</bean>
+
+	<!--属性文件 -->
+	<bean id="gdProperties" class="cn.gdeng.paycenter.util.web.api.GdProperties">
+		<property name="properties" ref="gdConfigs" />
+	</bean>
+</beans>

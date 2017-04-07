@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="Paid">
+	<sql id="queryPage">
+	<![CDATA[
+		SELECT
+			t.memberId,
+			mb.account,
+			mb.mobile,
+			SUM(orderCount) AS orderCount,
+			SUM(commissionCount) AS commissionCount,
+			SUM(penaltyCount) AS penaltyCount,
+			SUM(refundCount) AS refundCount,
+			SUM(amt) AS amt
+		FROM
+			(
+				SELECT
+					a.memberId,
+					COUNT(1) AS orderCount,
+					NULL AS commissionCount,
+					NULL AS penaltyCount,
+					NULL AS refundCount,
+					SUM(IFNULL(a.orderAmt, 0)) - SUM(IFNULL(a.feeAmt, 0)) - SUM(IFNULL(a.commissionAmt, 0)) - SUM(IFNULL(a.platCommissionAmt, 0)) + SUM(IFNULL(a.subsidyAmt, 0)) AS amt
+				FROM
+					(SELECT
+					  t.`orderNo`   AS `orderNo`,
+					  t.`userType`  AS `userType`,
+					  t.`memberId`  AS `memberId`,
+					  (CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+					  (CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+					  SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+					FROM `clear_detail` t
+					WHERE t.`isValid` = '1'
+					GROUP BY t.`orderNo`,t.`userType`,t.`memberId`) a
+				where (a.orderAmt > 0 OR a.subsidyAmt > 0) AND a.hasChange = '0' AND a.szType = '1'
+				GROUP BY
+					a.memberId
+					
+				UNION ALL
+					
+				SELECT 
+					a.memberId,
+					NULL AS orderCount,
+					(CASE WHEN a.commissionCount = 0 THEN NULL ELSE a.commissionCount END) AS commissionCount,
+					(CASE WHEN a.penaltyCount = 0 THEN NULL ELSE a.penaltyCount END) AS penaltyCount,
+					(CASE WHEN a.refundCount = 0 THEN NULL ELSE a.refundCount END) AS refundCount,
+					a.amt
+				FROM (
+					SELECT t.`memberId`,
+						COUNT(CASE WHEN `feeType` = '100002' THEN feeType END) AS commissionCount,
+						COUNT(CASE WHEN `feeType` = '100006' THEN feeType END) AS penaltyCount,
+						COUNT(CASE WHEN `feeType` = '100007' THEN feeType END) AS refundCount,
+						SUM(tradeAmt) AS amt
+						FROM clear_detail t WHERE t.`isValid` = '1' AND t.`hasChange` = '0' AND t.`szType` = '1' AND `feeType` IN ('100002', '100006', '100007') 
+					GROUP BY t.memberId
+					) a
+			) t
+		LEFT JOIN member_baseinfo mb ON mb.memberId = t.memberId
+		WHERE
+			1 = 1 AND t.`memberId` <> 1
+		<#if account?exists && account!="">
+			AND mb.account like "%":account"%"
+		</#if>
+		<#if mobile?exists && mobile!="">
+			AND mb.mobile like "%":mobile"%"
+		</#if>
+		<#if startAmt?exists && startAmt!="">
+			AND t.amt >= :startAmt
+		</#if>
+		<#if endAmt?exists && endAmt!="">
+			AND t.amt <= :endAmt
+		</#if>
+		<#if greaterZero?exists && greaterZero!="">
+			AND t.amt > 0
+		</#if>
+		GROUP BY t.memberId
+		ORDER BY t.amt DESC
+		<#if startRow?exists && startRow!="">	
+		LIMIT :startRow,:endRow
+		</#if>
+	]]>
+	</sql>
+	
+	<sql id="countByCondition">
+	<![CDATA[
+		select count(1) from (
+			SELECT
+				t.memberId,
+				mb.account,
+				mb.mobile,
+				SUM(orderCount) AS orderCount,
+				SUM(commissionCount) AS commissionCount,
+				SUM(penaltyCount) AS penaltyCount,
+				SUM(refundCount) AS refundCount,
+				SUM(amt) AS amt
+			FROM
+				(
+					SELECT
+						a.memberId,
+						COUNT(1) AS orderCount,
+						NULL AS commissionCount,
+						NULL AS penaltyCount,
+						NULL AS refundCount,
+						SUM(IFNULL(a.orderAmt, 0)) - SUM(IFNULL(a.feeAmt, 0)) - SUM(IFNULL(a.commissionAmt, 0)) - SUM(IFNULL(a.platCommissionAmt, 0)) + SUM(IFNULL(a.subsidyAmt, 0)) AS amt
+					FROM
+						(SELECT
+						  t.`orderNo`   AS `orderNo`,
+						  t.`userType`  AS `userType`,
+						  t.`memberId`  AS `memberId`,
+						  (CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+						  (CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+						  SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+						  SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+						FROM `clear_detail` t
+						WHERE t.`isValid` = '1'
+						GROUP BY t.`orderNo`,t.`userType`,t.`memberId`) a
+					where (a.orderAmt > 0 OR a.subsidyAmt > 0) AND a.hasChange = '0' AND a.szType = '1'
+					GROUP BY
+						a.memberId
+						
+					UNION ALL
+						
+						SELECT a.memberId,
+				NULL AS orderCount,
+				(CASE WHEN a.commissionCount = 0 THEN NULL ELSE a.commissionCount END) AS commissionCount,
+				(CASE WHEN a.penaltyCount = 0 THEN NULL ELSE a.penaltyCount END) AS penaltyCount,
+				(CASE WHEN a.refundCount = 0 THEN NULL ELSE a.refundCount END) AS refundCount,
+				a.amt
+				FROM (
+					SELECT t.`memberId`,
+						COUNT(CASE WHEN `feeType` = '100002' THEN feeType END) AS commissionCount,
+						COUNT(CASE WHEN `feeType` = '100006' THEN feeType END) AS penaltyCount,
+						COUNT(CASE WHEN `feeType` = '100007' THEN feeType END) AS refundCount,
+						SUM(tradeAmt) AS amt
+						FROM clear_detail t WHERE t.`isValid` = '1' AND t.`hasChange` = '0' AND t.`szType` = '1' AND `feeType` IN ('100002', '100006', '100007') 
+			
+					GROUP BY t.memberId
+					) a
+				) t
+			LEFT JOIN member_baseinfo mb ON mb.memberId = t.memberId
+			WHERE
+				1 = 1 AND t.`memberId` <> 1
+			<#if account?exists && account!="">
+				AND mb.account like "%":account"%"
+			</#if>
+			<#if mobile?exists && mobile!="">
+				AND mb.mobile like "%":mobile"%"
+			</#if>
+			<#if startAmt?exists && startAmt!="">
+				AND t.amt >= :startAmt
+			</#if>
+			<#if endAmt?exists && endAmt!="">
+				AND t.amt <= :endAmt
+			</#if>
+			<#if greaterZero?exists && greaterZero!="">
+				AND t.amt > 0
+			</#if>
+			GROUP BY t.memberId
+			ORDER BY t.amt DESC
+		) tt
+	]]>
+	</sql>
+	
+	<sql id="queryList">
+	<![CDATA[
+		SELECT 
+			t.memberId,
+			mb.account,
+			mb.mobile,
+			sum(orderCount) as orderCount,
+			sum(commissionCount) as commissionCount,
+			sum(refundCount) as refundCount,
+			sum(penaltyCount) as penaltyCount,
+			sum(amt) as amt
+		FROM 
+		(
+			SELECT
+				a.memberId,
+				count(1) AS orderCount,
+				NULL AS commissionCount,
+				NULL as refundCount,
+				NULL as penaltyCount,
+				sum(IFNULL(a.orderAmt,0)) - sum(IFNULL(a.feeAmt,0)) - sum(IFNULL(a.commissionAmt,0)) 
+					+ sum(IFNULL(a.subsidyAmt,0)) + sum(IFNULL(a.penaltyAmt,0)) + sum(IFNULL(a.refundAmt,0)) AS amt
+			FROM
+				v_clear_detail a
+			INNER JOIN 
+				pay_trade b ON b.orderNo = a.orderNo AND b.payeeUserId = a.memberId
+			WHERE
+				a.hasChange = '0'
+			GROUP BY
+				a.memberId
+			
+			UNION ALL
+			
+			SELECT
+				a.memberId,
+				NULL AS orderCount,
+				count(1) AS commissionCount,
+				NULL as refundCount,
+				NULL as penaltyCount,
+				sum(IFNULL(tradeAmt,0)) AS amt
+			FROM
+				clear_detail a
+			WHERE
+					a.szType = '1' AND a.feeType = '100002' AND a.hasChange = '0' AND a.isValid = '1'
+			GROUP BY
+				a.memberId
+		
+			UNION ALL
+		
+			SELECT
+				a.memberId,
+				NULL AS orderCount,
+				NULL AS commissionCount,
+				count(1) as refundCount,
+				NULL as penaltyCount,
+				sum(IFNULL(tradeAmt,0)) AS amt
+			FROM
+				clear_detail a
+			WHERE
+					a.szType = '1' AND a.feeType = '100007' AND a.hasChange = '0' AND a.isValid = '1'
+			GROUP BY
+				a.memberId
+		
+			UNION ALL
+		
+			SELECT
+				a.memberId,
+				NULL AS orderCount,
+				NULL AS commissionCount,
+				NULL as refundCount,
+				count(1) as penaltyCount,
+				sum(IFNULL(tradeAmt,0)) AS amt
+			FROM
+				clear_detail a
+			WHERE
+					a.szType = '1' AND a.feeType = '100006' AND a.hasChange = '0' AND a.isValid = '1'
+			GROUP BY
+				a.memberId
+		) t
+		LEFT JOIN
+			member_baseinfo mb ON mb.memberId = t.memberId
+		WHERE
+			1 = 1
+		<#if account?exists && account!="">
+			AND mb.account like "%":account"%"
+		</#if>
+		<#if mobile?exists && mobile!="">
+			AND mb.mobile like "%":mobile"%"
+		</#if>
+		<#if startAmt?exists && startAmt!="">
+			AND t.amt >= :startAmt
+		</#if>
+		<#if endAmt?exists && endAmt!="">
+			AND t.amt <= :endAmt
+		</#if>
+		<#if greaterZero?exists && greaterZero!="">
+			AND t.amt > 0
+		</#if>
+		GROUP BY t.memberId
+		ORDER BY t.amt DESC
+	]]>
+	</sql>
+	
+	<sql id="getBatNo">
+	<![CDATA[	
+		select max(SUBSTR(batNo, 10)) + 1 from clear_detail where batNo like "%":batNoPrefix"-%"
+	]]>
+	</sql>
+	
+	<sql id="updateOrderClearDetail">
+	<![CDATA[	
+		update clear_detail cd
+			JOIN pay_trade pt ON cd.orderNo = pt.orderNo and cd.memberId = pt.payeeUserId 
+			JOIN member_baseinfo mb ON cd.memberId = mb.memberId
+		set cd.batNo = :batNo, cd.hasChange = '1' 
+		where cd.hasChange = '0' and isValid = '1' and date(pt.payTime) <= :payTime and cd.feeType in('100001','100004')
+		AND mb.memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+
+	]]>
+	</sql>
+	<sql id="updateCommissionClearDetail">
+	<![CDATA[	
+		update clear_detail cd
+			JOIN pay_trade pt ON cd.orderNo = pt.orderNo
+			JOIN pay_trade_extend pte on pt.orderNo = pte.orderNo
+			JOIN member_baseinfo mb ON cd.memberId = mb.memberId 
+		set cd.batNo = :batNo, cd.hasChange = '1' 
+		where cd.szType = '1' and cd.hasChange = '0' and isValid = '1' and date(pt.payTime) <= :payTime and cd.feeType = '100002'
+		AND mb.memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+	]]>
+	</sql>
+	
+	<sql id="insertOrderClearDetail">
+	<![CDATA[	
+		insert into remit_record (batNo, memberId, changeTime, orderNum, commissionNum,refundNum,penaltyNum, dueAmt, payStatus, createUserId, updateUserId)
+		select 
+		vcd.batNo, 
+		vcd.memberId, 
+		SYSDATE(), 
+		count(if(vcd.orderAmt > 0,true,null )),
+		 0,0,0,
+		sum(IFNULL(vcd.orderAmt,0)) - sum(IFNULL(vcd.feeAmt,0)) - sum(IFNULL(vcd.commissionAmt,0)) + sum(IFNULL(vcd.subsidyAmt,0))- sum(IFNULL(vcd.platCommissionAmt,0)), 
+		'0',
+		:createUserId, :updateUserId 
+		from v_clear_detail vcd 
+		where vcd.userType = 'nps'
+		and vcd.batNo = :batNo
+		group by vcd.batNo, vcd.memberId
+	]]>
+	</sql>
+	
+	<sql id="insertCommissionClearDetail">
+	<![CDATA[	
+		insert into remit_record (batNo, memberId, changeTime, orderNum, commissionNum,refundNum,penaltyNum, dueAmt, payStatus, createUserId, updateUserId)
+		select 
+		vcd.batNo, 
+		vcd.memberId, 
+		SYSDATE(), 
+		0, 
+		count(if(vcd.commissionAmt > 0,true,null )),
+		0,0, 
+		sum(IFNULL(vcd.commissionAmt,0)), 
+		'0', 
+		:createUserId, 
+		:updateUserId 
+		from v_clear_detail vcd 
+		where vcd.userType = 'market'
+		and vcd.batNo = :batNo 
+		group by vcd.batNo, vcd.memberId
+	]]>
+	</sql>
+	
+	<sql id="queryClearDetailIdsByMemberIds">
+	<![CDATA[
+		SELECT 
+			id
+		FROM
+			clear_detail
+		WHERE
+			hasChange = '0' AND isValid = '1'
+			AND memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+	]]>
+	</sql>
+	<!-- 违约金 -->
+	<sql id="updateWyjClearDetail">
+	<![CDATA[	
+		update clear_detail cd
+			JOIN pay_trade pt ON cd.orderNo = pt.orderNo
+			JOIN member_baseinfo mb ON cd.memberId = mb.memberId
+		set cd.batNo = :batNo, cd.hasChange = '1' 
+		where cd.hasChange = '0' and isValid = '1' and date(pt.payTime) <= :payTime and cd.feeType = '100006'
+		and cd.userType in ('logis','nps')
+		AND mb.memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+	]]>
+	</sql>
+	
+	<!-- 物流公司违约金转结算 update-->
+	<sql id="updateLogisClearDetail">
+	<![CDATA[	
+		update clear_detail cd
+			JOIN pay_trade pt ON cd.orderNo = pt.orderNo
+			JOIN member_baseinfo mb ON cd.memberId = mb.memberId
+		set cd.batNo = :batNo, cd.hasChange = '1' 
+		where cd.hasChange = '0' and isValid = '1' and date(pt.payTime) <= :payTime and cd.userType = 'logis' and cd.feeType = '100006'
+		AND mb.memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+	]]>
+	</sql>
+	
+	<!-- 退款转结算 update-->
+	<sql id="updateBackClearDetail">
+	<![CDATA[	
+		update clear_detail cd
+			JOIN pay_trade pt ON cd.orderNo = pt.orderNo and cd.memberId = pt.payerUserId 
+			JOIN member_baseinfo mb ON cd.memberId = mb.memberId
+		set cd.batNo = :batNo, cd.hasChange = '1' 
+		where cd.hasChange = '0' and isValid = '1' and date(pt.payTime) <= :payTime and cd.feeType = '100007'
+		AND mb.memberId in 
+			(
+				<#assign listSize = memberIds?size />
+				<#list memberIds as memberId>
+					<#if memberId_index != listSize-1>
+							${memberId} ,
+						<#else>
+							${memberId}
+					</#if>
+				</#list>
+			)
+	]]>
+	</sql>
+	
+	<!-- 物流公司违约金转结算 insert-->
+	<sql id="insertLogisClearDetail">
+	<![CDATA[	
+		insert into remit_record (batNo, memberId, changeTime, orderNum, commissionNum, dueAmt, payStatus, createUserId, updateUserId)
+		select 
+		vcd.batNo, 
+		vcd.memberId, 
+		SYSDATE(), 
+		count(if(vcd.penaltyAmt > 0,true,null )),
+		0, 
+		sum(IFNULL(vcd.penaltyAmt,0)), 
+		'0', 
+		:createUserId, 
+		:updateUserId 
+		from v_clear_detail vcd 
+		where vcd.batNo = :batNo 
+		group by vcd.batNo, vcd.memberId
+	]]>
+	</sql>
+	
+	<!-- 退款转结算 insert-->
+	<sql id="insertBackClearDetail">
+	<![CDATA[	
+		insert into remit_record (batNo, memberId, changeTime, orderNum, commissionNum,refundNum,penaltyNum, dueAmt, payStatus, createUserId, updateUserId)
+		select 
+		vcd.batNo, 
+		vcd.memberId, 
+		SYSDATE(), 
+		0, 0, 
+		count(if(vcd.refundAmt > 0,true,null )),
+		0,
+		sum(IFNULL(vcd.refundAmt,0)), 
+		'0', 
+		:createUserId, 
+		:updateUserId 
+		from v_clear_detail vcd 
+		where vcd.batNo = :batNo
+		group by vcd.batNo, vcd.memberId
+	]]>
+	</sql>
+	<!-- 卖家违约金 insert -->
+	<sql id="insertpayeeWyjClearDetail">
+	<![CDATA[	
+		insert into remit_record (batNo, memberId, changeTime, orderNum, commissionNum,refundNum,penaltyNum, dueAmt, payStatus, createUserId, updateUserId)
+		select 
+		vcd.batNo, 
+		vcd.memberId, 
+		SYSDATE(), 
+		0, 0, 0,
+		count(if(vcd.penaltyAmt > 0,true,null )),
+		sum(IFNULL(vcd.penaltyAmt,0)), 
+		'0', 
+		:createUserId, 
+		:updateUserId 
+		from v_clear_detail vcd 
+		where vcd.batNo = :batNo
+		group by vcd.batNo, vcd.memberId
+	]]>
+	</sql>
+	
+	<!-- 根据批次号统计转结算订单笔数和金额 -->
+	<sql id="countOrd">
+	<![CDATA[
+		SELECT
+					a.memberId,
+					COUNT(1) AS orderCount,
+					SUM(IFNULL(a.orderAmt, 0)) - SUM(IFNULL(a.feeAmt, 0)) - SUM(IFNULL(a.commissionAmt, 0)) - SUM(IFNULL(a.platCommissionAmt,0)) + SUM(IFNULL(a.subsidyAmt, 0)) AS orderAmt
+				FROM
+					(SELECT
+					  t.`orderNo`   AS `orderNo`,
+					  t.`userType`  AS `userType`,
+					  t.`memberId`  AS `memberId`,
+					  (CASE WHEN (t.`feeType` = '100001') THEN `hasChange` END) AS `hasChange`,
+					  (CASE WHEN (t.`feeType` = '100001') THEN `szType` END) AS `szType`,
+					  (CASE WHEN (t.`feeType` = '100001') THEN `batNo` END) AS `batNo`,
+					  SUM((CASE WHEN (t.`feeType` = '100001') THEN `tradeAmt` ELSE 0 END)) AS `orderAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100003') THEN `tradeAmt` ELSE 0 END)) AS `feeAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100004') THEN `tradeAmt` ELSE 0 END)) AS `subsidyAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100005') THEN `tradeAmt` ELSE 0 END)) AS `platCommissionAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+					  SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+					FROM `clear_detail` t 
+					WHERE t.`isValid` = '1'
+					GROUP BY t.`orderNo`,t.`userType`,t.`memberId`) a
+				where (a.orderAmt > 0 OR a.subsidyAmt > 0) AND a.hasChange = '1' AND a.szType = '1' and a.batNo = :batNo
+				GROUP BY
+					a.memberId, a.batNo
+	]]>
+	</sql>
+	
+	<!-- 统计转结算笔数和金额 -->
+	<sql id="countother">
+	<![CDATA[
+		SELECT a.memberId,
+			(CASE WHEN a.commissionCount = NULL THEN 0 ELSE a.commissionCount END) AS commissionCount,
+			(CASE WHEN a.penaltyCount = NULL THEN 0 ELSE a.penaltyCount END) AS penaltyCount,
+			(CASE WHEN a.refundCount = NULL THEN 0 ELSE a.refundCount END) AS refundCount,
+			a.commissionAmt,
+			a.penaltyAmt,
+			a.refundAmt
+			FROM (
+				SELECT 
+					t.`memberId`,
+					t.`batNo`,
+					COUNT(CASE WHEN `feeType` = '100002' THEN feeType END) AS commissionCount,
+					COUNT(CASE WHEN `feeType` = '100006' THEN feeType END) AS penaltyCount,
+					COUNT(CASE WHEN `feeType` = '100007' THEN feeType END) AS refundCount,
+					SUM((CASE WHEN (t.`feeType` = '100002') THEN `tradeAmt` ELSE 0 END)) AS `commissionAmt`,
+					SUM((CASE WHEN (t.`feeType` = '100006') THEN `tradeAmt` ELSE 0 END)) AS `penaltyAmt`,
+					SUM((CASE WHEN (t.`feeType` = '100007') THEN `tradeAmt` ELSE 0 END)) AS `refundAmt`
+					FROM clear_detail t WHERE t.`isValid` = '1' AND t.`hasChange` = '1' AND t.`szType` = '1' AND `feeType` IN ('100002', '100006', '100007') and t.batNo = :batNo
+				GROUP BY t.memberId ,t.batNo
+				) a
+	]]>
+	</sql>
+	
+	<sql id="queryByBatNoMemId">
+		<![CDATA[
+			select 
+				(CASE WHEN t.orderNum = NULL THEN 0 ELSE t.orderNum END) AS orderCount,
+				(CASE WHEN t.commissionNum = NULL THEN 0 ELSE t.commissionNum END) AS commissionCount,
+				(CASE WHEN t.refundNum = NULL THEN 0 ELSE t.refundNum END) AS refundCount,
+				(CASE WHEN t.penaltyNum = NULL THEN 0 ELSE t.penaltyNum END) AS penaltyCount,
+				(CASE WHEN t.dueAmt = NULL THEN 0 ELSE t.dueAmt END) AS dueAmt
+			from remit_record t where t.memberId = :memberId and t.batNo = :batNo
+		]]>
+	</sql>
+	
+	<sql id="insertRemit">
+	<![CDATA[
+		insert into remit_record 
+		(
+		batNo, 
+		memberId, 
+		changeTime, 
+		orderNum,
+		commissionNum,
+		refundNum,
+		penaltyNum, 
+		dueAmt, 
+		payStatus, 
+		createUserId, 
+		updateUserId)
+		values(
+		:batNo, 
+		:memberId, 
+		SYSDATE(),
+		:orderNum,
+		:commissionNum,
+		:refundNum,
+		:penaltyNum, 
+		:dueAmt, 
+		'0', 
+		:createUserId, 
+		:updateUserId)
+		]]>
+	</sql>
+	
+	<sql id="updateRemit">
+	<![CDATA[
+		update remit_record set 
+		<#if orderNum?exists && orderNum!="" > 
+ 			orderNum=:orderNum,
+ 		</#if>
+ 		<#if refundNum?exists && refundNum!="" > 
+ 			refundNum=:refundNum,
+ 		</#if>
+ 		<#if commissionNum?exists && commissionNum!="" > 
+ 			commissionNum=:commissionNum,
+ 		</#if>
+ 		<#if penaltyNum?exists && penaltyNum!="" > 
+ 			penaltyNum=:penaltyNum,
+ 		</#if>
+ 		<#if dueAmt?exists && dueAmt!="" > 
+ 			dueAmt=:dueAmt,
+ 		</#if>
+ 		updateTime = now()
+ 		where 1 = 1 
+			and memberId=:memberId
+			and batNo=:batNo
+	]]>
+	</sql>
+</sqlMap>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PosMachineConfig">
+	<sql id="queryByCondition">
+	<![CDATA[
+		SELECT 
+			id,marketName,machineNum,createUserId,updateUserId,createTime,
+			updateTime,businessId,userType,account,hasClear,mobile,shopsName,marketId
+		FROM 
+			pos_machine_config WHERE 1=1
+		<#if id?exists && id!="" >
+			AND id=:id
+		</#if>
+		<#if marketName?exists && marketName!="" >
+			AND marketName=:marketName
+		</#if>
+		<#if machineNum?exists && machineNum!="" >
+			AND machineNum=:machineNum
+		</#if>
+		<#if createUserId?exists && createUserId!="" >
+			AND createUserId=:createUserId
+		</#if>
+		<#if updateUserId?exists && updateUserId!="" >
+			AND updateUserId=:updateUserId
+		</#if>
+		<#if createTime?exists && createTime!="" >
+			AND createTime=:createTime
+		</#if>
+		<#if updateTime?exists && updateTime!="" >
+			AND updateTime=:updateTime
+		</#if>
+		<#if businessId?exists && businessId!="" >
+			AND businessId=:businessId
+		</#if>
+		<#if userType?exists && userType!="" >
+			AND userType=:userType
+		</#if>
+		<#if account?exists && account!="" >
+			AND account=:account
+		</#if>
+		<#if hasClear?exists && hasClear!="" >
+			AND hasClear=:hasClear
+		</#if>
+		<#if mobile?exists && mobile!="" >
+			AND mobile=:mobile
+		</#if>
+		<#if shopsName?exists && shopsName!="" >
+			AND shopsName=:shopsName
+		</#if>
+		<#if marketId?exists && marketId!="" >
+			AND marketId=:marketId
+		</#if>
+		LIMIT :startRow,:endRow
+	]]>
+	</sql>
+	
+	<sql id="queryCount">
+	<![CDATA[
+		SELECT 
+			count(1)
+		FROM 
+			pos_machine_config WHERE 1=1
+		<#if id?exists && id!="" >
+			AND id=:id
+		</#if>
+		<#if marketName?exists && marketName!="" >
+			AND marketName=:marketName
+		</#if>
+		<#if machineNum?exists && machineNum!="" >
+			AND machineNum=:machineNum
+		</#if>
+		<#if createUserId?exists && createUserId!="" >
+			AND createUserId=:createUserId
+		</#if>
+		<#if updateUserId?exists && updateUserId!="" >
+			AND updateUserId=:updateUserId
+		</#if>
+		<#if createTime?exists && createTime!="" >
+			AND createTime=:createTime
+		</#if>
+		<#if updateTime?exists && updateTime!="" >
+			AND updateTime=:updateTime
+		</#if>
+		<#if businessId?exists && businessId!="" >
+			AND businessId=:businessId
+		</#if>
+		<#if userType?exists && userType!="" >
+			AND userType=:userType
+		</#if>
+		<#if account?exists && account!="" >
+			AND account=:account
+		</#if>
+		<#if hasClear?exists && hasClear!="" >
+			AND hasClear=:hasClear
+		</#if>
+		<#if mobile?exists && mobile!="" >
+			AND mobile=:mobile
+		</#if>
+		<#if shopsName?exists && shopsName!="" >
+			AND shopsName=:shopsName
+		</#if>
+		<#if marketId?exists && marketId!="" >
+			AND marketId=:marketId
+		</#if>
+	]]>
+	</sql>
+	
+	<sql id="deleteByBusinessId">
+	<![CDATA[
+	   update pos_machine_config set state=0 where businessId=:businessId and machineNum=:machineNum
+	]]>
+	</sql>
+	<sql id="insert">
+	<![CDATA[
+		INSERT INTO POS_MACHINE_CONFIG(
+		id, state, updateUserId, updateTime, 
+		businessId, machineNum, shopsName,
+		 marketId, hasClear, marketName, createTime, createUserId, memberId ) VALUES (:id, :state, :updateUserId, :updateTime, :businessId, :machineNum, :shopsName, 
+		:marketId, :hasClear, 
+		:marketName, :createTime, 
+		:createUserId, :memberId)
+	]]>
+	</sql>
+</sqlMap>

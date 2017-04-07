@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlMap namespace="BillCheckDetail">
+   
+   <!-- <sql id="countTotal">
+     <![CDATA[ 
+            select 
+               count(1)
+            from 
+               bill_check_detail bcd
+            left join 
+               pay_trade pt
+            on 
+               bcd.thirdPayNumber = pt.thirdPayNumber
+            left join
+               pay_trade_pos ptp
+            on
+               bcd.payCenterNumber = ptp.payCenterNumber
+			WHERE 1=1 and bcd.checkStatus = 2
+			<#if payType?exists && payType != "">
+			     AND bcd.payChannelCode =:payType
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND bcd.trans_date >=:startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND bcd.trans_date <=:endDate
+		    </#if>
+     ]]>
+   </sql> -->
+   
+   <sql id="countTotal">
+     <![CDATA[ 
+            select 
+    count(1) 
+    from (
+            select 
+               bcd.thirdPayNumber,
+               bcd.payCenterNumber,
+               bcd.failReason,
+               pt.orderNo,
+               bcd.payAmt,
+               pt.payerMobile,
+               bcd.payChannelCode payType,
+               bcd.payTime,
+               pt.payStatus,
+               ptp.posClientNo,
+               bcd.checkStatus,
+               pt.payAmt as orderAmt
+            from 
+               bill_check_detail bcd
+            left join 
+               pay_trade pt
+            on 
+               bcd.thirdPayNumber = pt.thirdPayNumber
+            left join
+               pay_trade_pos ptp
+            on
+               bcd.payCenterNumber = ptp.payCenterNumber  
+			WHERE 1=1 and bcd.checkStatus = 2
+			<#if payType?exists && payType != "">
+			     AND bcd.payChannelCode =:payType
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND bcd.payTime >=:startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND bcd.payTime <=:endDate
+		    </#if>
+		    GROUP BY bcd.thirdPayNumber, bcd.payCenterNumber
+			ORDER BY bcd.payTime DESC
+			<#if startRow?exists && startRow!="">
+			    LIMIT :startRow , :endRow
+		    </#if>
+		    ) tab 
+     ]]>
+   </sql>
+   
+   <sql id="queryList">
+      <![CDATA[ 
+            select 
+               bcd.thirdPayNumber,
+               bcd.payCenterNumber,
+               bcd.failReason,
+               group_concat(pt.orderNo) as orderNo,
+               bcd.payAmt,
+               pt.payerMobile,
+               bcd.payChannelCode payType,
+               bcd.payTime,
+               pt.payStatus,
+               ptp.posClientNo,
+               bcd.checkStatus,
+               sum(pt.payAmt) as orderAmt
+            from 
+               bill_check_detail bcd
+            left join 
+               pay_trade pt
+            on 
+               bcd.thirdPayNumber = pt.thirdPayNumber
+            left join
+               pay_trade_pos ptp
+            on
+               bcd.payCenterNumber = ptp.payCenterNumber  
+			WHERE 1=1 and bcd.checkStatus = 2
+			<#if payType?exists && payType != "">
+			     AND bcd.payChannelCode =:payType
+		    </#if>
+		    <#if startDate?exists && startDate != "">
+			    AND bcd.payTime >=:startDate
+		    </#if>
+		    <#if endDate?exists && endDate != "">
+			    AND bcd.payTime <=:endDate
+		    </#if>
+		    GROUP BY bcd.thirdPayNumber, bcd.payCenterNumber
+			ORDER BY bcd.payTime DESC
+			<#if startRow?exists && startRow!="">
+			    LIMIT :startRow , :endRow
+		    </#if>
+		    
+      ]]>
+   </sql>
+   
+   <!-- <sql id="queryDetail">
+      <![CDATA[ 
+            select 
+               bcd.resultType,
+               bcd.thirdPayNumber,
+               bcd.payCenterNumber,
+               bcd.failReason,
+               pt.orderNo,
+               bcd.payAmt,
+               pt.payerMobile,
+               bcd.payChannelCode payType,
+               bcd.trans_date payTime,
+               pt.payStatus,
+               bcd.checkStatus,
+               ptp.posClientNo,
+               bcd.remark,
+               bcd.trans_date,
+               pt.payAmt as orderAmt
+            from 
+               bill_check_detail bcd
+            left join 
+               pay_trade pt
+            on 
+               bcd.thirdPayNumber = pt.thirdPayNumber
+            left join
+               pay_trade_pos ptp
+            on
+               bcd.payCenterNumber = ptp.payCenterNumber  
+			WHERE 
+			   bcd.thirdPayNumber =:thirdPayNumber
+      ]]>
+   </sql> -->
+   
+   <sql id="queryDetail">
+      <![CDATA[ 
+           select 
+             bcd.resultType,
+             bcd.failReason,
+             btd.clientNo,
+             bcd.remark,
+             btd.businessNo,
+             btd.tradeType,
+             btd.thirdTransNo,
+             btd.tradeMoney,
+             btd.fee,
+             btd.cardNo,
+             pt.payTime,
+             pt.payerMobile,
+             pt.payStatus,
+             pmc.hasClear
+          from 
+             bill_trans_detail btd
+          left join 
+             pay_trade pt
+          on
+             btd.thirdTransNo = pt.thirdPayNumber
+          left join 
+             bill_check_detail bcd
+          on
+              btd.thirdTransNo = bcd.thirdPayNumber
+          left join
+              pos_machine_config pmc
+          on    
+              btd.clientNo = pmc.machineNum
+          where 
+             btd.thirdTransNo =:thirdPayNumber 
+      ]]>
+   </sql>
+   
+   <sql id="queryDetailBankNone">
+      <![CDATA[ 
+           select 
+             bcd.resultType,
+             btd.tradeMoney,
+             btd.fee,
+             btd.cardNo,
+             pt.payTime,
+             pt.payStatus,
+             pt.payerMobile,
+             bcd.failReason,
+             bcd.remark,
+             pmc.hasClear
+          from 
+             bill_trans_detail btd
+          left join 
+             pay_trade pt
+          on
+             btd.thirdTransNo = pt.thirdPayNumber
+          left join 
+             bill_check_detail bcd
+          on
+              btd.thirdTransNo = bcd.thirdPayNumber
+          left join
+              pos_machine_config pmc
+          on    
+              btd.clientNo = pmc.machineNum
+          where 
+             btd.thirdTransNo =:thirdPayNumber 
+      ]]>
+   </sql>
+   
+   <sql id="queryDetailGuDengNone">
+      <![CDATA[ 
+           select 
+             bcd.resultType,
+             bcd.failReason,
+             btd.clientNo,
+             bcd.remark,
+             btd.businessNo,
+             btd.tradeType,
+             btd.thirdTransNo,
+             btd.tradeMoney,
+             btd.fee,
+             btd.cardNo,
+             bcd.trans_date payTime,
+             pt.payerMobile,
+             pt.payStatus,
+             pmc.hasClear
+          from 
+             bill_trans_detail btd
+          left join 
+             pay_trade pt
+          on
+             btd.thirdTransNo = pt.thirdPayNumber
+          left join 
+             bill_check_detail bcd
+          on
+              btd.thirdTransNo = bcd.thirdPayNumber
+          left join
+              pos_machine_config pmc
+          on    
+              btd.clientNo = pmc.machineNum
+          where 
+             btd.thirdTransNo =:thirdPayNumber 
+      ]]>
+   </sql>
+   
+   
+   <sql id="queryGdOrderList">
+      <![CDATA[ 
+            select 
+               btd.clientNo,
+               bcd.payCenterNumber,
+               pt.orderNo,
+               pt.payAmt,
+               pt.payeeMobile,
+               pt.payerMobile,
+               bcd.failReason,
+               bcd.remark
+            from 
+               bill_check_detail bcd
+            left join 
+               pay_trade pt
+            on 
+               bcd.thirdPayNumber = pt.thirdPayNumber
+            left join
+              bill_trans_detail btd
+            on     
+              btd.thirdTransNo = bcd.thirdPayNumber
+			WHERE bcd.thirdPayNumber =:thirdPayNumber and bcd.checkStatus = 2
+			group by pt.orderNo,bcd.payCenterNumber
+      ]]>
+   </sql>
+   
+   <sql id="updateFailedBill">
+		 <![CDATA[  
+			update bill_check_detail set
+			<#if remark?exists && remark!="">
+				remark = :remark,
+			</#if>
+			updateUserId=:updateUserId,
+			updateTime=now()
+			where thirdPayNumber=:thirdPayNumber
+		 ]]>
+	</sql>
+	
+	
+	<sql id="queryResultType">
+      <![CDATA[ 
+           select resultType from bill_check_detail where thirdPayNumber =:thirdPayNumber 
+      ]]>
+   </sql>
+   
+   <sql id="queryLastestClearFlag">
+      <![CDATA[ 
+           select hasClear from pos_machine_config where machineNum =:machineNum and state = 1 order by createTime desc limit 1
+      ]]>
+   </sql>
+</sqlMap>

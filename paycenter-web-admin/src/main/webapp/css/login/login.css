@@ -1,0 +1,57 @@
+@charset "utf-8";
+/* CSS Document 贺典*/
+html,body{widht:100%;height:100%;}
+.header{background:#ffffff;/*height: 9.4%;*/height:0%;}
+.header .logo{top: 30px;position: fixed;margin-left: -146px;left: 50%;}
+.content{min-width:1000px;width:100%;height:100%;background:#4c6d8f url(../../images/background.png) center center;height:100%;}
+.p_01{width:450px;height:100px;position:absolute;top:50%;left:50%;margin-left:-225px;z-index:110;}
+.p_02,.p_03{width:620px;height:380px;position:absolute;top:50%;left:50%;margin:-190px 0 0 -310px;display:none;z-index:120;}
+input.grayBtn, input.blueBtn, input.yellowBtn, input.greenBtn{height:50px; line-height:50px;
+-webkit-border-radius:5px;
+-moz-border-radius:5px;
+border-radius:5px;
+border:1px solid #ccc;
+margin:7px 0 0 0;
+}
+.btn_size01{width:180px;height:65px;font-size:24px;margin:0 10px;color:#ffffff; vertical-align:middle;}
+.btn_size02{width:165px;height:65px;font-size:24px;margin:0 10px;color:#ffffff;}
+.styleBtn{background: none;border:solid 1px #fff;cursor:pointer;}
+.div_bg{opacity:0.2;background:#000;filter:alpha(opacity:20);width:100%;height:100%;position:absolute;left:0;top:0;}
+.div_bg01{opacity:0.4;background:#000;filter:alpha(opacity:40);width:100%;height:87%;position:absolute;left:0;top:13%;-webkit-border-radius: 0 0 10px 10px; -moz-border-radius: 0 0 10px 10px; border-radius: 0 0 10px 10px;}
+.form_div{width:100%;height:87%;position:absolute;left:0;top:13%;}
+.login_head{background:#339933;background-color:rgba(44, 136, 44, 0.6);;width:100%;height:13%;line-height:46px;color:#ffffff; -webkit-border-radius:10px 10px 0 0; -moz-border-radius:10px 10px 0 0; border-radius:10px 10px 0 0; font-size:18px;font-weight:400;text-shadow: 0 1px 2px rgba(0,0,0,0.2);}
+.hf_left{float:left;margin-left:25px;}
+.hf_right{float:right;cursor:pointer;width:82px;height:100%;}
+.hf_right:hover{background:#ef9411;}
+.input_div,.btn_div{color:#ffffff;clear:both;width: 450px;height: 56px;line-height:45px;margin:12px auto 18px;padding: 0;position:relative;}
+.input_div span{float:left;}
+.input_div input{background:#ffffff;border:solid 1px #dee5ef;float:right;width:360px;height:24px;overflow: visible;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;}
+.input_div div{position:absolute;left: 82px;top:24px;color:#ef9411;}
+.p_04{margin-top:30px;}
+.btn_div{height:96px; text-align:center;}
+.btn_div a{color:#ffffff;position:absolute;left: 213px;top:35px;}
+.welcome{position:relative;color:#ffffff;text-align:left;text-indent:25px;}
+input.greenBtn{
+	background-color: #94C315;
+    border-color: #94C315;
+}
+input.greenBtn:hover{
+    background-color: #8AB90C;
+    border-color: #8AB90C;
+}
+input.blueBtn{
+	background-color:#137DB9;
+	border-color:#0F75AF;
+}
+input.blueBtn:hover{
+	background-color:#1B89C7;
+	border-color:#1883BF;
+}
+input.yellowBtn{
+	background-color:#FFB026;
+	border-color:#FFB026;
+}
+input.yellowBtn:hover{
+	background-color:#FFC155;
+	border-color:#FFC155;
+}

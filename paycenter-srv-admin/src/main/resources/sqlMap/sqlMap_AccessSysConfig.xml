@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="AccessSysConfig">
+	<sql id="getAll">
+		<![CDATA[ 
+		select id,appKey,name
+		from access_sys_config where 1=1 AND status = 1
+		]]> 
+	</sql>
+</sqlMap>

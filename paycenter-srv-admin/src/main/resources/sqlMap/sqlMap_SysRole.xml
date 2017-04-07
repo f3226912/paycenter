@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysRole">
+	<!-- 查询所有实体 -->
+	<sql id="getAll">
+	 <![CDATA[ 
+			SELECT roleID,roleName,remark,createTime,createUserID,updateUserID,updateTime,attribute FROM SysRole WHERE 1=1
+		 	<#if roleName?exists && roleName!="" >
+			      AND roleName LIKE "%":roleName"%"
+			</#if>
+		 	<#if attribute?exists && attribute!="" >
+			      AND attribute =:attribute
+			</#if>
+			<#if roleId?exists && roleId!="" >
+			      AND roleId =:roleId
+			</#if>
+		 ]]>
+	</sql>
+	
+	<!-- 分页查询 -->	
+	<select id="getByCondition">
+		 <![CDATA[  
+			SELECT sr.roleID,sr.roleName,sr.createTime,sr.remark,sr.attribute
+		   FROM SysRole sr WHERE 1=1
+		    <#if roleName?exists && roleName!="" >
+			      AND sr.roleName LIKE "%":roleName"%"
+			</#if>
+		    <#if attribute?exists && attribute!="" >
+			      AND sr.attribute = :attribute
+			</#if>
+			<#if loginUserID?exists && loginUserID!="" >
+			      AND (SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:loginUserID) > 0
+			</#if>
+ 		ORDER BY createTime DESC,updateTime DESC
+		limit :startRow,:endRow 
+		]]>
+	</select>
+	
+	<!-- 记录总数 -->
+	<select id="getTotal">
+		 <![CDATA[  
+			SELECT count(*) as total
+			FROM SysRole sr WHERE 1=1
+		    <#if roleName?exists && roleName!="" >
+			      AND sr.roleName LIKE "%":roleName"%"
+			</#if>
+		    <#if attribute?exists && attribute!="" >
+			      AND sr.attribute = :attribute
+			</#if>
+			<#if loginUserID?exists && loginUserID!="" >
+			      AND (SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:loginUserID) > 0
+			</#if>
+		 ]]>
+	</select>
+	
+    <insert id="insert">
+		INSERT INTO SysRole
+		(roleID, roleName, remark, attribute,
+		 createUserID,createTime,updateUserID,
+		 updateTime)
+		 VALUES (:roleID, :roleName, :remark, :attribute,
+		 :createUserID,SYSDATE(),:updateUserID,
+		 null)
+	</insert>
+
+	<update id="update">
+		UPDATE SysRole 
+		SET roleName=:roleName,
+		    remark=:remark, 
+		    attribute=:attribute,
+		    updateUserID=:updateUserID,
+		    updateTime=SYSDATE()
+		WHERE roleID=:roleID
+	</update>
+	
+	<delete id="delete">
+		delete from SysRole where roleID=:roleID
+	</delete>
+	
+	<!-- 根据角色ID查询角色信息 -->
+	<select id="getSysRoleById">
+		SELECT   sr.roleID,sr.roleName,sr.remark,sr.attribute
+		FROM     sysRole sr 
+		WHERE    sr.roleID = :roleID
+	</select>
+</sqlMap>

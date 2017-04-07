@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="BillCheckSum"> 
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+	   	  SELECT * FROM (
+		   	  SELECT a.`payType`,
+				pt.`payTypeName`,
+				a.`payTime`,
+				(CASE WHEN (a.`checkNum` > 0) THEN `checkNum` ELSE `checkNum` END) AS `checkNum`,
+				(CASE WHEN (a.`checkAmt` > 0) THEN `checkAmt` ELSE `checkAmt` END) AS `checkAmt`,
+				(CASE WHEN (a.`checkSuccessNum` > 0) THEN `checkSuccessNum` ELSE `checkSuccessNum` END) AS `checkSuccessNum`,
+				(CASE WHEN (a.`checkSuccessAmt` > 0) THEN `checkSuccessAmt` ELSE `checkSuccessAmt` END) AS `checkSuccessAmt`,
+				(CASE WHEN (a.`checkFailNum` > 0) THEN `checkFailNum` ELSE `checkFailNum` END) AS `checkFailNum`,
+				(CASE WHEN (a.`checkFailAmt` > 0) THEN `checkFailAmt` ELSE `checkFailAmt` END) AS `checkFailAmt`
+				 FROM (
+							SELECT s.`payType`,
+								s.payTime,
+								 COUNT(*) AS checkNum,
+								 SUM(s.`payAmt`) AS checkAmt,
+								 COUNT(CASE WHEN s.`checkStatus` = 1 THEN 1 END) AS checkSuccessNum,
+								 IFNULL(SUM(CASE WHEN s.`checkStatus` = 1 THEN s.`payAmt` END), '0.00') AS checkSuccessAmt,
+								 COUNT(CASE WHEN s.`checkStatus` = 2 THEN 1 END) AS checkFailNum,
+								 IFNULL(SUM(CASE WHEN s.`checkStatus` = 2 THEN s.`payAmt` END), '0.00') AS checkFailAmt
+							FROM (
+								SELECT bcd.`payChannelCode` AS payType,
+									DATE_FORMAT( bcd.`payTime`,'%Y-%m-%d') AS payTime,
+									bcd.`payAmt`,
+									bcd.`checkStatus`
+								FROM bill_check_detail bcd
+								WHERE bcd.`payTime` IS NOT NULL
+							) s
+							
+							GROUP BY s.`payType`, s.payTime
+							
+							
+							UNION ALL
+							
+							SELECT * FROM (
+								SELECT 
+								  bcl.`payType`,
+								  DATE_FORMAT( bcl.`payTime`,'%Y-%m-%d') AS payTime,
+								  bcl.`checkNum`,
+								  bcl.`checkAmt`,
+								  bcl.`checkSuccessNum`,
+								  bcl.`checkSuccessAmt`,
+								  bcl.`checkFailNum`,
+								  bcl.`checkFailAmt` 
+								FROM
+								  `bill_check_log` bcl 
+								WHERE bcl.`checkNum` = 0 
+							) ss
+			
+							GROUP BY ss.`payType`, ss.payTime
+					
+				) a LEFT JOIN pay_type pt ON pt.`payType` = a.payType
+				GROUP BY a.`payType`, a.`payTime`
+			) b
+			WHERE 1=1
+			<#if checkAmt?exists && checkAmt != "" >
+			   AND checkAmt=:checkAmt
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if payTime?exists && payTime != "" >
+			   AND payTime=:payTime
+			</#if>
+			<#if checkNum?exists && checkNum != "" >
+			   AND checkNum=:checkNum
+			</#if>
+			<#if checkSuccessNum?exists && checkSuccessNum != "" >
+			   AND checkSuccessNum=:checkSuccessNum
+			</#if>
+			<#if checkSuccessAmt?exists && checkSuccessAmt != "" >
+			   AND checkSuccessAmt=:checkSuccessAmt
+			</#if>
+			<#if checkFailNum?exists && checkFailNum != "" >
+			   AND checkFailNum=:checkFailNum
+			</#if>
+			<#if checkFailAmt?exists && checkFailAmt != "" >
+			   AND checkFailAmt=:checkFailAmt
+			</#if>
+			<#if startPayTime?exists && startPayTime != "" >
+			   AND payTime>=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime != "" >
+			   AND payTime<=:endPayTime
+			</#if>
+		  ORDER BY `payTime` DESC, `payType` DESC
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  
+		SELECT count(*) FROM (
+				 SELECT  a.`payType`,
+					pt.`payTypeName`,
+					a.`payTime`,
+					(CASE WHEN (a.`checkNum` > 0) THEN `checkNum` ELSE `checkNum` END) AS `checkNum`,
+					(CASE WHEN (a.`checkAmt` > 0) THEN `checkAmt` ELSE `checkAmt` END) AS `checkAmt`,
+					(CASE WHEN (a.`checkSuccessNum` > 0) THEN `checkSuccessNum` ELSE `checkSuccessNum` END) AS `checkSuccessNum`,
+					(CASE WHEN (a.`checkSuccessAmt` > 0) THEN `checkSuccessAmt` ELSE `checkSuccessAmt` END) AS `checkSuccessAmt`,
+					(CASE WHEN (a.`checkFailNum` > 0) THEN `checkFailNum` ELSE `checkFailNum` END) AS `checkFailNum`,
+					(CASE WHEN (a.`checkFailAmt` > 0) THEN `checkFailAmt` ELSE `checkFailAmt` END) AS `checkFailAmt`
+				  FROM (
+							SELECT s.`payType`,
+								s.payTime,
+								 COUNT(*) AS checkNum,
+								 SUM(s.`payAmt`) AS checkAmt,
+								 COUNT(CASE WHEN s.`checkStatus` = 1 THEN 1 END) AS checkSuccessNum,
+								 IFNULL(SUM(CASE WHEN s.`checkStatus` = 1 THEN s.`payAmt` END), '0.00') AS checkSuccessAmt,
+								 COUNT(CASE WHEN s.`checkStatus` = 2 THEN 1 END) AS checkFailNum,
+								 IFNULL(SUM(CASE WHEN s.`checkStatus` = 2 THEN s.`payAmt` END), '0.00') AS checkFailAmt
+							FROM (
+								SELECT bcd.`payChannelCode` AS payType,
+									DATE_FORMAT( bcd.`payTime`,'%Y-%m-%d') AS payTime,
+									bcd.`payAmt`,
+									bcd.`checkStatus`
+								FROM bill_check_detail bcd
+								WHERE bcd.`payTime` IS NOT NULL
+							) s
+							
+							GROUP BY s.`payType`, s.payTime
+							
+							
+							UNION ALL
+							
+							SELECT * FROM (
+								SELECT 
+								  bcl.`payType`,
+								  DATE_FORMAT( bcl.`payTime`,'%Y-%m-%d') AS payTime,
+								  bcl.`checkNum`,
+								  bcl.`checkAmt`,
+								  bcl.`checkSuccessNum`,
+								  bcl.`checkSuccessAmt`,
+								  bcl.`checkFailNum`,
+								  bcl.`checkFailAmt` 
+								FROM
+								  `bill_check_log` bcl 
+								WHERE bcl.`checkNum` = 0 
+							) ss
+			
+							GROUP BY ss.`payType`, ss.payTime
+					
+				) a LEFT JOIN pay_type pt ON pt.`payType` = a.payType
+				GROUP BY a.`payType`, a.`payTime`
+			) b
+			WHERE 1=1
+			<#if checkAmt?exists && checkAmt != "" >
+			   AND checkAmt=:checkAmt
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if payTime?exists && payTime != "" >
+			   AND payTime=:payTime
+			</#if>
+			<#if checkNum?exists && checkNum != "" >
+			   AND checkNum=:checkNum
+			</#if>
+			<#if checkSuccessNum?exists && checkSuccessNum != "" >
+			   AND checkSuccessNum=:checkSuccessNum
+			</#if>
+			<#if checkSuccessAmt?exists && checkSuccessAmt != "" >
+			   AND checkSuccessAmt=:checkSuccessAmt
+			</#if>
+			<#if checkFailNum?exists && checkFailNum != "" >
+			   AND checkFailNum=:checkFailNum
+			</#if>
+			<#if checkFailAmt?exists && checkFailAmt != "" >
+			   AND checkFailAmt=:checkFailAmt
+			</#if>
+			<#if startPayTime?exists && startPayTime != "" >
+			   AND payTime>=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime != "" >
+			   AND payTime<=:endPayTime
+			</#if>
+	   ]]>
+	</sql>
+	
+	<!--针对导出excel提供的查询--> 
+	<sql id="queryForExcel"> 
+	   <![CDATA[ 
+		  SELECT a.`payType`,
+			pt.`payTypeName`,
+			a.`payTime`,
+			(CASE WHEN (a.`checkNum` > 0) THEN `checkNum` ELSE `checkNum` END) AS `checkNum`,
+			(CASE WHEN (a.`checkAmt` > 0) THEN `checkAmt` ELSE `checkAmt` END) AS `checkAmt`,
+			(CASE WHEN (a.`checkSuccessNum` > 0) THEN `checkSuccessNum` ELSE `checkSuccessNum` END) AS `checkSuccessNum`,
+			(CASE WHEN (a.`checkSuccessAmt` > 0) THEN `checkSuccessAmt` ELSE `checkSuccessAmt` END) AS `checkSuccessAmt`,
+			(CASE WHEN (a.`checkFailNum` > 0) THEN `checkFailNum` ELSE `checkFailNum` END) AS `checkFailNum`,
+			(CASE WHEN (a.`checkFailAmt` > 0) THEN `checkFailAmt` ELSE `checkFailAmt` END) AS `checkFailAmt`
+			 FROM (
+						SELECT s.`payType`,
+							s.payTime,
+							 COUNT(*) AS checkNum,
+							 SUM(s.`payAmt`) AS checkAmt,
+							 COUNT(CASE WHEN s.`checkStatus` = 1 THEN 1 END) AS checkSuccessNum,
+							 IFNULL(SUM(CASE WHEN s.`checkStatus` = 1 THEN s.`payAmt` END), '0.00') AS checkSuccessAmt,
+							 COUNT(CASE WHEN s.`checkStatus` = 2 THEN 1 END) AS checkFailNum,
+							 IFNULL(SUM(CASE WHEN s.`checkStatus` = 2 THEN s.`payAmt` END), '0.00') AS checkFailAmt
+						FROM (
+							SELECT bcd.`payChannelCode` AS payType,
+								DATE_FORMAT( bcd.`payTime`,'%Y-%m-%d') AS payTime,
+								bcd.`payAmt`,
+								bcd.`checkStatus`
+							FROM bill_check_detail bcd
+							WHERE bcd.`payTime` IS NOT NULL
+						) s
+						
+						GROUP BY s.`payType`, s.payTime
+						
+						
+						UNION ALL
+						
+						SELECT * FROM (
+							SELECT 
+							  bcl.`payType`,
+							  DATE_FORMAT( bcl.`payTime`,'%Y-%m-%d') AS payTime,
+							  bcl.`checkNum`,
+							  bcl.`checkAmt`,
+							  bcl.`checkSuccessNum`,
+							  bcl.`checkSuccessAmt`,
+							  bcl.`checkFailNum`,
+							  bcl.`checkFailAmt` 
+							FROM
+							  `bill_check_log` bcl 
+							WHERE bcl.`checkNum` = 0 
+						) ss
+		
+						GROUP BY ss.`payType`, ss.payTime
+				
+			) a LEFT JOIN pay_type pt ON pt.`payType` = a.payType
+			WHERE 1=1
+			<#if payType?exists && payType != "" >
+			   AND a.payType=:payType
+			</#if>
+			<#if startPayTime?exists && startPayTime != "" >
+			   AND a.payTime>=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime != "" >
+			   AND a.payTime<=:endPayTime
+			</#if>
+			GROUP BY a.`payType`, a.`payTime`
+			ORDER BY a.`payTime` DESC, a.`payType` DESC
+	   ]]>
+	</sql>
+
+</sqlMap>

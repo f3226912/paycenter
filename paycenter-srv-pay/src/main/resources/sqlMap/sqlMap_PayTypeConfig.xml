@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayTypeConfig">
+	<!-- 根据appKey 查询 -->
+	<sql id="qureyByAppKey">
+	<![CDATA[
+		SELECT
+			pt.*
+		FROM
+			pay_type_config ptc ,pay_type pt  
+		WHERE ptc.payType = pt.payType AND
+			ptc.appKey=:appKey
+		order by pt.id
+			
+	]]>
+	</sql>
+</sqlMap>

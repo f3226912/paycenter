@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="PosPayNotify"> 
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,payCenterNumber,businessNo,bankCardNo,posClientNo,payChannelCode,createTime,createUserId,
+			updateTime,updateUserId,transType,orderNo,orderAmt,payAmt,rateAmt,transDate,
+			transNo,status,appKey
+		  FROM pos_pay_notify
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if businessNo?exists && businessNo != "" >
+			   AND businessNo=:businessNo
+			</#if>
+			<#if bankCardNo?exists && bankCardNo != "" >
+			   AND bankCardNo=:bankCardNo
+			</#if>
+			<#if posClientNo?exists && posClientNo != "" >
+			   AND posClientNo=:posClientNo
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if transType?exists && transType != "" >
+			   AND transType=:transType
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if orderAmt?exists && orderAmt != "" >
+			   AND orderAmt=:orderAmt
+			</#if>
+			<#if payAmt?exists && payAmt != "" >
+			   AND payAmt=:payAmt
+			</#if>
+			<#if rateAmt?exists && rateAmt != "" >
+			   AND rateAmt=:rateAmt
+			</#if>
+			<#if transDate?exists && transDate != "" >
+			   AND transDate=:transDate
+			</#if>
+			<#if transNo?exists && transNo != "" >
+			   AND transNo=:transNo
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,payCenterNumber,businessNo,bankCardNo,posClientNo,payChannelCode,createTime,createUserId,
+			updateTime,updateUserId,transType,orderNo,orderAmt,payAmt,rateAmt,transDate,
+			transNo,status,appKey
+		  FROM pos_pay_notify
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if businessNo?exists && businessNo != "" >
+			   AND businessNo=:businessNo
+			</#if>
+			<#if bankCardNo?exists && bankCardNo != "" >
+			   AND bankCardNo=:bankCardNo
+			</#if>
+			<#if posClientNo?exists && posClientNo != "" >
+			   AND posClientNo=:posClientNo
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if transType?exists && transType != "" >
+			   AND transType=:transType
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if orderAmt?exists && orderAmt != "" >
+			   AND orderAmt=:orderAmt
+			</#if>
+			<#if payAmt?exists && payAmt != "" >
+			   AND payAmt=:payAmt
+			</#if>
+			<#if rateAmt?exists && rateAmt != "" >
+			   AND rateAmt=:rateAmt
+			</#if>
+			<#if transDate?exists && transDate != "" >
+			   AND transDate=:transDate
+			</#if>
+			<#if transNo?exists && transNo != "" >
+			   AND transNo=:transNo
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(null) 
+		  FROM pos_pay_notify
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if businessNo?exists && businessNo != "" >
+			   AND businessNo=:businessNo
+			</#if>
+			<#if bankCardNo?exists && bankCardNo != "" >
+			   AND bankCardNo=:bankCardNo
+			</#if>
+			<#if posClientNo?exists && posClientNo != "" >
+			   AND posClientNo=:posClientNo
+			</#if>
+			<#if payChannelCode?exists && payChannelCode != "" >
+			   AND payChannelCode=:payChannelCode
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if transType?exists && transType != "" >
+			   AND transType=:transType
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if orderAmt?exists && orderAmt != "" >
+			   AND orderAmt=:orderAmt
+			</#if>
+			<#if payAmt?exists && payAmt != "" >
+			   AND payAmt=:payAmt
+			</#if>
+			<#if rateAmt?exists && rateAmt != "" >
+			   AND rateAmt=:rateAmt
+			</#if>
+			<#if transDate?exists && transDate != "" >
+			   AND transDate=:transDate
+			</#if>
+			<#if transNo?exists && transNo != "" >
+			   AND transNo=:transNo
+			</#if>
+			<#if status?exists && status != "" >
+			   AND status=:status
+			</#if>
+	   ]]>
+	</sql>
+
+</sqlMap>

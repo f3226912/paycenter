@@ -1,0 +1,54 @@
+.pay-index .payHeader{width: 100%;background: url(../images/nstZhifuTitleBg.jpg) repeat;position: relative;}
+.pay-index .payHeader .header{color:#666666;text-align:center;font-size:1.6rem;padding:3rem 0 1rem 0;font-weight:500;}
+.pay-index .payHeader .headerMoney{color:#ff6c00;text-align:center;font-size:2rem;padding-bottom:2rem;}
+.pay-index .payHeader .headerMoney span{font-size:2.8rem;}
+.pay-index .payHeader .payHeaderLine{width:100%;height:13px;background: url(../images/payHeaderLine.png) repeat;position: absolute;left:0;bottom:-13px;}
+.pay-index .pay-remind{text-align:center;line-height:3.4rem;margin-top:7px;color:#999999;}
+.pay-index .choice-pay{border-bottom:1px solid #eeeeee;border-top:1px solid #eeeeee;background-color:#fff;}
+.pay-index .choice-pay li{border-bottom:1px solid #eeeeee;overflow:hidden;}
+.pay-index .choice-pay li .con{float:left;margin:1rem 0 1rem 3%;width:50%;}
+.pay-index .choice-pay li .con p{font-size:1.2rem;color:#999999;line-height:2.3rem;}
+.pay-index .choice-pay li .con .big{font-size:1.8rem;color:#666666;}
+.pay-index .choice-pay li img{width:3rem;display: block;margin:1.65rem 5% 0 5%;}
+.pay-index .choice-pay li .logo{float: left;}
+.pay-index .choice-pay li .choice-logo{float: right;}
+.pay-index .footer{width:100%;position: fixed;bottom:0;left:0;background-color:#FFFFFF;}
+.pay-index .footer .bottom{width:94%;margin:.5rem 3%;background-color:#ff6c00;color:#FFFFFF;text-align: center;line-height:4rem;border-radius:5px;font-size:1.5rem;}
+.paySuccess{width: 100%;}
+.paySuccess>img{width: 4rem;display: block;margin:39% auto 2rem;}
+.paySuccess>.con{width:100%;text-align: center;font-size:2.5rem;color:#ff6c00;}
+.paySuccess>ul{width: 100%;text-align: center;margin:6rem 0 0 0;color:#666666;}
+.paySuccess>ul>li{font-size:1.3rem;}
+.paySuccess .details{text-align: center;margin-top:2rem;}
+.paySuccess .details a{color:#ff6c00;font-size:1.6rem;}
+.payFailure{width: 100%;}
+.payFailure>img{width: 4rem;display: block;margin:39% auto 2rem;}
+.payFailure>.con{width:100%;text-align: center;font-size:2.5rem;color:#ff6c00;}
+.payFailure>ul{width: 100%;text-align: center;margin:6rem 0 0 0;color:#666666;}
+.payFailure>ul>li{font-size:1.2rem;}
+.payFailure .details{text-align: center;margin-top:2rem;}
+.payFailure .details a{color:#ff6c00;font-size:1.6rem;}
+.payFailure .footerBottom{width: 100%;position: fixed;left: 0;bottom: 0;background-color:#FFFFFF;}
+.payFailure .footerBottom a{display: block;width:94%;margin:.5rem auto;background-color:#ff6c00;color:#FFFFFF;text-align: center;line-height:4rem;border-radius:5px;font-size:1.5rem;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

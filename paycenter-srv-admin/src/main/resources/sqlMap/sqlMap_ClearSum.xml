@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="ClearSum">
+	
+	<sql id="queryByParams">
+	<![CDATA[
+	SELECT
+		  bcs.id,
+		  bcs.payType,
+		  DATE_FORMAT(bcs.payTime, '%Y-%m-%d') AS payTime,
+		  bcs.clearNum,
+		  bcs.clearAmt,
+		  bcs.clearSuccessNum,
+		  bcs.clearSuccessAmt,
+		  bcs.clearFailNum,
+		  bcs.clearFailAmt,
+		  bcs.createTime,
+		  bcs.createUserId,
+		  bcs.updateTime,
+		  bcs.updateUserId
+			FROM gd_pay.bill_clear_sum bcs
+			WHERE 1 = 1
+			<#if payType?exists && payType!="">
+				AND bcs.payType = :payType
+			</#if>
+			<#if payTimeBegin?exists && payTimeBegin!="">
+				AND bcs.payTime >= :payTimeBegin
+			</#if>
+			<#if payTimeEnd?exists && payTimeEnd!="">
+				AND bcs.payTime <= :payTimeEnd
+			</#if>
+			GROUP BY bcs.payTime
+			ORDER BY bcs.payTime DESC 
+			<#if startRow?exists && startRow!="">
+				LIMIT :startRow , :endRow
+			</#if>
+		]]> 
+	</sql>
+	
+	<sql id="queryCountByParams">
+	<![CDATA[ 
+	SELECT count(td.id) FROM (
+	  	SELECT bcs.id FROM gd_pay.bill_clear_sum bcs
+	    WHERE 1=1
+	    <#if payType?exists && payType!="">
+			AND bcs.payType = :payType
+		</#if>
+		<#if payTimeBegin?exists && payTimeBegin!="">
+			AND bcs.payTime >= :payTimeBegin
+		</#if>
+		<#if payTimeEnd?exists && payTimeEnd!="">
+			AND bcs.payTime <= :payTimeEnd
+		</#if>
+	    GROUP BY bcs.payTime
+	) as td
+	]]> 
+	</sql>
+	
+</sqlMap>

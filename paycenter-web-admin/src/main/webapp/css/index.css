@@ -1,0 +1,23 @@
+@CHARSET "UTF-8";
+
+/**顶部导航*/
+.header{width:100%;height:94px;float:left;margin:0 auto;}
+.navigation {width:100%;height:94px;background:url(../images/home/top.jpg) repeat-x;background-size: cover;float:left;box-shadow:0px 2px 5px rgba(0, 0, 0, 0.2);}
+.logo{float:left;width:400px;height:94px;background:url(../images/home/logo.png) no-repeat 35px 15px;}
+/**顶部右侧登录信息*/
+.logininfo{float:right;height:46px;position: absolute;top: 50%;left: 82%;}
+.logininfo .userinfo{float:right;width:112px;color:#fff;line-height:46px;padding-left: 5px;}
+.logininfo .userinfo a{color:#fff;text-decoration:none;}
+.userinfo a:hover{color:#fff600;cursor: pointer}
+
+/* .index_bg{background: url(../images/home/index_bg.jpg) no-repeat;overflow: hidden;} */
+.index_bg{background: url(../images/home/) no-repeat;overflow: hidden;}
+.usericon{float:right;width:20px;height:46px;background:url(../images/home/user.png) no-repeat 0 12px;}
+/**退出*/
+.logout{float:right;background:url(../images/home/logout.png) no-repeat 0 13px;line-height:46px}
+.logout a{padding-left:20px;color:#fff;text-decoration:none;font-size:12px;}
+.logout a:hover{color:#fff600}
+
+
+.footer{height:30px;width:100%;background-color: #95B8E7};
+

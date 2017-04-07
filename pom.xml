@@ -1,0 +1,950 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.gudeng.framework</groupId>
+		<artifactId>gd-parent</artifactId>
+		<version>1.0.1</version>
+	</parent>
+	<groupId>cn.gdeng.pay.gd</groupId>
+	<artifactId>gd-paycenter-pom</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>gd-paycenter-pom</name>
+
+	<properties>
+		<gudeng.framework.version>1.0.1</gudeng.framework.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.version>1.0.0-SNAPSHOT</project.version>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+
+				<maven.info.customer.url>http://10.17.1.173:8080/</maven.info.customer.url>
+				<!-- 支付服务提供者、消费者(pay) -->
+				<maven.dubbo.registry.address>zookeeper://10.17.1.215:2181?backup=10.17.1.216:2181,10.17.1.217:2181</maven.dubbo.registry.address>
+				<!--<maven.dubbo.registry.address>zookeeper://127.0.0.1:2181</maven.dubbo.registry.address> 
+					<maven.dubbo.registry.address>zookeeper://10.17.4.211:2181</maven.dubbo.registry.address> -->
+				<maven.dubbo.provider.application.name>paycenter-srv-provider</maven.dubbo.provider.application.name>
+				<maven.dubbo.provider.application.owner>paycenter-srv-owner</maven.dubbo.provider.application.owner>
+				<maven.dubbo.provider.service.group>paycenter-srv-group</maven.dubbo.provider.service.group>
+				<maven.dubbo.provider.service.version>v1.0.0</maven.dubbo.provider.service.version>
+				<maven.dubbo.provider.service.timeout>10000</maven.dubbo.provider.service.timeout>
+				<maven.dubbo.admin.provider.protocol.port>20891</maven.dubbo.admin.provider.protocol.port>
+				<maven.dubbo.pay.provider.protocol.port>20892</maven.dubbo.pay.provider.protocol.port>
+				<maven.dubbo.notify.provider.protocol.port>20893</maven.dubbo.notify.provider.protocol.port>
+				<maven.dubbo.provider.protocol.threads>5</maven.dubbo.provider.protocol.threads>
+				<maven.dubbo.provider.protocol.threadpool>cached</maven.dubbo.provider.protocol.threadpool>
+
+
+				<maven.dubbo.consumer.application.name>paycenter-web-consumer</maven.dubbo.consumer.application.name>
+				<maven.dubbo.consumer.application.owner>paycenter-web-owner</maven.dubbo.consumer.application.owner>
+				<maven.dubbo.consumer.reference.group>paycenter-srv-group</maven.dubbo.consumer.reference.group>
+				<maven.dubbo.consumer.reference.retries>0</maven.dubbo.consumer.reference.retries>
+				<maven.dubbo.consumer.reference.init>false</maven.dubbo.consumer.reference.init>
+				<maven.dubbo.consumer.reference.loadbalance>random</maven.dubbo.consumer.reference.loadbalance>
+				<maven.dubbo.consumer.reference.async>false</maven.dubbo.consumer.reference.async>
+				<maven.dubbo.consumer.reference.cache>false</maven.dubbo.consumer.reference.cache>
+				<maven.dubbo.consumer.reference.version>v1.0.0</maven.dubbo.consumer.reference.version>
+				<maven.dubbo.consumer.reference.timeout>10000</maven.dubbo.consumer.reference.timeout>
+				<maven.dubbo.consumer.reference.check>false</maven.dubbo.consumer.reference.check>
+				<!-- 支付服务提供者、消费者(pay) end -->
+
+				<!-- redis properties -->
+				<env>redis</env>
+				<redis.zkAddr>10.17.1.215:2181,10.17.1.216:2181,10.17.1.217:2181</redis.zkAddr>
+				<!--<redis.zkAddr>127.0.0.1:2181</redis.zkAddr> -->
+				<redis.zkSessionTimeoutMs>15000</redis.zkSessionTimeoutMs>
+				<redis.timeoutMs>15000</redis.timeoutMs>
+				<redis.zkProxyDir>/zk/codis/db_test/proxy</redis.zkProxyDir>
+
+				<jedis.maxTotal>-1</jedis.maxTotal>
+				<jedis.maxIdle>20</jedis.maxIdle>
+				<jedis.minIdle>5</jedis.minIdle>
+				<jedis.numTestsPerEvictionRun>200</jedis.numTestsPerEvictionRun>
+				<jedis.timeBetweenEvictionRunsMillis>-1</jedis.timeBetweenEvictionRunsMillis>
+				<jedis.minEvictableIdleTimeMillis>1800000</jedis.minEvictableIdleTimeMillis>
+				<jedis.softMinEvictableIdleTimeMillis>-1</jedis.softMinEvictableIdleTimeMillis>
+				<jedis.maxWaitMillis>-1</jedis.maxWaitMillis>
+				<jedis.testOnBorrow>true</jedis.testOnBorrow>
+				<jedis.testWhileIdle>true</jedis.testWhileIdle>
+				<jedis.testOnReturn>true</jedis.testOnReturn>
+				<jedis.jmxEnabled>true</jedis.jmxEnabled>
+				<jedis.jmxNamePrefix>myj</jedis.jmxNamePrefix>
+				<jedis.blockWhenExhausted>true</jedis.blockWhenExhausted>
+				<jedis.testOnCreate>true</jedis.testOnCreate>
+				<!-- redis properties end -->
+
+
+				<!-- mq -->
+				<gd.MQ.AccessKey>FmQ1FZSfeGcLxl13</gd.MQ.AccessKey>
+				<gd.MQ.SecretKey>t3QfuZjugirBJraeD8TIz1G5cpTfUY</gd.MQ.SecretKey>
+
+				<gd.MQ.pay.ProducerID>PID_dev_nst_order_pay_detail</gd.MQ.pay.ProducerID>
+				<gd.MQ.pay.ConsumerID>CID_dev_nst_order_pay_detail</gd.MQ.pay.ConsumerID>
+
+				<gd.MQ.bankcard.ConsumerID>CID_dev_nst_bank</gd.MQ.bankcard.ConsumerID>
+				<gd.MQ.bankcard.Topic>dev_nst_bank</gd.MQ.bankcard.Topic>
+
+				<gd.MQ.bankinfo.ProducerID>PID_dev_pay_bank</gd.MQ.bankinfo.ProducerID>
+				<gd.MQ.bankinfo.Topic>dev_pay_bank</gd.MQ.bankinfo.Topic>
+
+				<gd.MQ.pay.nsy.create.ProducerID>PID_dev_nsy_pay_order_create</gd.MQ.pay.nsy.create.ProducerID>
+				<gd.MQ.pay.nsy.create.Topic>dev_nsy_pay_order_create</gd.MQ.pay.nsy.create.Topic>
+
+				<gd.MQ.nsy.pay.created.ConsumerID>CID_dev_nsy_order_pay_created</gd.MQ.nsy.pay.created.ConsumerID>
+				<gd.MQ.nsy.pay.created.Topic>dev_nsy_order_pay_created</gd.MQ.nsy.pay.created.Topic>
+
+				<gd.MQ.member.ConsumerID>CID_dev_nst_member_info</gd.MQ.member.ConsumerID>
+				<gd.MQ.member.Topic>dev_nst_member_info</gd.MQ.member.Topic>
+
+				<gd.MQ.member.nsy.ConsumerID>CID_dev_nsy_member_info</gd.MQ.member.nsy.ConsumerID>
+				<gd.MQ.member.nsy.Topic>dev_nsy_member_info</gd.MQ.member.nsy.Topic>
+
+				<gd.MQ.posmachine.ConsumerID>CID_dev_nsy_pos_machine_info</gd.MQ.posmachine.ConsumerID>
+				<gd.MQ.posmachine.Topic>dev_nsy_pos_machine_info</gd.MQ.posmachine.Topic>
+				<!-- log日志 flashdog -->
+				<maven.logger><![CDATA[classpath:log/main_DEV_logging.xml]]></maven.logger>
+
+				<logger.mongodb.uri>mongodb://10.17.1.165:27017</logger.mongodb.uri>
+				<logger.paycenter-srv-pay-dev.mongodb.db>paycenter_srv_pay_dev</logger.paycenter-srv-pay-dev.mongodb.db>
+				<logger.paycenter-srv-pay-dev.mongodb.collection>paycenter_srv_pay_log_dev</logger.paycenter-srv-pay-dev.mongodb.collection>
+
+
+				<logger.paycenter-gateway-dev.mongodb.db>paycenter_gateway_dev</logger.paycenter-gateway-dev.mongodb.db>
+				<logger.paycenter-gateway-dev.mongodb.collection>paycenter_gateway_log_dev</logger.paycenter-gateway-dev.mongodb.collection>
+
+
+				<logger.paycenter-srv-notify-dev.mongodb.db>paycenter_srv_notify_dev</logger.paycenter-srv-notify-dev.mongodb.db>
+				<logger.paycenter-srv-notify-dev.mongodb.collection>paycenter_srv_notify_log_dev</logger.paycenter-srv-notify-dev.mongodb.collection>
+
+
+				<logger.paycenter-task-dev.mongodb.db>paycenter_task_dev</logger.paycenter-task-dev.mongodb.db>
+				<logger.paycenter-task-dev.mongodb.collection>paycenter_task_log_dev</logger.paycenter-task-dev.mongodb.collection>
+
+
+				<logger.paycenter-srv-admin-dev.mongodb.db>paycenter_srv_admin_dev</logger.paycenter-srv-admin-dev.mongodb.db>
+				<logger.paycenter-srv-admin-dev.mongodb.collection>paycenter_srv_admin_log_dev</logger.paycenter-srv-admin-dev.mongodb.collection>
+
+
+				<logger.paycenter-web-admin-dev.mongodb.db>paycenter_web_admin_dev</logger.paycenter-web-admin-dev.mongodb.db>
+				<logger.paycenter-web-admin-dev.mongodb.collection>paycenter_web_admin_log_dev</logger.paycenter-web-admin-dev.mongodb.collection>
+
+				<!-- DB数字签名私钥本地磁盘存放路径 -->
+				<maven.rsa.sign.key.path>/usr/local/pay_center_key/</maven.rsa.sign.key.path>
+				
+				<!-- DB数字签名验证开关 true开启 false 关闭 -->
+				<maven.rsa.sign.on.off>false</maven.rsa.sign.on.off>
+
+				<!-- hessian -->
+				<maven.gd.order.url>http://10.17.1.173:8085/</maven.gd.order.url>
+				<maven.gd.api.url>http://10.17.1.174:8082/</maven.gd.api.url>
+				<maven.gd.memberId>1</maven.gd.memberId>
+				<!-- 网关接口测试是否需要签名 -->
+				<maven.gateway.sign>false</maven.gateway.sign>
+				<maven.paycenter.gateway>http://10.17.1.174:8311/</maven.paycenter.gateway>
+				<maven.env>dev</maven.env>
+			</properties>
+		</profile>
+
+
+		<profile>
+			<id>test</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<maven.info.customer.url>http://10.17.1.200:8080/</maven.info.customer.url>
+
+				<!-- 支付服务提供者、消费者(pay) -->
+				<maven.dubbo.registry.address>zookeeper://10.17.1.161:2181?backup=10.17.1.162:2181,10.17.1.163:2181</maven.dubbo.registry.address>
+				<maven.dubbo.provider.application.name>paycenter-srv-provider</maven.dubbo.provider.application.name>
+				<maven.dubbo.provider.application.owner>paycenter-srv-owner</maven.dubbo.provider.application.owner>
+				<maven.dubbo.provider.service.group>paycenter-srv-group-test</maven.dubbo.provider.service.group>
+				<maven.dubbo.provider.service.version>v1.0.0</maven.dubbo.provider.service.version>
+				<maven.dubbo.provider.service.timeout>10000</maven.dubbo.provider.service.timeout>
+				<maven.dubbo.admin.provider.protocol.port>20891</maven.dubbo.admin.provider.protocol.port>
+				<maven.dubbo.pay.provider.protocol.port>20892</maven.dubbo.pay.provider.protocol.port>
+				<maven.dubbo.notify.provider.protocol.port>20893</maven.dubbo.notify.provider.protocol.port>
+				<maven.dubbo.provider.protocol.threads>20</maven.dubbo.provider.protocol.threads>
+				<maven.dubbo.provider.protocol.threadpool>cached</maven.dubbo.provider.protocol.threadpool>
+
+
+				<maven.dubbo.consumer.application.name>paycenter-web-consumer</maven.dubbo.consumer.application.name>
+				<maven.dubbo.consumer.application.owner>paycenter-web-owner</maven.dubbo.consumer.application.owner>
+				<maven.dubbo.consumer.reference.group>paycenter-srv-group-test</maven.dubbo.consumer.reference.group>
+				<maven.dubbo.consumer.reference.retries>1</maven.dubbo.consumer.reference.retries>
+				<maven.dubbo.consumer.reference.init>false</maven.dubbo.consumer.reference.init>
+				<maven.dubbo.consumer.reference.loadbalance>random</maven.dubbo.consumer.reference.loadbalance>
+				<maven.dubbo.consumer.reference.async>false</maven.dubbo.consumer.reference.async>
+				<maven.dubbo.consumer.reference.cache>false</maven.dubbo.consumer.reference.cache>
+				<maven.dubbo.consumer.reference.version>v1.0.0</maven.dubbo.consumer.reference.version>
+				<maven.dubbo.consumer.reference.timeout>10000</maven.dubbo.consumer.reference.timeout>
+				<maven.dubbo.consumer.reference.check>false</maven.dubbo.consumer.reference.check>
+				<!-- 支付服务提供者、消费者(pay) end -->
+
+				<!-- redis properties -->
+				<env>redis</env>
+				<redis.zkAddr>10.17.1.161:2181,10.17.1.162:2181,10.17.1.163:2181</redis.zkAddr>
+				<redis.zkSessionTimeoutMs>15000</redis.zkSessionTimeoutMs>
+				<redis.timeoutMs>15000</redis.timeoutMs>
+				<redis.zkProxyDir>/zk/codis/db_test/proxy</redis.zkProxyDir>
+
+				<jedis.maxTotal>-1</jedis.maxTotal>
+				<jedis.maxIdle>20</jedis.maxIdle>
+				<jedis.minIdle>5</jedis.minIdle>
+				<jedis.numTestsPerEvictionRun>200</jedis.numTestsPerEvictionRun>
+				<jedis.timeBetweenEvictionRunsMillis>-1</jedis.timeBetweenEvictionRunsMillis>
+				<jedis.minEvictableIdleTimeMillis>1800000</jedis.minEvictableIdleTimeMillis>
+				<jedis.softMinEvictableIdleTimeMillis>-1</jedis.softMinEvictableIdleTimeMillis>
+				<jedis.maxWaitMillis>-1</jedis.maxWaitMillis>
+				<jedis.testOnBorrow>true</jedis.testOnBorrow>
+				<jedis.testWhileIdle>true</jedis.testWhileIdle>
+				<jedis.testOnReturn>true</jedis.testOnReturn>
+				<jedis.jmxEnabled>true</jedis.jmxEnabled>
+				<jedis.jmxNamePrefix>myj</jedis.jmxNamePrefix>
+				<jedis.blockWhenExhausted>true</jedis.blockWhenExhausted>
+				<jedis.testOnCreate>true</jedis.testOnCreate>
+				<!-- redis properties end -->
+
+
+
+				<gd.MQ.AccessKey>FmQ1FZSfeGcLxl13</gd.MQ.AccessKey>
+				<gd.MQ.SecretKey>t3QfuZjugirBJraeD8TIz1G5cpTfUY</gd.MQ.SecretKey>
+
+				<gd.MQ.pay.ProducerID>PID_test_nst_order_pay_detail_a</gd.MQ.pay.ProducerID>
+				<gd.MQ.pay.ConsumerID>CID_test_nst_order_pay_detail_a</gd.MQ.pay.ConsumerID>
+
+				<gd.MQ.bankcard.ConsumerID>CID_test_nst_bank_a</gd.MQ.bankcard.ConsumerID>
+				<gd.MQ.bankcard.Topic>test_nst_bank_a</gd.MQ.bankcard.Topic>
+
+				<gd.MQ.bankinfo.ProducerID>PID_test_pay_bank_a</gd.MQ.bankinfo.ProducerID>
+				<gd.MQ.bankinfo.Topic>test_pay_bank_a</gd.MQ.bankinfo.Topic>
+
+				<gd.MQ.pay.nsy.create.ProducerID>PID_test_nsy_pay_order_create</gd.MQ.pay.nsy.create.ProducerID>
+				<gd.MQ.pay.nsy.create.Topic>test_nsy_pay_order_create</gd.MQ.pay.nsy.create.Topic>
+
+				<gd.MQ.nsy.pay.created.ConsumerID>CID_test_nsy_order_pay_created</gd.MQ.nsy.pay.created.ConsumerID>
+				<gd.MQ.nsy.pay.created.Topic>test_nsy_order_pay_created</gd.MQ.nsy.pay.created.Topic>
+
+				<gd.MQ.member.ConsumerID>CID_test_nst_member_info</gd.MQ.member.ConsumerID>
+				<gd.MQ.member.Topic>test_nst_member_info</gd.MQ.member.Topic>
+
+				<gd.MQ.member.nsy.ConsumerID>CID_test_nsy_member_info</gd.MQ.member.nsy.ConsumerID>
+				<gd.MQ.member.nsy.Topic>test_nsy_member_info</gd.MQ.member.nsy.Topic>
+
+				<gd.MQ.posmachine.ConsumerID>CID_test_nsy_pos_machine_info</gd.MQ.posmachine.ConsumerID>
+				<gd.MQ.posmachine.Topic>test_nsy_pos_machine_info</gd.MQ.posmachine.Topic>
+
+				<maven.logger><![CDATA[classpath:log/main_TEST_logging.xml]]></maven.logger>
+
+				<logger.mongodb.uri>mongodb://10.17.1.165:27017</logger.mongodb.uri>
+
+				<logger.paycenter-srv-pay-test.mongodb.db>paycenter_srv_pay_test</logger.paycenter-srv-pay-test.mongodb.db>
+				<logger.paycenter-srv-pay-test.mongodb.collection>paycenter_srv_pay_log_test</logger.paycenter-srv-pay-test.mongodb.collection>
+
+				<logger.paycenter-gateway-test.mongodb.db>paycenter_gateway_test</logger.paycenter-gateway-test.mongodb.db>
+				<logger.paycenter-gateway-test.mongodb.collection>paycenter_gateway_log_test</logger.paycenter-gateway-test.mongodb.collection>
+
+				<logger.paycenter-srv-notify-test.mongodb.db>paycenter_srv_notify_test</logger.paycenter-srv-notify-test.mongodb.db>
+				<logger.paycenter-srv-notify-test.mongodb.collection>paycenter_srv_notify_log_test</logger.paycenter-srv-notify-test.mongodb.collection>
+
+				<logger.paycenter-task-test.mongodb.db>paycenter_task_test</logger.paycenter-task-test.mongodb.db>
+				<logger.paycenter-task-test.mongodb.collection>paycenter_task_log_test</logger.paycenter-task-test.mongodb.collection>
+
+				<logger.paycenter-srv-admin-test.mongodb.db>paycenter_srv_admin_test</logger.paycenter-srv-admin-test.mongodb.db>
+				<logger.paycenter-srv-admin-test.mongodb.collection>paycenter_srv_admin_log_test</logger.paycenter-srv-admin-test.mongodb.collection>
+
+				<logger.paycenter-web-admin-test.mongodb.db>paycenter_web_admin_test</logger.paycenter-web-admin-test.mongodb.db>
+				<logger.paycenter-web-admin-test.mongodb.collection>paycenter_web_admin_log_test</logger.paycenter-web-admin-test.mongodb.collection>
+
+				<!-- DB数字签名私钥本地磁盘存放路径 -->
+				<maven.rsa.sign.key.path>/usr/local/pay_center_key/</maven.rsa.sign.key.path>
+				
+				<!-- DB数字签名验证开关 true开启 false 关闭 -->
+				<maven.rsa.sign.on.off>false</maven.rsa.sign.on.off>
+
+				<maven.gd.order.url>http://10.17.1.200:8085/</maven.gd.order.url>
+
+				<maven.gd.order.url>http://10.17.1.200:8085/</maven.gd.order.url>
+				<maven.gd.api.url>http://10.17.1.201:8082/</maven.gd.api.url>
+				<maven.gd.memberId>1</maven.gd.memberId>
+
+				<!-- 网关接口测试是否需要签名 -->
+				<maven.gateway.sign>false</maven.gateway.sign>
+				<maven.env>test</maven.env>
+				<maven.paycenter.gateway>http://121.15.169.11:18820/</maven.paycenter.gateway>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>uat</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<maven.info.customer.url>http://10.17.1.206:8080/</maven.info.customer.url>
+
+				<!-- 支付服务提供者、消费者(pay) -->
+				<maven.dubbo.registry.address>zookeeper://10.17.1.161:2181?backup=10.17.1.162:2181,10.17.1.163:2181</maven.dubbo.registry.address>
+				<maven.dubbo.provider.application.name>paycenter-srv-provider</maven.dubbo.provider.application.name>
+				<maven.dubbo.provider.application.owner>paycenter-srv-owner</maven.dubbo.provider.application.owner>
+				<maven.dubbo.provider.service.group>paycenter-srv-group-uat</maven.dubbo.provider.service.group>
+				<maven.dubbo.provider.service.version>v1.0.0</maven.dubbo.provider.service.version>
+				<maven.dubbo.provider.service.timeout>10000</maven.dubbo.provider.service.timeout>
+				<maven.dubbo.admin.provider.protocol.port>20891</maven.dubbo.admin.provider.protocol.port>
+				<maven.dubbo.pay.provider.protocol.port>20892</maven.dubbo.pay.provider.protocol.port>
+				<maven.dubbo.notify.provider.protocol.port>20893</maven.dubbo.notify.provider.protocol.port>
+				<maven.dubbo.provider.protocol.threads>20</maven.dubbo.provider.protocol.threads>
+				<maven.dubbo.provider.protocol.threadpool>cached</maven.dubbo.provider.protocol.threadpool>
+
+
+				<maven.dubbo.consumer.application.name>paycenter-web-consumer</maven.dubbo.consumer.application.name>
+				<maven.dubbo.consumer.application.owner>paycenter-web-owner</maven.dubbo.consumer.application.owner>
+				<maven.dubbo.consumer.reference.group>paycenter-srv-group-uat</maven.dubbo.consumer.reference.group>
+				<maven.dubbo.consumer.reference.retries>0</maven.dubbo.consumer.reference.retries>
+				<maven.dubbo.consumer.reference.init>false</maven.dubbo.consumer.reference.init>
+				<maven.dubbo.consumer.reference.loadbalance>random</maven.dubbo.consumer.reference.loadbalance>
+				<maven.dubbo.consumer.reference.async>false</maven.dubbo.consumer.reference.async>
+				<maven.dubbo.consumer.reference.cache>false</maven.dubbo.consumer.reference.cache>
+				<maven.dubbo.consumer.reference.version>v1.0.0</maven.dubbo.consumer.reference.version>
+				<maven.dubbo.consumer.reference.timeout>10000</maven.dubbo.consumer.reference.timeout>
+				<maven.dubbo.consumer.reference.check>false</maven.dubbo.consumer.reference.check>
+				<!-- 支付服务提供者、消费者(pay) end -->
+
+				<!-- redis properties -->
+				<env>redis</env>
+				<redis.zkAddr>10.17.1.161:2181,10.17.1.162:2181,10.17.1.163:2181</redis.zkAddr>
+				<!--<redis.zkAddr>127.0.0.1:2181</redis.zkAddr> -->
+				<redis.zkSessionTimeoutMs>15000</redis.zkSessionTimeoutMs>
+				<redis.timeoutMs>15000</redis.timeoutMs>
+				<redis.zkProxyDir>/zk/codis/db_test/proxy</redis.zkProxyDir>
+
+				<jedis.maxTotal>-1</jedis.maxTotal>
+				<jedis.maxIdle>20</jedis.maxIdle>
+				<jedis.minIdle>5</jedis.minIdle>
+				<jedis.numTestsPerEvictionRun>200</jedis.numTestsPerEvictionRun>
+				<jedis.timeBetweenEvictionRunsMillis>-1</jedis.timeBetweenEvictionRunsMillis>
+				<jedis.minEvictableIdleTimeMillis>1800000</jedis.minEvictableIdleTimeMillis>
+				<jedis.softMinEvictableIdleTimeMillis>-1</jedis.softMinEvictableIdleTimeMillis>
+				<jedis.maxWaitMillis>-1</jedis.maxWaitMillis>
+				<jedis.testOnBorrow>true</jedis.testOnBorrow>
+				<jedis.testWhileIdle>true</jedis.testWhileIdle>
+				<jedis.testOnReturn>true</jedis.testOnReturn>
+				<jedis.jmxEnabled>true</jedis.jmxEnabled>
+				<jedis.jmxNamePrefix>myj</jedis.jmxNamePrefix>
+				<jedis.blockWhenExhausted>true</jedis.blockWhenExhausted>
+				<jedis.testOnCreate>true</jedis.testOnCreate>
+				<!-- redis properties end -->
+
+
+
+				<gd.MQ.AccessKey>FmQ1FZSfeGcLxl13</gd.MQ.AccessKey>
+				<gd.MQ.SecretKey>t3QfuZjugirBJraeD8TIz1G5cpTfUY</gd.MQ.SecretKey>
+
+				<gd.MQ.pay.ProducerID>PID_uat_nst_order_pay_detail</gd.MQ.pay.ProducerID>
+				<gd.MQ.pay.ConsumerID>CID_uat_nst_order_pay_detail</gd.MQ.pay.ConsumerID>
+
+				<gd.MQ.bankcard.ConsumerID>CID_uat_nst_bank</gd.MQ.bankcard.ConsumerID>
+				<gd.MQ.bankcard.Topic>uat_nst_bank</gd.MQ.bankcard.Topic>
+
+				<gd.MQ.bankinfo.ProducerID>PID_uat_pay_bank</gd.MQ.bankinfo.ProducerID>
+				<gd.MQ.bankinfo.Topic>uat_pay_bank</gd.MQ.bankinfo.Topic>
+
+				<gd.MQ.pay.nsy.create.ProducerID>PID_uat_nsy_pay_order_create</gd.MQ.pay.nsy.create.ProducerID>
+				<gd.MQ.pay.nsy.create.Topic>uat_nsy_pay_order_create</gd.MQ.pay.nsy.create.Topic>
+
+				<gd.MQ.nsy.pay.created.ConsumerID>CID_uat_nsy_order_pay_created</gd.MQ.nsy.pay.created.ConsumerID>
+				<gd.MQ.nsy.pay.created.Topic>uat_nsy_order_pay_created</gd.MQ.nsy.pay.created.Topic>
+
+				<gd.MQ.member.ConsumerID>CID_uat_nst_member_info</gd.MQ.member.ConsumerID>
+				<gd.MQ.member.Topic>uat_nst_member_info</gd.MQ.member.Topic>
+
+                <gd.MQ.member.nsy.ConsumerID>CID_uat_nsy_member_info</gd.MQ.member.nsy.ConsumerID>
+				<gd.MQ.member.nsy.Topic>uat_nsy_member_info</gd.MQ.member.nsy.Topic>
+                
+				<gd.MQ.posmachine.ConsumerID>CID_uat_nsy_pos_machine_info</gd.MQ.posmachine.ConsumerID>
+				<gd.MQ.posmachine.Topic>uat_nsy_pos_machine_info</gd.MQ.posmachine.Topic>
+
+				<maven.logger><![CDATA[classpath:log/main_UAT_logging.xml]]></maven.logger>
+
+				<!-- DB数字签名私钥本地磁盘存放路径 -->
+				<maven.rsa.sign.key.path>/usr/local/pay_center_key/</maven.rsa.sign.key.path>
+				
+				<!-- DB数字签名验证开关 true开启 false 关闭 -->
+				<maven.rsa.sign.on.off>false</maven.rsa.sign.on.off>
+
+				<maven.gd.order.url>http://10.17.1.206:8085/</maven.gd.order.url>
+				<maven.gd.api.url>http://10.17.1.207:8082/</maven.gd.api.url>
+				<maven.gd.memberId>1</maven.gd.memberId>
+				<!-- 网关接口测试是否需要签名 -->
+				<maven.gateway.sign>false</maven.gateway.sign>
+				<maven.env>uat</maven.env>
+				<maven.paycenter.gateway>http://121.15.169.11:18821/</maven.paycenter.gateway>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>release</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<maven.info.customer.url>http://100.98.202.194:8080/</maven.info.customer.url>
+
+				<!-- 支付服务提供者、消费者(pay) -->
+				<maven.dubbo.registry.address>zookeeper://10.24.228.199:2181?backup=10.24.214.103:2181,10.116.118.17:2181</maven.dubbo.registry.address>
+				<maven.dubbo.provider.application.name>paycenter-srv-provider</maven.dubbo.provider.application.name>
+				<maven.dubbo.provider.application.owner>paycenter-srv-owner</maven.dubbo.provider.application.owner>
+				<maven.dubbo.provider.service.group>paycenter-srv-group-release</maven.dubbo.provider.service.group>
+				<maven.dubbo.provider.service.version>v1.0.0</maven.dubbo.provider.service.version>
+				<maven.dubbo.provider.service.timeout>10000</maven.dubbo.provider.service.timeout>
+				<maven.dubbo.admin.provider.protocol.port>20891</maven.dubbo.admin.provider.protocol.port>
+				<maven.dubbo.pay.provider.protocol.port>20892</maven.dubbo.pay.provider.protocol.port>
+				<maven.dubbo.notify.provider.protocol.port>20893</maven.dubbo.notify.provider.protocol.port>
+				<maven.dubbo.provider.protocol.threads>50</maven.dubbo.provider.protocol.threads>
+				<maven.dubbo.provider.protocol.threadpool>cached</maven.dubbo.provider.protocol.threadpool>
+
+
+				<maven.dubbo.consumer.application.name>paycenter-web-consumer</maven.dubbo.consumer.application.name>
+				<maven.dubbo.consumer.application.owner>paycenter-web-owner</maven.dubbo.consumer.application.owner>
+				<maven.dubbo.consumer.reference.group>paycenter-srv-group-release</maven.dubbo.consumer.reference.group>
+				<maven.dubbo.consumer.reference.retries>1</maven.dubbo.consumer.reference.retries>
+				<maven.dubbo.consumer.reference.init>false</maven.dubbo.consumer.reference.init>
+				<maven.dubbo.consumer.reference.loadbalance>random</maven.dubbo.consumer.reference.loadbalance>
+				<maven.dubbo.consumer.reference.async>false</maven.dubbo.consumer.reference.async>
+				<maven.dubbo.consumer.reference.cache>false</maven.dubbo.consumer.reference.cache>
+				<maven.dubbo.consumer.reference.version>v1.0.0</maven.dubbo.consumer.reference.version>
+				<maven.dubbo.consumer.reference.timeout>10000</maven.dubbo.consumer.reference.timeout>
+				<maven.dubbo.consumer.reference.check>false</maven.dubbo.consumer.reference.check>
+				<!-- 支付服务提供者、消费者(pay) end -->
+
+				<!-- redis properties -->
+				<env>redis</env>
+				<redis.zkAddr>10.24.228.199:2181,10.24.214.103:2181,10.116.118.17:2181</redis.zkAddr>
+				<redis.zkSessionTimeoutMs>15000</redis.zkSessionTimeoutMs>
+				<redis.timeoutMs>15000</redis.timeoutMs>
+				<redis.zkProxyDir>/zk/codis/db_gudeng/proxy</redis.zkProxyDir>
+
+				<jedis.maxTotal>-1</jedis.maxTotal>
+				<jedis.maxIdle>50</jedis.maxIdle>
+				<jedis.minIdle>10</jedis.minIdle>
+				<jedis.numTestsPerEvictionRun>200</jedis.numTestsPerEvictionRun>
+				<jedis.timeBetweenEvictionRunsMillis>-1</jedis.timeBetweenEvictionRunsMillis>
+				<jedis.minEvictableIdleTimeMillis>1800000</jedis.minEvictableIdleTimeMillis>
+				<jedis.softMinEvictableIdleTimeMillis>-1</jedis.softMinEvictableIdleTimeMillis>
+				<jedis.maxWaitMillis>-1</jedis.maxWaitMillis>
+				<jedis.testOnBorrow>true</jedis.testOnBorrow>
+				<jedis.testWhileIdle>true</jedis.testWhileIdle>
+				<jedis.testOnReturn>true</jedis.testOnReturn>
+				<jedis.jmxEnabled>true</jedis.jmxEnabled>
+				<jedis.jmxNamePrefix>myj</jedis.jmxNamePrefix>
+				<jedis.blockWhenExhausted>true</jedis.blockWhenExhausted>
+				<jedis.testOnCreate>true</jedis.testOnCreate>
+				<!-- redis properties end -->
+
+
+
+				<gd.MQ.AccessKey>FmQ1FZSfeGcLxl13</gd.MQ.AccessKey>
+				<gd.MQ.SecretKey>t3QfuZjugirBJraeD8TIz1G5cpTfUY</gd.MQ.SecretKey>
+
+				<gd.MQ.pay.ProducerID>PID_prd_nst_order_pay_detail</gd.MQ.pay.ProducerID>
+				<gd.MQ.pay.ConsumerID>CID_prd_nst_order_pay_detail</gd.MQ.pay.ConsumerID>
+
+				<gd.MQ.bankcard.ConsumerID>CID_prd_nst_bank</gd.MQ.bankcard.ConsumerID>
+				<gd.MQ.bankcard.Topic>prd_nst_bank</gd.MQ.bankcard.Topic>
+
+				<gd.MQ.bankinfo.ProducerID>PID_prd_pay_bank</gd.MQ.bankinfo.ProducerID>
+				<gd.MQ.bankinfo.Topic>prd_pay_bank</gd.MQ.bankinfo.Topic>
+
+				<gd.MQ.pay.nsy.create.ProducerID>PID_prd_nsy_pay_order_create</gd.MQ.pay.nsy.create.ProducerID>
+				<gd.MQ.pay.nsy.create.Topic>prd_nsy_pay_order_create</gd.MQ.pay.nsy.create.Topic>
+
+				<gd.MQ.nsy.pay.created.ConsumerID>CID_prd_nsy_order_pay_created</gd.MQ.nsy.pay.created.ConsumerID>
+				<gd.MQ.nsy.pay.created.Topic>prd_nsy_order_pay_created</gd.MQ.nsy.pay.created.Topic>
+
+				<gd.MQ.member.ConsumerID>CID_prd_nst_member_info</gd.MQ.member.ConsumerID>
+				<gd.MQ.member.Topic>prd_nst_member_info</gd.MQ.member.Topic>
+
+                <gd.MQ.member.nsy.ConsumerID>CID_prd_nsy_member_info</gd.MQ.member.nsy.ConsumerID>
+				<gd.MQ.member.nsy.Topic>prd_nsy_member_info</gd.MQ.member.nsy.Topic>
+				
+				<gd.MQ.posmachine.ConsumerID>CID_prd_nsy_pos_machine_info</gd.MQ.posmachine.ConsumerID>
+				<gd.MQ.posmachine.Topic>prd_nsy_pos_machine_info</gd.MQ.posmachine.Topic>
+
+				<maven.logger><![CDATA[classpath:log/main_RELEASE_logging.xml]]></maven.logger>
+
+				<!-- DB数字签名私钥本地磁盘存放路径 -->
+				<maven.rsa.sign.key.path>/usr/local/pay_center_key/</maven.rsa.sign.key.path>
+				
+				<!-- DB数字签名验证开关 true开启 false 关闭 -->
+				<maven.rsa.sign.on.off>false</maven.rsa.sign.on.off>
+
+				<maven.gd.order.url>http://100.98.202.193:8085/</maven.gd.order.url>
+				<maven.gd.api.url>http://100.98.202.196:8082/</maven.gd.api.url>
+				<maven.gd.memberId>1</maven.gd.memberId>
+				<!-- 网关接口测试是否需要签名 -->
+				<maven.gateway.sign>true</maven.gateway.sign>
+				<maven.env>prd</maven.env>
+				<maven.paycenter.gateway>http://pay.gdeng.cn/</maven.paycenter.gateway>
+			</properties>
+		</profile>
+
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-core2</artifactId>
+			<version>${gudeng.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-dba</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-dbrws</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-ws</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-redis</artifactId>
+			<version>${gudeng.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.gudeng.framework</groupId>
+			<artifactId>gd-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<classifier>ftp</classifier>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- fastjson -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.39</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160212</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>opensymphony</groupId>
+			<artifactId>sitemesh</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-digester3</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-htmlunit-driver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-lgpl</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-lgpl</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+		<!-- product end -->
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.samba.jcifs</groupId>
+			<artifactId>jcifs</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jasig.cas.client</groupId>
+			<artifactId>cas-client-core</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cas</groupId>
+			<artifactId>casclient</artifactId>
+			<version>2.1.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<!-- jedis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.8.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>redis.clients</groupId>
+					<artifactId>jedis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- codis -->
+		<dependency>
+			<groupId>io.codis.jodis</groupId>
+			<artifactId>jodis</artifactId>
+			<version>0.3.1</version>
+		</dependency>
+
+		<!-- zookeeper dependency -->
+		<dependency>
+			<groupId>com.101tec</groupId>
+			<artifactId>zkclient</artifactId>
+			<version>0.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.101tec</groupId>
+					<artifactId>zkclient</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-client</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.5.1-alpha</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.zookeeper</groupId>
+					<artifactId>zookeeper</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- dubbo dependency -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dubbo</artifactId>
+			<version>2.8.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.18.1-GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>3.2.9.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.0.20</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.virgilsecurity.sdk</groupId>
+			<artifactId>crypto</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aliyun.openservices</groupId>
+			<artifactId>ons-client</artifactId>
+			<version>1.2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>logback.mongodb</groupId>
+			<artifactId>logback.mongodb</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<!-- <filters> -->
+		<!-- <filter>src/main/resources/filters/${env}.properties</filter> -->
+		<!-- </filters> -->
+	</build>
+	<distributionManagement>
+		<repository>
+			<id>my-nexus-releases</id>
+			<url>
+				http://10.17.1.176:8081/nexus/content/repositories/releases/
+			</url>
+		</repository>
+		<snapshotRepository>
+			<id>my-nexus-snapshot</id>
+			<url>
+				http://10.17.1.176:8081/nexus/content/repositories/snapshots/
+			</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<modules>
+		<module>paycenter-api</module>
+		<module>paycenter-srv-notify</module>
+		<module>paycenter-srv-pay</module>
+		<module>paycenter-task</module>
+		<module>paycenter-web-gateway</module>
+
+		<module>paycenter-srv-admin</module>
+		<module>paycenter-web-admin</module>
+		<module>paycenter-hessian</module>
+	</modules>
+
+
+</project>

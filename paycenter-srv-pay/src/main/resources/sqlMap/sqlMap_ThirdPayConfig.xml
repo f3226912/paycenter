@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="ThirdPayConfig">
+	<sql id="queryByPayType">
+	<![CDATA[
+		select id,payType,subPayType,paramJson,keyType,publicKey,privateKey,sysPublicKey,
+		md5Key,status,appKey from third_pay_config
+		where 1=1 and status=1
+		
+		<#if payType?exists && payType!="" > 
+ 			and payType=:payType 
+ 		</#if>
+ 		<#if subPayType?exists && subPayType!="" > 
+ 			and subPayType=:subPayType 
+ 		</#if>
+ 		<#if appKey?exists && appKey!="" > 
+ 			and appKey=:appKey 
+ 		</#if>
+ 		<#if payCenterNumber?exists && payCenterNumber!="" > 
+ 			and payType=(select payType from pay_trade where payCenterNumber=:payCenterNumber)
+ 			and appKey=(select appKey from pay_trade where payCenterNumber=:payCenterNumber)
+ 		</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryAll">
+	<![CDATA[
+		select * 
+		from third_pay_config
+		where status=1			
+	]]>
+	</sql>
+	
+</sqlMap>

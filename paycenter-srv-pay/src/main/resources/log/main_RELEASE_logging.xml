@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<!-- 控制台输出日志 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n</pattern>
+		</layout>
+	</appender>
+	
+	<!-- 文件输出日志 (文件大小策略进行文件输出，每小时产生一个日志文件给异常监控平台进行分析) -->
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>/logdata/pay/paycenter-srv-pay.log</File>
+		<!-- 日志文件rolling策略 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>/logdata/pay/paycenter-srv-pay_%d{yyyy-MM-dd_HH}.log</FileNamePattern>
+			<maxHistory>24</maxHistory>
+		</rollingPolicy>
+		
+		<!-- 日志输出格式 -->
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg%n</Pattern>
+		</layout>
+	</appender>
+
+	<!-- 需要记录日志的包 -->
+	<logger name="org.springframework" level="INFO" />
+	<logger name="org.apache.zookeeper.ClientCnxn" level="INFO" />
+	
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+	
+</configuration>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="PayTradeUidRecord"> 
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,appKey,orderNo,payUid,payCenterNumber,createTime,createUserId,updateTime,updateUserId
+		  FROM pay_trade_uid_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if payUid?exists && payUid != "" >
+			   AND payUid=:payUid
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,appKey,orderNo,payUid,payCenterNumber,createTime,createUserId,updateTime,updateUserId
+		  FROM pay_trade_uid_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if payUid?exists && payUid != "" >
+			   AND payUid=:payUid
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM pay_trade_uid_record
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if appKey?exists && appKey != "" >
+			   AND appKey=:appKey
+			</#if>
+			<#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if payUid?exists && payUid != "" >
+			   AND payUid=:payUid
+			</#if>
+			<#if payCenterNumber?exists && payCenterNumber != "" >
+			   AND payCenterNumber=:payCenterNumber
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+	   ]]>
+	</sql>
+	
+	<sql id="deletePayTradeUidRecord">
+		<![CDATA[
+			delete from pay_trade_uid_record where payCenterNumber=:payCenterNumber
+		]]>
+	</sql>
+</sqlMap>

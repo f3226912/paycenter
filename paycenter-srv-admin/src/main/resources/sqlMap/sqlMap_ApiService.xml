@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlMap namespace="ApiService">
+
+	<select id="getVClearList">
+	     <![CDATA[
+	       select  orderNo,userType,memberId,orderAmt,commissionAmt,feeAmt,subsidyAmt
+	       from v_clear_detail where 1=1
+	       <#if orderNo?exists && orderNo != "" >
+			   AND orderNo=:orderNo
+			</#if>
+			<#if userType?exists && userType != "" >
+			   AND userType=:userType
+			</#if>
+			<#if memberId?exists && memberId != "" >
+			   AND memberId=:memberId
+			</#if>
+	      ]]>
+    </select>
+</sqlMap>

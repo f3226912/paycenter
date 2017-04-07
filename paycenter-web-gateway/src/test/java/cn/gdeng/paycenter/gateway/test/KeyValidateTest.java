@@ -1,0 +1,21 @@
+package cn.gdeng.paycenter.gateway.test;
+
+import cn.gdeng.paycenter.util.web.api.RsaUtil;
+
+public class KeyValidateTest {
+
+	private static String privateKey = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAJxxUh7LPQOdnTwW7pFfbmvtMx2K2DwEyynGq+HY97R7PZpWzX0PozFrD1EkR6jZMwtBEHO6ljtabgxSVfGqVdCS4Y4NFc2KGuF7DsZCME41UcmX2+4ySpKAfi/VQYfG/zP03Kov64K2FpKIik6RlhAaLqHJFIymfiXQo9E9hiWtAgMBAAECgYANsdnXekEgFOcTwIonzavT5NLJrkLZli3WvV6EicK9WOB+p0SbwwetJssTdlKTlFfkj1CKYPYPwg3KJFcDrb6PPZJ8YerAjDQKk3kDdkLbGxmYCGbp9Rhn+skEUnphKgZdtmlGE/BmzRdQl1453oQGFksGt+GIPhVGajlgG5AKXQJBAMnOKs57StEL1t1w0TGcmjkhWcWNj1dNZ4kxLajMhd0Auj4wpg6ZHC4qWaRGXkLjWeiO3vJhV7rBHHgF1rFBKocCQQDGdIh8iKQO138DX/q4NcGNZ5Wd91ciovtvM7PiLHeQ2+eVm3B24v1J785kQFBNXTuDGZSRs8gDog/tk6f0RzcrAkEAuQ3egSPcMqA5syxeGLFzVwo3KQortLHdTJgVN6H86vFc1+SCkgZjKg5Zz2Nb0thqvPAuj3MmILIu6fzop/iLBwJBALlJ8mj7ltl4oFEBWvCE2DrzPMEpPwTK0SDpUAla5SOt/dI0N9P4aO6QZM47Mf6Zjsf/qTREe/nQZTi3RPgRSdMCQQCQ8TrhfkVMjMfyj9npfOSMDxPi1ck2nL6YD8pb6OB22I4edruJb7iaAdmmYLejXSXHD7JKzCMlhuPgBToDnU1R";
+	
+	private static String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCccVIeyz0DnZ08Fu6RX25r7TMditg8BMspxqvh2Pe0ez2aVs19D6Mxaw9RJEeo2TMLQRBzupY7Wm4MUlXxqlXQkuGODRXNihrhew7GQjBONVHJl9vuMkqSgH4v1UGHxv8z9NyqL+uCthaSiIpOkZYQGi6hyRSMpn4l0KPRPYYlrQIDAQAB";
+	
+	private static String CHARSET = "utf-8";
+	
+	public static void main(String[] args) {
+		String content = "liu.ax";
+		
+		String sign = RsaUtil.sign(content, privateKey, CHARSET);
+		System.out.println(sign);
+		
+		System.out.println(RsaUtil.verify(content, sign, publicKey, CHARSET));
+	}
+}

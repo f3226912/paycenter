@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="MemberBankcardInfo">
+	<!-- 根据appKey 查询 -->
+	<sql id="query">
+	<![CDATA[
+		SELECT 
+		  `id`,
+		  `infoId`,
+		  `memberId`,
+		  `realName`,
+		  `idCard`,
+		  `bankId`,
+		  `depositBankName`,
+		  `subBankName`,
+		  `bankCardNo`,
+		  `provinceId`,
+		  `cityId`,
+		  `areaId`,
+		  `accCardType`,
+		  `status`,
+		  `auditStatus`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  `regtype`,
+		  `updateUserId` 
+		FROM
+		  member_bankcard_info 
+		WHERE 
+		  infoId = :infoId
+			
+	]]>
+	</sql>
+	
+	<sql id="add">
+	<![CDATA[
+		INSERT INTO 
+		  member_bankcard_info 
+		  (`infoId`,
+		  `account`,
+		  `mobile`,
+		  `telephone`,
+		  `memberId`,
+		  `realName`,
+		  `idCard`,
+		  `bankId`,
+		  `depositBankName`,
+		  `subBankName`,
+		  `bankCardNo`,
+		  `provinceId`,
+		  `cityId`,
+		  `areaId`,
+		  `provinceName`,
+		  `cityName`,
+		  `areaName`,
+		  `accCardType`,
+		  `status`,
+		  `auditStatus`,
+		  `createTime`,
+		  `createUserId`,
+		  `updateTime`,
+		  commitTime,
+		  `regtype`,
+		  `updateUserId`) 
+		  VALUES
+		  (
+		  :infoId,
+		  :account,
+		  :mobile,
+		  :telephone,
+		  :memberId,
+		  :realName,
+		  :idCard,
+		  :bankId,
+		  :depositBankName,
+		  :subBankName,
+		  :bankCardNo,
+		  :provinceId,
+		  :cityId,
+		  :areaId,
+		  :provinceName,
+		  :cityName,
+		  :areaName,
+		  :accCardType,
+		  :status,
+		  :auditStatus,
+		  SYSDATE(),
+		  :createUserId,
+		  SYSDATE(),
+		  SYSDATE(),
+		  :regtype,
+		  :updateUserId)
+	]]>
+	</sql>
+	
+	<sql id="update">
+	<![CDATA[
+		UPDATE member_bankcard_info 
+		SET 
+		<#if memberId?exists && memberId!="" > 
+			memberId=:memberId,
+ 		</#if>
+ 		<#if realName?exists && realName!="" > 
+			realName=:realName,
+ 		</#if>
+ 		<#if idCard?exists && idCard!="" > 
+			idCard=:idCard,
+ 		</#if>
+ 		<#if bankId?exists && bankId!="" > 
+			bankId=:bankId,
+ 		</#if>
+ 		<#if depositBankName?exists && depositBankName!="" > 
+			depositBankName=:depositBankName,
+ 		</#if>
+		<#if subBankName?exists && subBankName!="" > 
+			subBankName=:subBankName,
+ 		</#if>
+ 		<#if bankCardNo?exists && bankCardNo!="" > 
+			bankCardNo=:bankCardNo,
+ 		</#if>
+ 		<#if provinceId?exists && provinceId!="" > 
+			provinceId=:provinceId,
+ 		</#if>
+ 		<#if cityId?exists && cityId!="" > 
+			cityId=:cityId,
+ 		</#if>
+ 		<#if areaId?exists && areaId!="" > 
+			areaId=:areaId,
+ 		</#if>
+ 		<#if accCardType?exists && accCardType!="" > 
+			accCardType=:accCardType,
+ 		</#if>
+ 		<#if status?exists && status!="" > 
+			`status`=:status,
+ 		</#if>
+ 		<#if updateUserId?exists && updateUserId!="" > 
+			updateUserId=:updateUserId,
+ 		</#if>
+ 		<#if mobile?exists && mobile!="" > 
+			mobile=:mobile,
+ 		</#if>
+ 		<#if telephone?exists && telephone!="" > 
+			telephone=:telephone,
+ 		</#if>
+ 		<#if provinceName?exists && provinceName!="" > 
+			provinceName=:provinceName,
+ 		</#if>
+ 		<#if cityName?exists && cityName!="" > 
+			cityName=:cityName,
+ 		</#if>
+ 		<#if areaName?exists && areaName!="" > 
+			areaName=:areaName,
+ 		</#if>
+ 		<#if auditStatus?exists && auditStatus!="" > 
+			auditStatus=:auditStatus,
+ 		</#if>
+ 		<#if regtype?exists && regtype!="" > 
+			regtype=:regtype,
+ 		</#if>
+		updateTime=SYSDATE(),
+		commitTime=SYSDATE()
+		WHERE 
+		  infoId = :infoId
+			
+	]]>
+	</sql>
+</sqlMap>

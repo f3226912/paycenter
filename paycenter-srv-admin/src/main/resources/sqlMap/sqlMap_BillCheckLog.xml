@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<sqlMap namespace="BillCheckLog"> 
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,checkSuccessAmt,checkFailNum,checkSuccessNum,createUserId,updateUserId,updateTime,checkFailAmt,
+			createTime,checkTime,payTime,checkNum,checkAmt,payType
+		  FROM bill_check_log
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if checkSuccessAmt?exists && checkSuccessAmt != "" >
+			   AND checkSuccessAmt=:checkSuccessAmt
+			</#if>
+			<#if checkFailNum?exists && checkFailNum != "" >
+			   AND checkFailNum=:checkFailNum
+			</#if>
+			<#if checkSuccessNum?exists && checkSuccessNum != "" >
+			   AND checkSuccessNum=:checkSuccessNum
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if checkFailAmt?exists && checkFailAmt != "" >
+			   AND checkFailAmt=:checkFailAmt
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if checkTime?exists && checkTime != "" >
+			   AND checkTime=:checkTime
+			</#if>
+			<#if payTime?exists && payTime != "" >
+			   AND payTime=:payTime
+			</#if>
+			<#if checkNum?exists && checkNum != "" >
+			   AND checkNum=:checkNum
+			</#if>
+			<#if checkAmt?exists && checkAmt != "" >
+			   AND checkAmt=:checkAmt
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,checkSuccessAmt,checkFailNum,checkSuccessNum,createUserId,updateUserId,updateTime,checkFailAmt,
+			createTime,checkTime,payTime,checkNum,checkAmt,payType
+		  FROM bill_check_log
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if checkSuccessAmt?exists && checkSuccessAmt != "" >
+			   AND checkSuccessAmt=:checkSuccessAmt
+			</#if>
+			<#if checkFailNum?exists && checkFailNum != "" >
+			   AND checkFailNum=:checkFailNum
+			</#if>
+			<#if checkSuccessNum?exists && checkSuccessNum != "" >
+			   AND checkSuccessNum=:checkSuccessNum
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if checkFailAmt?exists && checkFailAmt != "" >
+			   AND checkFailAmt=:checkFailAmt
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if checkTime?exists && checkTime != "" >
+			   AND checkTime=:checkTime
+			</#if>
+			<#if payTime?exists && payTime != "" >
+			   AND payTime=:payTime
+			</#if>
+			<#if checkNum?exists && checkNum != "" >
+			   AND checkNum=:checkNum
+			</#if>
+			<#if checkAmt?exists && checkAmt != "" >
+			   AND checkAmt=:checkAmt
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if startPayTime?exists && startPayTime != "" >
+			   AND payTime>=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime != "" >
+			   AND payTime<=:endPayTime
+			</#if>
+			
+		  	ORDER BY checkTime DESC
+		  
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM bill_check_log
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if checkSuccessAmt?exists && checkSuccessAmt != "" >
+			   AND checkSuccessAmt=:checkSuccessAmt
+			</#if>
+			<#if checkFailNum?exists && checkFailNum != "" >
+			   AND checkFailNum=:checkFailNum
+			</#if>
+			<#if checkSuccessNum?exists && checkSuccessNum != "" >
+			   AND checkSuccessNum=:checkSuccessNum
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if checkFailAmt?exists && checkFailAmt != "" >
+			   AND checkFailAmt=:checkFailAmt
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if checkTime?exists && checkTime != "" >
+			   AND checkTime=:checkTime
+			</#if>
+			<#if payTime?exists && payTime != "" >
+			   AND payTime=:payTime
+			</#if>
+			<#if checkNum?exists && checkNum != "" >
+			   AND checkNum=:checkNum
+			</#if>
+			<#if checkAmt?exists && checkAmt != "" >
+			   AND checkAmt=:checkAmt
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if startPayTime?exists && startPayTime != "" >
+			   AND payTime>=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime != "" >
+			   AND payTime<=:endPayTime
+			</#if>
+	   ]]>
+	</sql>
+</sqlMap>

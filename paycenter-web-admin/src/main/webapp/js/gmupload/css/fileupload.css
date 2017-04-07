@@ -1,0 +1,100 @@
+@CHARSET "utf-8";
+
+*{margin:0;padding:0;font-size:12px;}
+
+/**上传DIV的样式**/
+.uploadDiv{width: 466px;height:500px;display:none;z-index: 9999;background:url(../images/upload_bg.png) no-repeat}
+.uploadTitleBack{width: 454px;height:37px;background:url(../images/upload_tit_bg.png) no-repeat;margin:4px 6px;}
+.uploadTitle{text-align: right;margin:4px;color:#5092cd;}
+.upload_notice{width:466px;float:left;display:none;}
+.titleText{float:left;color:#fff;height:37px;line-height:20px;padding:5px 20px;font-size: 12px;font-weight: bold;}
+.upload_ifr{float: left;width: 466px;height: 383px}
+.close_X{width:20px;height:37px;float:right;padding-right:5px;}
+.closeX{width:9px;height:10px;cursor:pointer;margin-top:10px;background:url(../images/close_x.png) no-repeat}
+.closeText{float:left;width:466px;height:33px;;color:#777777;background:url(../images/close_bo_bg.png) no-repeat;margin-left:6px;}
+.closeText span{float:right;cursor: pointer;padding-right:20px;line-height:36px;font-size: 14px}
+
+/**添加应用 图片列表样式**/
+.imageUploader-queue li {
+  border: solid 1px #e0e0e0;
+  margin: 0 10px 10px 0;
+  width: 108px;
+  height: 108px;
+  position: relative;
+  padding: 0;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  background-color: #fff;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.images-queue{width:466px;}
+.images-queue ul li a:hover{background-color:#ddd;}
+.grid {
+  letter-spacing: -0.31em;
+  *letter-spacing: normal;
+  word-spacing: -0.43em;
+}
+.imageUploader-queue {
+  margin: 0;
+  margin-top: 10px;
+  padding: 0;
+  font-size: 12px;
+}
+.grid .g-u {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  /* IE < 8: fake inline-block */
+
+  letter-spacing: normal;
+  word-spacing: normal;
+  vertical-align: top;
+  _vertical-align: text-bottom;
+}
+.imageUploader-queue .pic-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 120px;
+  opacity: 0.8;
+  background: #fff;
+  z-index: 7;
+  filter: alpha(opacity=80);
+}
+.imageUploader-queue .pic {
+  *overflow: hidden;
+  display: table;
+  text-align: center;
+  table-layout: fixed;
+}
+.imageUploader-queue .pic img {
+  display: none;
+  border: none;
+  vertical-align: middle;
+  max-width: 106px;
+  max-height: 74px;
+  margin: 0;
+  padding: 0;
+}
+.imageUploader-queue .pic a {
+  width: 108px;
+  height: 108px;
+  padding: 1px;
+  display: table-cell;
+  /*非IE、IE8、IE9的主流浏览器识别的垂直居中的方法*/
+  vertical-align: middle;
+  /*text-align: center;*/
+  *display: block;
+  *font-family: Arial;
+  /*防止非utf-8引起的hack失效问题，如gbk编码*/
+  *line-height: 1;
+  /* 避免行高导致垂直居中有误 */
+  *font-size: 105px;
+}
+.closeImgX{background:url(../images/close_x.png) no-repeat;width:15px;height:15px;position:relative;top:6px;left:110px;z-index:999;color:#696969;}
+.closeImgX:hover{cursor:pointer;}

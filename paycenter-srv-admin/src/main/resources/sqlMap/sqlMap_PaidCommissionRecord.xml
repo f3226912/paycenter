@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PaidCommissionRecord">
+	<sql id="queryPaidCommissionRecordList">
+	<![CDATA[
+		SELECT * FROM (
+			SELECT	
+				IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType, 
+				s.memberId,
+				s.orderNo,
+				pt.`orderTime`,
+				pte.marketId,
+				pte.`marketName`,
+				IFNULL(vcd.orderAmt, 0.00) AS totalAmt,
+				IFNULL(SUM(pt.feeAmt), 0.00) AS feeAmt,
+				IFNULL(s.commissionAmt, 0.00) AS commissionAmt,
+				IFNULL(vcd.subsidyAmt, 0.00) AS subsidyAmt,
+				rr.bankTradeNo AS payCenterNumber,
+				rr.payTime,
+				rr.id AS remitRecordId,
+				rr.payStatus,
+				mb.`mobile`,
+				pte.orderType,
+				pt.id,
+				IFNULL(
+				(SELECT 
+				SUM(tradeAmt) 
+				FROM
+				clear_detail 
+				WHERE orderNo = s.orderNo 
+					AND feeType = 100002 
+					AND szType = '2'
+					AND userType = 'nps'), 0.00) AS 'marketCommission',
+				IFNULL(
+				(SELECT 
+				SUM(tradeAmt)
+				FROM
+				clear_detail 
+				WHERE orderNo = s.orderNo 
+				AND feeType = 100005 
+				AND szType = '2'
+				AND userType = 'nps'),
+				0.00
+				) AS 'platformCommission',
+				s.hasChange,
+				IFNULL(rr.bankTradeNo, '-') AS thirdPayNumber,
+				rr.depositBankName,
+				rr.bankCardNo,
+				s.userType,
+				rr.batNo
+			  FROM (
+				SELECT vcdi.`orderNo`,
+					vcdi.`memberId`,
+					vcdi.`tradeAmt` AS commissionAmt,
+					vcdi.`batNo`,vcdi.`hasChange`,
+					vcdi.`refUserType` AS userType 
+				FROM v_clear_detail_item vcdi
+				WHERE  vcdi.`isValid` = '1' AND vcdi.`feeType` = '100002' AND vcdi.`szType` = '1'
+			) s LEFT JOIN pay_trade pt ON s.orderNo = pt.`orderNo`
+			    LEFT JOIN pay_trade_extend pte ON s.orderNo = pte.orderNo 
+			    LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId 
+			    LEFT JOIN v_clear_detail vcd ON s.orderNo = vcd.`orderNo` AND pt.`payeeUserId` = vcd.`memberId`
+			    LEFT JOIN member_baseinfo mb ON mb.`memberId` = s.`memberId`
+			WHERE (s.commissionAmt > 0) and s.userType is not null
+			GROUP BY s.`orderNo`,s.userType
+		) a
+		WHERE 1=1
+		<#if userType?exists && userType!="">
+			AND a.userType=:userType
+		</#if>
+		<#if orderNo?exists && orderNo!="">
+			AND a.orderNo =:orderNo
+		</#if>
+		<#if payStatus?exists && payStatus!="" && payStatus=='0' >
+			AND (a.payStatus=:payStatus OR a.payStatus IS NULL)
+		</#if>
+		<#if payStatus?exists && payStatus!="" && payStatus=='1' >
+			AND a.payStatus=:payStatus
+		</#if>
+		<#if startPayTime?exists && startPayTime!="">
+			AND DATE_FORMAT(a.payTime,'%Y-%m-%d') >=:startPayTime
+		</#if>
+		<#if endPayTime?exists && endPayTime!="">
+			AND DATE_FORMAT(a.payTime,'%Y-%m-%d') <=:endPayTime
+		</#if>
+		<#if startOrderTime?exists && startOrderTime!="">
+			AND DATE_FORMAT(a.orderTime,'%Y-%m-%d') >=:startOrderTime
+		</#if>
+		<#if endOrderTime?exists && endOrderTime!="">
+			AND DATE_FORMAT(a.orderTime,'%Y-%m-%d') <=:endOrderTime
+		</#if>
+		<#if mobile?exists && mobile!="">
+			AND a.mobile =:mobile
+		</#if>
+		<#if memberId?exists && memberId!="">
+			AND a.memberId =:memberId
+		</#if>
+		<#if hasChange?exists && hasChange!="">
+			AND a.hasChange =:hasChange
+		</#if>
+		<#if batNo?exists && batNo!="">
+			AND a.batNo =:batNo
+		</#if>
+		<#if marketId?exists && marketId!="">
+			AND a.marketId =:marketId
+		</#if>
+		ORDER BY a.orderTime DESC
+		<#if startRow?exists && startRow!="" && endRow?exists && endRow!="">
+			LIMIT :startRow,:endRow
+		</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryPaidCommissionRecordListTotal">
+	<![CDATA[
+		select count(1) from (
+			SELECT * FROM (
+				SELECT	
+					IFNULL(CONCAT(rr.payerBankName,CONCAT('(尾号', RIGHT(rr.bankCardNo,4), ')')),'-') as payType, 
+					s.memberId,
+					s.orderNo,
+					pt.`orderTime`,
+					pte.marketId,
+					pte.`marketName`,
+					IFNULL(vcd.orderAmt, 0.00) AS totalAmt,
+					IFNULL(SUM(pt.feeAmt), 0.00) AS feeAmt,
+					IFNULL(s.commissionAmt, 0.00) AS commissionAmt,
+					IFNULL(vcd.subsidyAmt, 0.00) AS subsidyAmt,
+					rr.bankTradeNo AS payCenterNumber,
+					rr.payTime,
+					rr.id AS remitRecordId,
+					rr.payStatus,
+					mb.`mobile`,
+					pte.orderType,
+					pt.id,
+					IFNULL(
+					(SELECT 
+					SUM(tradeAmt) 
+					FROM
+					clear_detail 
+					WHERE orderNo = s.orderNo 
+						AND feeType = 100002 
+						AND szType = '2'
+						AND userType = 'nps'), 0.00) AS 'marketCommission',
+					IFNULL(
+					(SELECT 
+					SUM(tradeAmt)
+					FROM
+					clear_detail 
+					WHERE orderNo = s.orderNo 
+					AND feeType = 100005 
+					AND szType = '2'
+					AND userType = 'nps'),
+					0.00
+					) AS 'platformCommission',
+					s.hasChange,
+					IFNULL(rr.bankTradeNo, '-') AS thirdPayNumber,
+					rr.depositBankName,
+					rr.bankCardNo,
+					s.userType,
+					rr.batNo
+			  FROM (
+				SELECT vcdi.`orderNo`,
+					vcdi.`memberId`,
+					vcdi.`tradeAmt` AS commissionAmt,
+					vcdi.`batNo`,vcdi.`hasChange`,
+					vcdi.`refUserType` AS userType 
+				FROM v_clear_detail_item vcdi
+				WHERE  vcdi.`isValid` = '1' AND vcdi.`feeType` = '100002' AND vcdi.`szType` = '1'
+			) s LEFT JOIN pay_trade pt ON s.orderNo = pt.`orderNo`
+			    LEFT JOIN pay_trade_extend pte ON s.orderNo = pte.orderNo 
+			    LEFT JOIN remit_record rr ON s.batNo = rr.batNo AND s.memberId = rr.memberId 
+			    LEFT JOIN v_clear_detail vcd ON s.orderNo = vcd.`orderNo` AND pt.`payeeUserId` = vcd.`memberId`
+			    LEFT JOIN member_baseinfo mb ON mb.`memberId` = s.`memberId`
+			WHERE (s.commissionAmt > 0) and s.userType is not null
+			GROUP BY s.`orderNo`,s.userType
+			  ) a
+			    WHERE 1=1
+			<#if userType?exists && userType!="">
+				AND a.userType=:userType
+			</#if>
+			<#if orderNo?exists && orderNo!="">
+				AND a.orderNo =:orderNo
+			</#if>
+			<#if payStatus?exists && payStatus!="" && payStatus=='0' >
+				AND (a.payStatus=:payStatus OR a.payStatus IS NULL)
+			</#if>
+			<#if payStatus?exists && payStatus!="" && payStatus=='1' >
+				AND a.payStatus=:payStatus
+			</#if>
+			<#if startPayTime?exists && startPayTime!="">
+				AND DATE_FORMAT(a.payTime,'%Y-%m-%d') >=:startPayTime
+			</#if>
+			<#if endPayTime?exists && endPayTime!="">
+				AND DATE_FORMAT(a.payTime,'%Y-%m-%d') <=:endPayTime
+			</#if>
+			<#if startOrderTime?exists && startOrderTime!="">
+				AND DATE_FORMAT(a.orderTime,'%Y-%m-%d') >=:startOrderTime
+			</#if>
+			<#if endOrderTime?exists && endOrderTime!="">
+				AND DATE_FORMAT(a.orderTime,'%Y-%m-%d') <=:endOrderTime
+			</#if>
+			<#if mobile?exists && mobile!="">
+				AND a.mobile =:mobile
+			</#if>
+			<#if memberId?exists && memberId!="">
+				AND a.memberId =:memberId
+			</#if>
+			<#if hasChange?exists && hasChange!="">
+				AND a.hasChange =:hasChange
+			</#if>
+			<#if batNo?exists && batNo!="">
+				AND a.batNo =:batNo
+			</#if>
+			<#if marketId?exists && marketId!="">
+				AND a.marketId =:marketId
+			</#if>
+		) t
+	]]>
+	</sql>
+</sqlMap>

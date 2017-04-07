@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysUserRole">
+	<!-- 查询条件 -->
+	<sql id="pageWhere">
+	<![CDATA[
+		<#if roleID?exists && roleID!="" >
+			and (sur.roleID=:roleID)
+		</#if>
+		<#if userID?exists && userID!="" >
+			and (sur.userID=:userID)
+		</#if>
+		<#if userName?exists && userName!="" >
+			and exists( select 1 from sysuserrole s where s.userID in 
+				(select s1.userID from sysregisteruser s1 
+					where sur.userID=s1.userID and s1.userName like "%":userName"%") 
+				)
+		</#if>
+	]]>
+	</sql>
+	
+	<!-- 根据角色ID查询用户角色List @author tanjun-->
+    <select id="getUserRoleList">
+	 <![CDATA[  
+		    SELECT 
+				sur.urID,
+				sur.roleID,
+				sur.userID,
+				sur.createUserID,
+				sur.createTime
+			FROM SysUserRole sur where roleID=:roleID
+		 ]]>
+	</select>
+	
+	<!-- 查询所有实体 -->
+	<select id="getAll">
+	     <![CDATA[ 
+			SELECT 
+				sur.urID,
+				sur.roleID,
+				sur.userID,
+				sur.createUserID,
+				sur.createTime,
+				t.attribute,
+				u.userName,u.userCode
+			FROM SysUserRole sur
+			LEFT JOIN sysregisteruser u ON sur.userID=u.userID
+			LEFT JOIN sysrole t 
+    		ON sur.`roleID` = t.`roleID` 
+		 ]]>
+		 <include refid="pageWhere"/>
+    </select>
+    <!-- 查询一个用户实体 -->
+    <select id="get">
+	     <![CDATA[  
+		    SELECT 
+				urID,
+				roleID,
+				userID,
+				createUserID,
+				createTime
+			FROM SysUserRole
+		  where urID=:urID
+		 ]]>
+    </select>
+    
+    <insert id="insert">
+		INSERT INTO SysUserRole
+		(
+			urID,roleID,userID,createUserID,createTime
+		)
+		 VALUES (
+		 	:urID,:roleID,:userID,:createUserID,SYSDATE()
+		)
+	</insert>
+	
+	<update id="update" >
+		UPDATE SysUserRole 
+		SET 
+			roleID=:roleID,
+			userID=:userID
+		WHERE urID=:urID
+	</update>
+	
+	<delete id="delete" >
+		DELETE FROM SysUserRole WHERE urID=:urID
+	</delete>
+	
+	<!-- 删除用户的角色  根据用户编号-->
+	<delete id="deleteByUserID">
+		DELETE FROM SysUserRole WHERE userID=:userID
+	</delete>
+	
+	<!-- 分页查询 -->	
+	<select id="getByCondition">
+		 <![CDATA[  
+			SELECT 
+				sur.urID,
+				sur.roleID,
+				sur.userID,
+				sur.createUserID,
+				sur.createTime,
+				su.userName,sr.roleName 
+			FROM sysuserrole sur 
+			LEFT JOIN sysregisteruser su ON sur.userID=su.userID 
+			LEFT JOIN sysrole sr ON sur.roleID=sr.roleID 
+		 ]]>
+		 <include refid="pageWhere"/>
+		 LIMIT :startRow,:endRow 
+	</select>
+	<!-- 记录总数 -->
+	<select id="getTotal">
+		 <![CDATA[  
+			SELECT count(*) as total FROM SysUserRole sur
+		 ]]>
+		 <include refid="pageWhere"/>
+	</select>
+	
+	<!-- 分配角色用户查询条件 -->
+	<sql id="sysUserWhere">
+		<where>
+				AND sru.deleted!=1
+			<if test="userCode != null">
+				AND sru.userCode like "%":userCode"%"
+			</if>
+			<if test="userName != null">
+				AND sru.userName like "%":userName"%" 
+			</if>
+			<if test="locked != null">
+				AND sru.locked =:locked 
+			</if>
+			<if test="isAuth != null">
+				AND (SELECT COUNT(1) FROM sysuserrole sr WHERE sr.userID=sru.userID AND sr.roleID=:roleID) > 0
+			</if>
+			<if test="orgUnitId != null">
+				and sru.orgUnitId =:orgUnitId 
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 查询所有用户，已分配角色的用户返回已分配角色 -->
+	<select id="getSysUserList">
+		<![CDATA[
+			SELECT
+			  sru.userID,
+			  sru.userCode,
+			  sru.userName,
+			  sru.locked,
+			  sru.type 
+			FROM
+			  sysregisteruser sru 
+			WHERE sru.`userID` IN 
+			  (SELECT 
+			    DISTINCT t.`userID` 
+			  FROM
+			    `sysuserrole` t 
+			  WHERE t.`roleID` =:roleID)
+			<#if userCode?exists && userCode!="" >
+			      AND sru.userCode like "%":userCode"%"
+			</#if>
+			<#if userName?exists && userName!="" >
+			     AND sru.userName like "%":userName"%" 
+			</#if>
+			<#if locked?exists && locked!="" >
+			     AND sru.locked =:locked 
+			</#if>
+			LIMIT :startRow,:endRow 
+		]]>
+	</select>
+	<!-- 查询要分配权限的用户 -->
+	<select id="getSysUserCount" >
+		<![CDATA[
+			SELECT
+			  count(*)
+			FROM
+			  sysregisteruser sru 
+			WHERE sru.`userID` IN 
+			  (SELECT 
+			    DISTINCT t.`userID` 
+			  FROM
+			    `sysuserrole` t 
+			  WHERE t.`roleID` =:roleID)
+			<#if userCode?exists && userCode!="" >
+			      AND sru.userCode like "%":userCode"%"
+			</#if>
+			<#if userName?exists && userName!="" >
+			     AND sru.userName like "%":userName"%" 
+			</#if>
+			<#if locked?exists && locked!="" >
+			     AND sru.locked =:locked 
+			</#if>
+		]]>
+	</select>
+	
+	<!-- 根据角色ID删除用户角色 -->
+	<delete id="deleteByRoleID">
+		DELETE FROM SysUserRole WHERE roleID=:roleID
+	</delete>
+	
+	<!-- 分配角色用户查询条件 -->
+	<sql id="userRoleWhere">
+		<![CDATA[
+			<#if roleName?exists && roleName!="" >
+				AND sr.roleName LIKE "%":roleName"%"
+			</#if>
+			<#if attribute?exists && attribute!="" >
+				AND sr.attribute =:attribute
+			</#if>
+			<!-- 被分配标识 -->
+			<#if isAuth?exists && isAuth!="" >
+				AND (SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:userID) > 0
+			</#if>
+			<!-- 当前登录人ID -->
+			<#if loginUserID?exists && loginUserID!="" >
+				AND (
+					((SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:loginUserID) > 0)
+					OR
+					((SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:userID) > 0)
+				)
+			</#if>
+		]]>
+	</sql>
+	
+	<!-- 查询出用户所有已分配未分配的角色 ，传回已分配角色标识-->
+	<sql id="getUserAllRoleList">
+		<![CDATA[
+			SELECT sr.roleID,sr.roleName,sr.remark,sr.attribute
+			<#if userID?exists && userID!="" >
+				,(SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:userID) AS isAuth
+			</#if>	 
+			<#if loginUserID?exists && loginUserID!="" >
+				,(SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:loginUserID) AS canAssign
+			</#if>	 
+				FROM sysrole sr WHERE 1=1
+				<#if attribute?exists && attribute!="" >
+					AND sr.attribute =:attribute
+				</#if>
+			]]>
+			<include refid="userRoleWhere"></include>
+			<![CDATA[
+			<#if userID?exists && userID!="" >
+				ORDER BY (SELECT COUNT(1) FROM sysuserrole sur WHERE sur.roleID=sr.roleID AND sur.userID=:userID) DESC
+			</#if>
+			<#if userID==""||userID==null >
+				ORDER BY sr.createTime DESC,sr.updateTime DESC
+			</#if>
+			LIMIT :startRow,:endRow
+			]]>
+	</sql>
+	
+	<!-- 查询角色数量 -->
+	<sql id="getUserAllRoleCount" >
+		<![CDATA[
+			SELECT COUNT(1) 
+			FROM sysrole sr WHERE 1=1
+			<#if attribute?exists && attribute!="" >
+				AND sr.attribute =:attribute
+			</#if>
+		]]>
+		<include refid="userRoleWhere"></include>
+	</sql>
+</sqlMap>
+

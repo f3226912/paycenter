@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="AccessSysConfig">
+	<!-- 根据appKey 查询 -->
+	<sql id="queryByAppKey">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			access_sys_config
+		WHERE
+			appKey=:appKey AND  status=1
+			
+	]]>
+	</sql>
+	
+		<!--  查询所有接入系统 -->
+	<sql id="queryAll">
+	<![CDATA[
+		SELECT
+			*
+		FROM
+			access_sys_config
+		WHERE
+			status=1
+			
+	]]>
+	</sql>
+	
+</sqlMap>

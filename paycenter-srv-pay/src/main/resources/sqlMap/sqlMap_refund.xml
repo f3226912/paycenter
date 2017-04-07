@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="Refund">
+	<sql id="queryRefundOrderNo">
+	<![CDATA[
+		select 
+			rr.refundNo,
+			rr.orderNo,
+			rr.refundAmt,
+			rr.status,
+			rr.refundType
+		from pay_trade pt inner JOIN refund_record rr on rr.orderNo = pt.orderNo
+		where date(pt.payTime)= :payTime group by rr.orderNo
+	]]>
+	</sql>
+	
+	<sql id="queryPayTradeList">
+	<![CDATA[
+		select 
+			payTime,
+			orderNo,
+			payerUserId,
+			payeeUserId,
+			logisticsUserId logisUserId,
+			payAmt
+		from pay_trade
+		where orderNo = :orderNo
+	]]>
+	</sql>
+	<sql id="queryRefundItemList">
+	<![CDATA[
+		select 
+			feeType,
+			feeAmt
+		from refund_fee_item_detail
+		where refundNo = :refundNo and clearState = '0'
+	]]>
+	</sql>
+	<sql id="updStatusByRefundNo">
+		update refund_record set
+		status = :status 
+		where refundNo = :refundNo
+	</sql>
+	<sql id="updItemStatusByRefundNo">
+		update refund_fee_item_detail set
+		clearState = :clearState 
+		where refundNo = :refundNo
+	</sql>
+</sqlMap>

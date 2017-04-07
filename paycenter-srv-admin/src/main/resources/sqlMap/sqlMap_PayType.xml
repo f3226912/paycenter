@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="PayType">
+
+	<!--根据条件查询--> 
+	<sql id="queryByCondition"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,bankName,updateUserId,payTypeName,createTime,createUserId,updateTime,gdBankCardNo,
+			bak,hasCheck,image,sign,payType,telephone,mail,contact
+		  FROM pay_type
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payTypeName?exists && payTypeName != "" >
+			   AND payTypeName like  '%' :payTypeName '%'
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if gdBankCardNo?exists && gdBankCardNo != "" >
+			   AND gdBankCardNo=:gdBankCardNo
+			</#if>
+			<#if bak?exists && bak != "" >
+			   AND bak=:bak
+			</#if>
+			<#if hasCheck?exists && hasCheck != "" >
+			   AND hasCheck=:hasCheck
+			</#if>
+			<#if image?exists && image != "" >
+			   AND image=:image
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+	   ]]>
+	</sql>
+
+	<!--根据条件分页查询--> 
+	<sql id="queryByConditionPage"> 
+	   <![CDATA[ 
+		  SELECT 
+			id,bankName,updateUserId,payTypeName,createTime,createUserId,updateTime,gdBankCardNo,
+			bak,hasCheck,image,sign,payType,telephone,mail,contact
+		  FROM pay_type
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payTypeName?exists && payTypeName != "" >
+			   AND payTypeName like  '%' :payTypeName '%'
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if gdBankCardNo?exists && gdBankCardNo != "" >
+			   AND gdBankCardNo=:gdBankCardNo
+			</#if>
+			<#if bak?exists && bak != "" >
+			   AND bak=:bak
+			</#if>
+			<#if hasCheck?exists && hasCheck != "" >
+			   AND hasCheck=:hasCheck
+			</#if>
+			<#if image?exists && image != "" >
+			   AND image=:image
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+		  LIMIT :startRow,:endRow 
+	   ]]>
+	</sql>
+
+	<!--根据条件统计--> 
+	<sql id="countByCondition"> 
+	   <![CDATA[ 
+		  SELECT count(id) 
+		  FROM pay_type
+		  WHERE 1=1 
+			<#if id?exists && id != "" >
+			   AND id=:id
+			</#if>
+			<#if bankName?exists && bankName != "" >
+			   AND bankName=:bankName
+			</#if>
+			<#if updateUserId?exists && updateUserId != "" >
+			   AND updateUserId=:updateUserId
+			</#if>
+			<#if payTypeName?exists && payTypeName != "" >
+			   AND payTypeName like  '%' :payTypeName '%'
+			</#if>
+			<#if createTime?exists && createTime != "" >
+			   AND createTime=:createTime
+			</#if>
+			<#if createUserId?exists && createUserId != "" >
+			   AND createUserId=:createUserId
+			</#if>
+			<#if updateTime?exists && updateTime != "" >
+			   AND updateTime=:updateTime
+			</#if>
+			<#if gdBankCardNo?exists && gdBankCardNo != "" >
+			   AND gdBankCardNo=:gdBankCardNo
+			</#if>
+			<#if bak?exists && bak != "" >
+			   AND bak=:bak
+			</#if>
+			<#if hasCheck?exists && hasCheck != "" >
+			   AND hasCheck=:hasCheck
+			</#if>
+			<#if image?exists && image != "" >
+			   AND image=:image
+			</#if>
+			<#if sign?exists && sign != "" >
+			   AND sign=:sign
+			</#if>
+			<#if payType?exists && payType != "" >
+			   AND payType=:payType
+			</#if>
+			<#if telephone?exists && telephone != "" >
+			   AND telephone=:telephone
+			</#if>
+			<#if mail?exists && mail != "" >
+			   AND mail=:mail
+			</#if>
+			<#if contact?exists && contact != "" >
+			   AND contact=:contact
+			</#if>
+	   ]]>
+	</sql>
+
+	<sql id="queryPayTypeByType">
+	<![CDATA[
+		select id,payType,payTypeName,image,bak,createTime,createUserId,updateTime,updateUserId  
+		from pay_type
+		where 1=1
+		
+ 		<#if payType?exists && payType!="" > 
+ 					and payType = :payType 
+ 		</#if>
+	]]>
+	</sql>
+	
+	<sql id="queryAll">
+	<![CDATA[
+		select id,payType,payTypeName,image,bak,createTime,createUserId,updateTime,updateUserId  
+		from pay_type
+	]]>
+	</sql>
+	
+</sqlMap>

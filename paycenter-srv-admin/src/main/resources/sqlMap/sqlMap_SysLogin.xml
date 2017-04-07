@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="SysLogin">
+     <!-- 查询一个用户实体 -->
+    <select id="getLoginUser">
+	     <![CDATA[
+	       SELECT sru.userID,sru.userCode,sru.userName,sru.userPassWord,sru.mobile,
+					 sru.locked,sru.deleted,sru.pwdErrorTimes,sru.createUserID, 
+					 sru.createTime,sru.updateUserID,sru.updateTime,sru.deletedUserID,sru.deletedTime,
+					 sru.type,sru.orgUnitId,sru.type
+			FROM sysregisteruser sru 
+		    WHERE userCode=:userCode AND IFNULL(deleted,'0')='0'
+	      ]]>
+    </select>
+<!--      CASE  -->
+<!-- 				WHEN sru.type=1 THEN (SELECT ps.`name` FROM purchasecenter ps WHERE ps.id=sru.orgUnitId) -->
+<!-- 				WHEN sru.type=2 THEN (SELECT dc.`name` FROM distribcenter dc WHERE dc.id=sru.orgUnitId) -->
+<!-- 				WHEN sru.type=3 THEN (SELECT s.`name` FROM school s WHERE s.id=sru.orgUnitId AND s.type=0) -->
+<!-- 				WHEN sru.type=4 THEN (SELECT s.`name` FROM school s WHERE s.id=sru.orgUnitId AND s.type=1) -->
+<!-- 				WHEN sru.type=5 THEN (SELECT pb.`name` FROM productbase pb WHERE pb.id=sru.orgUnitId) -->
+<!-- 			 ELSE '后台管理系统' END AS orgUnitName, -->
+<!-- 			 CASE -->
+<!-- 				WHEN sru.type=1 THEN '联采中心' -->
+<!-- 				WHEN sru.type=2 THEN '配送站' -->
+<!-- 				WHEN sru.type=3 THEN '学校' -->
+<!-- 				WHEN sru.type=4 THEN '食堂' -->
+<!-- 				WHEN sru.type=5 THEN '基地' -->
+<!-- 				ELSE '系统' END AS typeName -->
+    
+	<!-- 查询到用户的角色菜单 -->
+	<select id="getSysMenu">
+	 <![CDATA[  
+		SELECT * FROM 
+			(SELECT DISTINCT m.menuID,m.menuID AS id,m.menuCode,m.menuName,m.menuName AS text,m.menuModuleID,m.actionUrl,m.iconCls,
+			m.sort,m.level,m.createUserID,m.createTime,m.updateTime,m.updateUserID ,m.attribute
+		  	 FROM sysuserrole ur
+			 INNER JOIN sysrolemenu rm ON ur.roleID=rm.roleID
+			 INNER JOIN sysmenu m ON rm.menuID=m.menuID
+			 WHERE ur.userID=:userID
+			 )x
+           ORDER  BY x.menuModuleID,x.sort,x.menuCode
+		 ]]>
+	</select>
+	
+	<!-- 查询到用户的角色 -->
+	<select id="getSysRole">
+	 
+	</select>
+	
+	<!-- 查询到用户的菜单button 		INNER JOIN SysRightBtn b ON m.rmID=b.rmID-->
+	<select id="getSysMenuButton">
+	 <![CDATA[
+	    SELECT DISTINCT 
+		  m.btnCode,
+		  m.btnName 
+		FROM
+		  SysMenuButton m 
+		WHERE m.`btnID` IN 
+		  (SELECT 
+		    t.`btnID` 
+		  FROM
+		    `sysrightbtn` t 
+		  WHERE t.`roleID` IN 
+		    (SELECT 
+		      r.roleid 
+		    FROM
+		      SysUserRole r 
+		    WHERE r.`userID` = :userID))
+	]]>
+	</select>
+	
+	<!-- 更新用户错误密码的输入次数 -->
+	<update id="updateUserLogin">
+		UPDATE sysregisteruser 
+		SET locked=:locked,pwdErrorTimes=:pwdErrorTimes,lastErrorTime=SYSDATE()
+		WHERE userID=:userID
+	</update>
+	
+</sqlMap>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="ClearLog">
+	
+	<sql id="queryByParams">
+		<![CDATA[ 
+		select 
+			c.id,
+			c.payType,
+			c.clearTime,
+			c.payTime,
+			c.clearNum,
+			c.clearAmt,
+			c.clearSuccessNum,
+			c.clearSuccessAmt,
+			c.clearFailNum,
+			c.clearFailAmt,
+			c.createTime,
+			c.createUserId,
+			c.updateTime,
+			c.updateUserId
+			from bill_clear_log c 
+			where 1 = 1
+			<#if payType?exists && payType !="">
+				AND c.payType = :payType
+			</#if>
+			<#if payTime?exists && payTime !="">
+				AND c.payTime = :payTime
+			</#if>
+			GROUP BY c.clearTime
+			ORDER BY c.clearTime DESC
+			<#if startRow?exists && startRow!="">
+				LIMIT :startRow , :endRow
+			</#if>
+		]]> 
+	</sql>
+	<sql id="queryCountByParams">
+	<![CDATA[ 
+			SELECT count(*) FROM (
+		SELECT c.id FROM gd_pay.bill_clear_log c 
+		WHERE 1=1
+		<#if payType?exists && payType!="">
+					AND c.payType = :payType
+				</#if>
+				<#if payTime?exists && payTime !="">
+					AND c.payTime = :payTime
+				</#if>
+		GROUP BY c.clearTime
+) AS td
+	]]> 
+	</sql>
+</sqlMap>

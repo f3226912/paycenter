@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<sqlMap namespace="VClearDetail">
+	<sql id="queryByParams">
+		<![CDATA[ 
+		select 
+			v.orderNo,
+			v.userType,
+			v.memberId,
+			v.orderAmt,
+			v.commissionAmt,
+			v.feeAmt,
+			v.subsidyAmt,
+			v.platCommissionAmt,
+			v.penaltyAmt,
+			v.refundAmt
+			from v_clear_detail2 v
+			where 1 = 1
+			<#if orderNo?exists && orderNo!="">
+				AND v.orderNo = :orderNo
+			</#if>
+			<#if memberId?exists && memberId!="">
+				AND v.memberId = :memberId
+			</#if>
+			<#if userType?exists && userType!="">
+				AND v.userType = :userType
+			</#if>
+		]]> 
+	 </sql>
+</sqlMap>

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xmlns:ss="http://www.springframework.org/schema/security"
+	 xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+   	http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+   	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+   	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+	<context:annotation-config />
+
+	<!-- DAL客户端接口实现 -->
+	<!-- 数据源路由配置 -->
+	<bean id="dbRouteConfig" class="cn.gdeng.paycenter.dao.route.support.SimpleParamDatabaseRouteConfig">
+		<!-- 默认数据源 -->
+		<property name="defaultDataSource"  ref="dataSource"/>
+		<!-- 数据源集合 -->
+		<property name="referDataSources">
+			<map>
+				<entry key="gudengBi" value-ref="dataSource" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="dbaClient" class="com.gudeng.framework.dba.client.support.DefaultDbaClient">
+		<!-- 数据源路由配置 -->
+		<property name="databaseRouteConfig" ref="dbRouteConfig"/>
+		<!-- SQL的Xml配置路径 -->
+		<property name="resources" value="classpath*:sqlMap/sqlMap_*.xml" />
+		<!-- 定义默义的数据源。配置了databaseRouteConfig，此参数则无任何意义 -->
+		<!-- <property name="defaultDataSource" ref="dataSource" /> -->
+	</bean>
+
+	<!-- 定义事务管理拦截器 -->
+	<bean id="transactionInterceptor"
+		class="com.gudeng.framework.dba.transaction.advisor.TransactionInterceptor">
+		<!-- 注入DAL客户端接口 -->
+		<property name="dbaClient" ref="dbaClient" />
+	</bean>
+
+	<!-- 定义bean自动代理容器 -->
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="interceptorNames">
+			<list>
+				<!-- 配置拦截器 -->
+				<value>transactionInterceptor</value>
+			</list>
+		</property>
+		<property name="beanNames">
+			<list>
+				<!-- 需要拦截serivce的beanName,支持通配 -->
+				<value>*Service</value>
+			</list>
+		</property>
+		<!-- 根据Target类型动态使用代理技术(proxy与cglib) -->
+		<property name="proxyTargetClass" value="true" />
+		<!-- 暴露代理对象，可以使用AopContext -->
+		<property name="exposeProxy" value="true" />
+	</bean>
+	
+	<!-- 定义事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>
